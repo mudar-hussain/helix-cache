@@ -1,5 +1,6 @@
 package com.mudar.helixcache.service;
 
+import com.mudar.helixcache.config.NodeProperties;
 import com.mudar.helixcache.dto.CacheStats;
 import com.mudar.helixcache.exception.HelixValidationException;
 import com.mudar.helixcache.model.Cache;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CacheService {
     private final CacheStore cacheStore;
+    private final NodeProperties nodeProperties;
 
     public String addCache(String key, String value, Long ttl, LocalDateTime expiresAt) {
         if(expiresAt != null && ttl != null) {
@@ -37,7 +39,7 @@ public class CacheService {
     public String addCache(String key, String value, Timestamp expiresAt) {
         HelixUtils.validateKeyValueExpiresAtForCreate(key, value, expiresAt);
         Timestamp createdAt = HelixUtils.getCurrentTimestamp();
-        return cacheStore.put(key, new Cache(key, value, HelixConstant.DEFAULT_NODE_ID, createdAt, expiresAt));
+        return cacheStore.put(key, new Cache(key, value, nodeProperties.getId(), createdAt, expiresAt));
     }
 
     public Cache getCache(String key) {

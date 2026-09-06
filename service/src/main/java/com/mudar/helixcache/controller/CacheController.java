@@ -1,6 +1,8 @@
 package com.mudar.helixcache.controller;
 
+import com.mudar.helixcache.config.NodeProperties;
 import com.mudar.helixcache.dto.CacheStats;
+import com.mudar.helixcache.dto.NodeInfoResponse;
 import com.mudar.helixcache.model.Cache;
 import com.mudar.helixcache.service.CacheService;
 import lombok.AllArgsConstructor;
@@ -20,6 +22,7 @@ import java.time.LocalDateTime;
 public class CacheController {
 
     private final CacheService cacheService;
+    private final NodeProperties nodeProperties;
 
     @PutMapping("/{key}")
     public ResponseEntity<String> addCache(@PathVariable String key,
@@ -55,6 +58,19 @@ public class CacheController {
     public ResponseEntity<CacheStats> getCacheStats() {
         CacheStats cacheStats = cacheService.getCacheStats();
         return ResponseEntity.ok(cacheStats);
+    }
+
+    @GetMapping("/node")
+    public ResponseEntity<NodeInfoResponse> getNodeInfo() {
+
+        NodeInfoResponse response = new NodeInfoResponse(
+                nodeProperties.getId(),
+                nodeProperties.getHost(),
+                nodeProperties.getPort(),
+                cacheService.size()
+        );
+
+        return ResponseEntity.ok(response);
     }
 
 }
