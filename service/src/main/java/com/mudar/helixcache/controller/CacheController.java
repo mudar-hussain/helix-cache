@@ -1,5 +1,7 @@
 package com.mudar.helixcache.controller;
 
+import com.mudar.helixcache.cluster.ClusterManager;
+import com.mudar.helixcache.cluster.Node;
 import com.mudar.helixcache.config.NodeProperties;
 import com.mudar.helixcache.dto.CacheStats;
 import com.mudar.helixcache.dto.NodeInfoResponse;
@@ -23,6 +25,7 @@ public class CacheController {
 
     private final CacheService cacheService;
     private final NodeProperties nodeProperties;
+    private final ClusterManager clusterManager;
 
     @PutMapping("/{key}")
     public ResponseEntity<String> addCache(@PathVariable String key,
@@ -71,6 +74,15 @@ public class CacheController {
         );
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/route/{key}")
+    public ResponseEntity<Node> routeKey(
+            @PathVariable String key
+    ) {
+        return ResponseEntity.ok(
+                clusterManager.getOwner(key)
+        );
     }
 
 }
