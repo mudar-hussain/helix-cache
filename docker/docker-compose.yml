@@ -1,0 +1,62 @@
+services:
+
+  node-a:
+    build:
+      context: ../service
+    container_name: helix-node-a
+    environment:
+      HELIX_NODE_ID: node-a
+      HELIX_HOST: node-a
+      HELIX_PORT: 8080
+    ports:
+      - "8081:8080"
+    networks:
+      - helix-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  node-b:
+    build:
+      context: ../service
+    container_name: helix-node-b
+    environment:
+      HELIX_NODE_ID: node-b
+      HELIX_HOST: node-b
+      HELIX_PORT: 8080
+    ports:
+      - "8082:8080"
+    networks:
+      - helix-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  node-c:
+    build:
+      context: ../service
+    container_name: helix-node-c
+    environment:
+      HELIX_NODE_ID: node-c
+      HELIX_HOST: node-c
+      HELIX_PORT: 8080
+    ports:
+      - "8083:8080"
+    networks:
+      - helix-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+networks:
+  helix-network:
+    driver: bridge
