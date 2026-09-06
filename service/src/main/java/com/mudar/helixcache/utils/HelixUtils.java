@@ -24,14 +24,6 @@ public class HelixUtils {
         return Timestamp.valueOf(localDateTime);
     }
 
-    public static Timestamp addSecondsToCurrentTimestamp(Long seconds) {
-        return addSeconds(getCurrentTimestamp(), seconds);
-    }
-
-    public static Timestamp addSeconds(Timestamp timestamp, Long seconds) {
-        return new Timestamp(timestamp.getTime() + (seconds * 1000));
-    }
-
     public static boolean isExpired(Timestamp expiresAt) {
         if(expiresAt == null) return false;
         return !isFuture(expiresAt);

@@ -21,11 +21,14 @@ public class ClusterManager {
         clusterProperties.getNodes().forEach(hashRing::addNode);
         hashRing.getVirtualNodes().stream()
                 .limit(10)
-                .forEach(v ->
-                        System.out.println(
-                                v.hash() + " -> " + v.node().id()
-                        )
+                .forEach(v -> {
+                            System.out.println(
+                                    v.hash() + " -> " + v.node().id()
+                            );
+                            System.out.println(v.node().address());
+                        }
                 );
+
     }
 
     public Node getOwner(String key) {
