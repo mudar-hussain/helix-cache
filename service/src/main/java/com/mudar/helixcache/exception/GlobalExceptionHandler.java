@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.RestClientException;
 
 @Slf4j
 @RestControllerAdvice
@@ -25,6 +26,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(e.getMessage());
+    }
+
+    @ExceptionHandler(RestClientException.class)
+    public ResponseEntity<String> handleRestClientException(RestClientException e) {
+        log.error("Inter-node communication failed: {}", e.getMessage(), e);
+        return ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body("A cluster node is unreachable. Please try again.");
     }
 
     @ExceptionHandler(Exception.class)

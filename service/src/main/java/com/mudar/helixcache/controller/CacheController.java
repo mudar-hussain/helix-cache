@@ -7,15 +7,11 @@ import com.mudar.helixcache.dto.CacheStats;
 import com.mudar.helixcache.dto.NodeInfoResponse;
 import com.mudar.helixcache.model.Cache;
 import com.mudar.helixcache.service.CacheService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @RestController
@@ -39,11 +35,6 @@ public class CacheController {
     @GetMapping("/{key}")
     public ResponseEntity<Cache> getCache(@PathVariable String key) {
         Cache cache = cacheService.getCache(key);
-        if (cache == null) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .build();
-        }
         return ResponseEntity.ok(cache);
     }
 
