@@ -15,6 +15,5 @@ public class HelixConstant {
     public static final String ERROR_KEY_NOT_EXIST = "Cache key does not exist";
     public static final String ERROR_VALUE_REQUIRED = "Cache value must not be blank";
     public static final String ERROR_EXPIRY_IN_PAST = "Expiry Time must be in the future";
-    public static final String ERROR_TTL_EXPIRY_BOTH = "Provide either ttl or expiresAt, not both";
     public static final String INTERNAL_SERVER_ERROR = "Something went wrong. Please try again later.";
 }

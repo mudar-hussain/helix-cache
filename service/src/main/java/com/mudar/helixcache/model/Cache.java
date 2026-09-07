@@ -1,5 +1,6 @@
 package com.mudar.helixcache.model;
 
+import com.mudar.helixcache.utils.HelixConstant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,7 @@ public class Cache {
     private Timestamp createdAt;
     private Timestamp expiresAt;
     private Timestamp lastAccessedAt;
-    private long version = 1;
+    private long version = HelixConstant.DEFAULT_CACHE_VERSION;
 
     public Cache(String key, String value, String primaryNode, Timestamp createdAt, Timestamp expiresAt) {
         this.key = key;
