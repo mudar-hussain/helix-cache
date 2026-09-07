@@ -30,10 +30,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RestClientException.class)
     public ResponseEntity<String> handleRestClientException(RestClientException e) {
-        log.error("Inter-node communication failed: {}", e.getMessage(), e);
+        String errorMsg = "Inter-node communication failed: " + e.getMessage();
+        log.error(errorMsg, e);
         return ResponseEntity
                 .status(HttpStatus.SERVICE_UNAVAILABLE)
-                .body("A cluster node is unreachable. Please try again.");
+                .body(errorMsg);
     }
 
     @ExceptionHandler(Exception.class)

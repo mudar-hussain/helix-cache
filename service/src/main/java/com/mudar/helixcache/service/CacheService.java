@@ -1,7 +1,7 @@
 package com.mudar.helixcache.service;
 
 import com.mudar.helixcache.cluster.ClusterManager;
-import com.mudar.helixcache.cluster.Node;
+import com.mudar.helixcache.model.Node;
 import com.mudar.helixcache.dto.CacheStats;
 import com.mudar.helixcache.model.Cache;
 import com.mudar.helixcache.store.CacheStore;

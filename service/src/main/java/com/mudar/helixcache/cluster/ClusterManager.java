@@ -2,6 +2,7 @@ package com.mudar.helixcache.cluster;
 
 import com.mudar.helixcache.config.ClusterProperties;
 import com.mudar.helixcache.config.NodeProperties;
+import com.mudar.helixcache.model.Node;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
