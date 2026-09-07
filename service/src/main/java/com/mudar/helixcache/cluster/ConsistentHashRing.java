@@ -106,4 +106,38 @@ public class ConsistentHashRing {
         }
     }
 
+    public List<Node> getReplicaNodes(String key, int n) {
+        HelixUtils.validateKey(key);
+        lock.readLock().lock();
+        try {
+            if(ring.isEmpty()) {
+                throw new HelixValidationException("No Nodes Available");
+            }
+            List<Node> replicas = new ArrayList<>();
+            Set<String> seen = new LinkedHashSet<>();
+
+            Long hash = hashFunction.hash(key);
+
+            //Start from the ceiling entry, walk the full ring if needed
+            NavigableMap<Long, VirtualNode> tailMap = ring.tailMap(hash, true);
+            for(VirtualNode v: tailMap.values()) {
+                if(seen.add(v.node().id())) {
+                    replicas.add(v.node());
+                }
+                if(replicas.size() == n) return replicas;
+            }
+
+            //Wrap around from the beginning of the ring
+            for(VirtualNode v: ring.values()) {
+                if(seen.add(v.node().id())) {
+                    replicas.add(v.node());
+                }
+                if(replicas.size() == n) return replicas;
+            }
+            return replicas;
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
 }

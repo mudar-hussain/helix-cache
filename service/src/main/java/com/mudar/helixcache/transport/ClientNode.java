@@ -34,7 +34,7 @@ public class ClientNode {
     public Cache getCache(Node node, String key) {
         return restClient
                 .get()
-                .uri("http://" + node.address() + "/internal/cache/{key}" + key)
+                .uri("http://" + node.address() + "/internal/cache/{key}", key)
                 .retrieve()
                 .body(Cache.class);
     }
@@ -42,7 +42,7 @@ public class ClientNode {
     public String deleteCache(Node node, String key) {
         return restClient
                 .delete()
-                .uri("http://" + node.address() + "/internal/cache/{key}" + key)
+                .uri("http://" + node.address() + "/internal/cache/{key}", key)
                 .retrieve()
                 .body(String.class);
     }

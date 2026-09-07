@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Slf4j
 @Component
 @Getter
@@ -34,4 +36,9 @@ public class ClusterManager {
     public Node getOwner(String key) {
         return hashRing.getNode(key);
     }
+
+    public List<Node> getReplicas(String key) {
+        return hashRing.getReplicaNodes(key, clusterProperties.getReplicationFactor());
+    }
+
 }
