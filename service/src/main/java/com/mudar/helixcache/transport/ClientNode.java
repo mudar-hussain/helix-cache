@@ -2,16 +2,20 @@ package com.mudar.helixcache.transport;
 
 import com.mudar.helixcache.cluster.Node;
 import com.mudar.helixcache.model.Cache;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.time.LocalDateTime;
 
 @Component
+@RequiredArgsConstructor
 public class ClientNode {
 
+    private final RestClient restClient;
+
     public String addCache(Node node, String key, String value, LocalDateTime expiresAt) {
-        return RestClient.create()
+        return restClient
                 .put()
                 .uri("http://" + node.address()
                         + "/internal/cache/" + key

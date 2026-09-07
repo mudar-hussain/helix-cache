@@ -49,7 +49,6 @@ public class ConsistentHashRing {
         try {
             Node node = nodeMap.remove(nodeId);
             if(node == null) return;
-            nodeMap.put(node.id(), node);
             for(int i = 0; i<this.virtualNodesPerNode; i++) {
                 String virtualNodeKey = node.id() + "#" + i;
                 Long hash = hashFunction.hash(virtualNodeKey);

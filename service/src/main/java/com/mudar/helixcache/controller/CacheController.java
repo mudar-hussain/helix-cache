@@ -8,6 +8,7 @@ import com.mudar.helixcache.dto.NodeInfoResponse;
 import com.mudar.helixcache.model.Cache;
 import com.mudar.helixcache.service.CacheService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/cache")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CacheController {
 
     private final CacheService cacheService;

@@ -5,10 +5,8 @@ import com.mudar.helixcache.service.CacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.CacheResponse;
 import java.time.LocalDateTime;
 
 @RestController
