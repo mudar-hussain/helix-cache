@@ -37,6 +37,7 @@ public class LocalNode {
     public Cache getCache(String key) {
         validateExistKey(key);
         Cache cache = cacheStore.get(key);
+        if(cache==null) validateExistKey(key);
         if(HelixUtils.isExpired(cache.getExpiresAt())) {
             cacheStore.remove(key);
             throw new HelixValidationException(HelixConstant.ERROR_KEY_EXPIRED);

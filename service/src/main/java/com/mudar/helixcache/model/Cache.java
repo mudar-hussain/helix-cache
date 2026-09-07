@@ -1,7 +1,6 @@
 package com.mudar.helixcache.model;
 
 import com.mudar.helixcache.utils.HelixConstant;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,7 +10,6 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Cache {
     private String key;
     private String value;

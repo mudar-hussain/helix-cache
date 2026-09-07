@@ -20,7 +20,9 @@ public class HelixUtils {
     }
 
     public static Timestamp convertToTimestamp(LocalDateTime localDateTime) {
-        return Timestamp.valueOf(localDateTime);
+        return new Timestamp(
+                localDateTime.atZone(ZoneId.of(HelixConstant.TIMEZONE_UTC)).toInstant().toEpochMilli()
+        );
     }
 
     public static boolean isExpired(Timestamp expiresAt) {
