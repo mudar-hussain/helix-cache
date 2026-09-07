@@ -1,8 +1,10 @@
 package com.mudar.helixcache.transport;
 
-import com.mudar.helixcache.cluster.Node;
+import com.mudar.helixcache.model.Node;
+import com.mudar.helixcache.exception.HelixValidationException;
 import com.mudar.helixcache.model.Cache;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -22,11 +24,19 @@ public class ClientNode {
                     .uri(baseUri + "?value={value}&expiresAt={expiresAt}",
                             key, value, expiresAt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                     .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                        String body = new String(response.getBody().readAllBytes());
+                        throw new HelixValidationException(body);
+                    })
                     .body(String.class);
         } else {
             return restClient.put()
                     .uri(baseUri + "?value={value}", key, value)
                     .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                        String body = new String(response.getBody().readAllBytes());
+                        throw new HelixValidationException(body);
+                    })
                     .body(String.class);
         }
     }
@@ -36,6 +46,10 @@ public class ClientNode {
                 .get()
                 .uri("http://" + node.address() + "/internal/cache/{key}", key)
                 .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                            String body = new String(response.getBody().readAllBytes());
+                            throw new HelixValidationException(body);
+                })
                 .body(Cache.class);
     }
 
@@ -44,6 +58,10 @@ public class ClientNode {
                 .delete()
                 .uri("http://" + node.address() + "/internal/cache/{key}", key)
                 .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                    String body = new String(response.getBody().readAllBytes());
+                    throw new HelixValidationException(body);
+                })
                 .body(String.class);
     }
 }

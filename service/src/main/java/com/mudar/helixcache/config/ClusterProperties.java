@@ -1,6 +1,6 @@
 package com.mudar.helixcache.config;
 
-import com.mudar.helixcache.cluster.Node;
+import com.mudar.helixcache.model.Node;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;

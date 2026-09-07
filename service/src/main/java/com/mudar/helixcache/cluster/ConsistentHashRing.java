@@ -1,6 +1,8 @@
 package com.mudar.helixcache.cluster;
 
 import com.mudar.helixcache.exception.HelixValidationException;
+import com.mudar.helixcache.model.Node;
+import com.mudar.helixcache.model.VirtualNode;
 import com.mudar.helixcache.utils.HelixUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

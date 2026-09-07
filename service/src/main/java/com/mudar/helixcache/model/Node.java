@@ -1,4 +1,4 @@
-package com.mudar.helixcache.cluster;
+package com.mudar.helixcache.model;
 
 public record Node(
         String id,
