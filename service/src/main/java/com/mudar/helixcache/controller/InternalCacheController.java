@@ -21,7 +21,7 @@ public class InternalCacheController {
                                            @RequestParam("value") String value,
                                            @RequestParam(value = "expiresAt", required = false)
                                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime expiresAt) {
-        String msg = cacheService.addCache(key, value, expiresAt);
+        String msg = cacheService.writeCacheLocal(key, value, expiresAt);
         return ResponseEntity.ok(msg);
     }
 
