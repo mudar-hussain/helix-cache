@@ -16,5 +16,6 @@ import java.util.List;
 public class ClusterProperties {
     private int replicationFactor = 3;
     private int writeQuorum = 2;
+    private int readQuorum = 2;
     private List<Node> nodes = new ArrayList<>();
 }

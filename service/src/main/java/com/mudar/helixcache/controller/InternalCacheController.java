@@ -27,14 +27,13 @@ public class InternalCacheController {
 
     @GetMapping("/{key}")
     public ResponseEntity<Cache> getCache(@PathVariable String key) {
-        Cache cache = cacheService.getCache(key);
+        Cache cache = cacheService.readCacheLocal(key);
         return ResponseEntity.ok(cache);
     }
 
     @DeleteMapping("/{key}")
-    public ResponseEntity<String> deleteCache(
-            @PathVariable String key) {
-        String msg = cacheService.deleteCache(key);
+    public ResponseEntity<String> deleteCache(@PathVariable String key) {
+        String msg = cacheService.deleteCacheLocal(key);
         return ResponseEntity.ok(msg);
     }
 }

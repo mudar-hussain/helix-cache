@@ -2,6 +2,7 @@ package com.mudar.helixcache.utils;
 
 
 import com.mudar.helixcache.exception.HelixValidationException;
+import com.mudar.helixcache.model.Cache;
 import lombok.NoArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
 
@@ -51,6 +52,11 @@ public class HelixUtils {
         HelixUtils.validateValue(value);
     }
 
+    public static void validateKeyCache(String key, Cache cache) {
+        validateKey(key);
+        validateCache(cache);
+    }
+
     public static void validateKey(String key) {
         if(Strings.isBlank(key)) {
             throw new HelixValidationException(HelixConstant.ERROR_KEY_REQUIRED);
@@ -60,6 +66,12 @@ public class HelixUtils {
     public static void validateValue(String value) {
         if(Strings.isBlank(value)) {
             throw new HelixValidationException(HelixConstant.ERROR_VALUE_REQUIRED);
+        }
+    }
+
+    public static void validateCache(Cache cache) {
+        if(cache == null) {
+            throw new NullPointerException(HelixConstant.ERROR_CACHE_REQUIRED);
         }
     }
 }

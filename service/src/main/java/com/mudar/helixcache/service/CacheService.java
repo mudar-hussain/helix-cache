@@ -8,6 +8,7 @@ import com.mudar.helixcache.model.Cache;
 import com.mudar.helixcache.store.CacheStore;
 import com.mudar.helixcache.transport.ClientNode;
 import com.mudar.helixcache.transport.LocalNode;
+import com.mudar.helixcache.utils.HelixConstant;
 import com.mudar.helixcache.utils.HelixUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -48,11 +50,11 @@ public class CacheService {
                 log.warn("Replication to {} failed for key '{}': {}", replica.id(), key, e.getMessage());
                 failures.add(replica.id() + ": " + e.getMessage());
             }
-            log.info("Write quorum for key '{}': {}/{} succeeded (required: {})", key, successCount, replicas.size(), writeQuorum);
-            if(successCount<writeQuorum) {
-                throw new HelixValidationException("Write quorum not met: " + successCount + "/" + replicas.size()
-                                                + " replicas acknowledged. Failures: " + failures);
-            }
+        }
+        log.info("Write quorum for key '{}': {}/{} succeeded (required: {})", key, successCount, replicas.size(), writeQuorum);
+        if(successCount<writeQuorum) {
+            throw new HelixValidationException("Write quorum not met: " + successCount + "/" + replicas.size()
+                    + " replicas acknowledged. Failures: " + failures);
         }
         return successMsg;
     }
@@ -63,20 +65,92 @@ public class CacheService {
 
     public Cache getCache(String key) {
         HelixUtils.validateKey(key);
-        Node owner = clusterManager.getOwner(key);
-        if(owner.id().equals(clusterManager.getLocalNode().id())) {
-            return localNode.getCache(key);
+        List<Node> replicas = clusterManager.getReplicas(key);
+        int readQuorum = clusterManager.getClusterProperties().getReadQuorum();
+
+        List<Cache> responses = new ArrayList<>();
+        List<String> failures = new ArrayList<>();
+
+        for(Node replica: replicas) {
+            try {
+                Cache result;
+                if(replica.id().equals(clusterManager.getLocalNode().id())) {
+                    result = localNode.getCache(key);
+                } else {
+                    result = clientNode.getCacheFromReplica(replica, key);
+                }
+                responses.add(result);
+                log.info("Read from replica {}: version={}", replica.id(), result.getVersion());
+            } catch (Exception e) {
+                log.warn("Read from replica {} failed for key '{}': {}", replica.id(), key, e.getMessage());
+                failures.add(replica.id() + ": " + e.getMessage());
+            }
         }
-        return clientNode.getCache(owner, key);
+        if(responses.size() < readQuorum) {
+            if (responses.isEmpty()) {
+                throw new HelixValidationException(
+                        failures.isEmpty() ? "No Replicas Available" : failures.get(0).split(": ", 2)[1]
+                );
+            }
+            throw new HelixValidationException(
+                    "Read quorum not met: only " + responses.size() + "/" + replicas.size()
+                    + " replicas responded (required: " + readQuorum + ")"
+            );
+        }
+
+        return responses.stream()
+                .max(Comparator.comparingLong(Cache::getVersion))
+                .orElseThrow(() -> new HelixValidationException(HelixConstant.ERROR_KEY_NOT_EXIST));
+    }
+
+    public Cache readCacheLocal(String key) {
+        return localNode.getCache(key);
     }
 
     public String deleteCache(String key) {
         HelixUtils.validateKey(key);
-        Node owner = clusterManager.getOwner(key);
-        if(owner.id().equals(clusterManager.getLocalNode().id())) {
-            return localNode.deleteCache(key);
+        List<Node> replicas = clusterManager.getReplicas(key);
+        int writeQuorum = clusterManager.getClusterProperties().getWriteQuorum();
+
+        String successMsg = "Cache entry removed";
+        int successCount = 0;
+        List<String> failures = new ArrayList<>();
+
+        for(Node replica: replicas) {
+            try{
+                String result;
+                if(replica.id().equals(clusterManager.getLocalNode().id())) {
+                    result = localNode.deleteCache(key);
+                } else {
+                    result = clientNode.deleteCacheFromReplica(replica, key);
+                }
+                successCount++;
+                successMsg = result;
+                log.info("Deleted key '{}' from replica {}: {}", key, replica.id(), result);
+            } catch (HelixValidationException e) {
+                // If replica says key doesn't exist, the desired state is achieved - count as success
+                if(HelixConstant.ERROR_KEY_NOT_EXIST.equals(e.getMessage())) {
+                    successCount++;
+                    log.info("Key '{}' already absent on replicas {} - counting on success", key, replica.id());
+                } else {
+                    log.warn("Deletion from replica {} failed for key '{}': {}", replica.id(), key, e.getMessage());
+                    failures.add(replica.id() + ": " + e.getMessage());
+                }
+            } catch (Exception e) {
+                log.warn("Deletion from replica {} failed for key '{}': {}", replica.id(), key, e.getMessage());
+                failures.add(replica.id() + ": " + e.getMessage());
+            }
         }
-        return clientNode.deleteCache(owner, key);
+        log.info("Delete quorum for key '{}': {}/{} succeeded (required: {})", key, successCount, replicas.size(), writeQuorum);
+        if(successCount < writeQuorum) {
+            throw new HelixValidationException("Delete quorum not met: " + successCount + "/" + replicas.size()
+                    + " replicas acknowledged. Failures: " + failures);
+        }
+        return successMsg;
+    }
+
+    public String deleteCacheLocal(String key) {
+        return localNode.deleteCache(key);
     }
 
     public int size() {

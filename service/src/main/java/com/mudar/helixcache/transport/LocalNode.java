@@ -31,7 +31,7 @@ public class LocalNode {
     public String addCache(String key, String value, Timestamp expiresAt) {
         HelixUtils.validateKeyValueExpiresAtForCreate(key, value, expiresAt);
         Timestamp createdAt = HelixUtils.getCurrentTimestamp();
-        return cacheStore.put(key, new Cache(key, value, nodeProperties.getId(), createdAt, expiresAt));
+        return cacheStore.put(key, new Cache(key, value, nodeProperties.getId(), createdAt, expiresAt, cacheStore.getNodeVersion(key) + 1));
     }
 
     public Cache getCache(String key) {
