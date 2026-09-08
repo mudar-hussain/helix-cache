@@ -31,14 +31,14 @@ public class CacheService {
     public String addCache(String key, String value, LocalDateTime expiresAt) {
         HelixUtils.validateKey(key);
         List<Node> replicas = clusterManager.getReplicas(key);
-        int writeQuorum = clusterManager.getClusterProperties().getWriteQuorum();
+        int writeQuorum = clusterManager.getWriteQuorum();
         String successMsg = "Cache entry written";
         int successCount = 0;
         List<String> failures = new ArrayList<>();
         for(Node replica: replicas) {
             try{
                 String result;
-                if(replica.id().equals(clusterManager.getLocalNode().id())) {
+                if(replica.id().equals(clusterManager.getLocalNodeId())) {
                     result = localNode.addCacheWithLocalDateTime(key, value, expiresAt);
                 } else {
                     result = clientNode.replicateCache(replica, key, value, expiresAt);
@@ -66,7 +66,7 @@ public class CacheService {
     public Cache getCache(String key) {
         HelixUtils.validateKey(key);
         List<Node> replicas = clusterManager.getReplicas(key);
-        int readQuorum = clusterManager.getClusterProperties().getReadQuorum();
+        int readQuorum = clusterManager.getReadQuorum();
 
         List<Cache> responses = new ArrayList<>();
         List<String> failures = new ArrayList<>();
@@ -74,7 +74,7 @@ public class CacheService {
         for(Node replica: replicas) {
             try {
                 Cache result;
-                if(replica.id().equals(clusterManager.getLocalNode().id())) {
+                if(replica.id().equals(clusterManager.getLocalNodeId())) {
                     result = localNode.getCache(key);
                 } else {
                     result = clientNode.getCacheFromReplica(replica, key);
@@ -110,7 +110,7 @@ public class CacheService {
     public String deleteCache(String key) {
         HelixUtils.validateKey(key);
         List<Node> replicas = clusterManager.getReplicas(key);
-        int writeQuorum = clusterManager.getClusterProperties().getWriteQuorum();
+        int writeQuorum = clusterManager.getWriteQuorum();
 
         String successMsg = "Cache entry removed";
         int successCount = 0;
@@ -119,7 +119,7 @@ public class CacheService {
         for(Node replica: replicas) {
             try{
                 String result;
-                if(replica.id().equals(clusterManager.getLocalNode().id())) {
+                if(replica.id().equals(clusterManager.getLocalNodeId())) {
                     result = localNode.deleteCache(key);
                 } else {
                     result = clientNode.deleteCacheFromReplica(replica, key);

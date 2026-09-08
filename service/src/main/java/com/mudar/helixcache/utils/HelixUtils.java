@@ -36,12 +36,12 @@ public class HelixUtils {
         return getCurrentTimestamp().before(timestamp);
     }
 
-    public static void validateKeyValueExpiresAtForCreate(String key, String value, Timestamp expiresAt) {
-        HelixUtils.validateExpiresAtForCreate(expiresAt);
+    public static void validateKeyValueExpiresAt(String key, String value, Timestamp expiresAt) {
+        HelixUtils.validateExpiresAt(expiresAt);
         HelixUtils.validateKeyValue(key, value);
     }
 
-    public static void validateExpiresAtForCreate(Timestamp expiresAt) {
+    public static void validateExpiresAt(Timestamp expiresAt) {
         if(HelixUtils.isExpired(expiresAt)) {
             throw new HelixValidationException(HelixConstant.ERROR_EXPIRY_IN_PAST);
         }

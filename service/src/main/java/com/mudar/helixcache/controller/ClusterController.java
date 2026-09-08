@@ -1,11 +1,13 @@
 package com.mudar.helixcache.controller;
 
 import com.mudar.helixcache.cluster.ClusterManager;
+import com.mudar.helixcache.enums.NodeStatus;
 import com.mudar.helixcache.model.Node;
 import com.mudar.helixcache.config.NodeProperties;
 import com.mudar.helixcache.dto.CacheStats;
 import com.mudar.helixcache.dto.NodeInfoResponse;
 import com.mudar.helixcache.service.CacheService;
+import com.mudar.helixcache.utils.HelixUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -54,5 +57,15 @@ public class ClusterController {
     @GetMapping("/replicas/{key}")
     public ResponseEntity<List<Node>> getReplicas(@PathVariable String key) {
         return ResponseEntity.ok(clusterManager.getReplicas(key));
+    }
+
+    @GetMapping("/ping")
+    public ResponseEntity<Map<String, String>> ping() {
+        return ResponseEntity.ok(
+                Map.of(
+                        "nodeId", clusterManager.getLocalNodeId(),
+                        "status", NodeStatus.UP.name(),
+                        "timestamp", HelixUtils.getCurrentTimestamp().toString()
+                ));
     }
 }
