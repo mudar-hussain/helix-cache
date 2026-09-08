@@ -14,6 +14,7 @@ import java.util.List;
 @Component
 @ConfigurationProperties(prefix = "helix.cluster")
 public class ClusterProperties {
-    private int replicationFactor;
+    private int replicationFactor = 3;
+    private int writeQuorum = 2;
     private List<Node> nodes = new ArrayList<>();
 }

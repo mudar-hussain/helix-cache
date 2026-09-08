@@ -17,7 +17,7 @@ public class ClientNode {
 
     private final RestClient restClient;
 
-    public String addCache(Node node, String key, String value, LocalDateTime expiresAt) {
+    public String replicateCache(Node node, String key, String value, LocalDateTime expiresAt) {
         String baseUri = "http://" + node.address() + "/internal/cache/{key}";
         if(expiresAt != null) {
             return restClient.put()
