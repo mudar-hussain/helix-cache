@@ -1,14 +1,15 @@
 package com.mudar.helixcache.controller;
 
 import com.mudar.helixcache.cluster.ClusterManager;
+import com.mudar.helixcache.cluster.NodeStateManager;
 import com.mudar.helixcache.enums.NodeStatus;
 import com.mudar.helixcache.model.Node;
-import com.mudar.helixcache.config.NodeProperties;
 import com.mudar.helixcache.dto.CacheStats;
 import com.mudar.helixcache.dto.NodeInfoResponse;
 import com.mudar.helixcache.service.CacheService;
 import com.mudar.helixcache.utils.HelixUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,8 +24,8 @@ import java.util.Map;
 @RequestMapping("/cluster")
 public class ClusterController {
     private final CacheService cacheService;
-    private final NodeProperties nodeProperties;
     private final ClusterManager clusterManager;
+    private final NodeStateManager nodeStateManager;
 
     @GetMapping("/stats")
     public ResponseEntity<CacheStats> getCacheStats() {
@@ -34,11 +35,11 @@ public class ClusterController {
 
     @GetMapping("/node")
     public ResponseEntity<NodeInfoResponse> getNodeInfo() {
-
+        Node localNode = clusterManager.getLocalNode();
         NodeInfoResponse response = new NodeInfoResponse(
-                nodeProperties.getId(),
-                nodeProperties.getHost(),
-                nodeProperties.getPort(),
+                localNode.id(),
+                localNode.host(),
+                localNode.port(),
                 cacheService.size()
         );
 
@@ -61,6 +62,22 @@ public class ClusterController {
 
     @GetMapping("/ping")
     public ResponseEntity<Map<String, String>> ping() {
+        if(nodeStateManager.isPaused()) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body(Map.of(
+                            "nodeId", clusterManager.getLocalNode().id(),
+                            "status", NodeStatus.DOWN.name(),
+                            "reason", "Node is paused (simulated failure)"
+                    ));
+        }
+        long delayMs = nodeStateManager.getSlowDelayMs();
+        if(delayMs > 0) {
+            try {
+                Thread.sleep(delayMs);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
         return ResponseEntity.ok(
                 Map.of(
                         "nodeId", clusterManager.getLocalNodeId(),

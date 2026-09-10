@@ -2,10 +2,12 @@ package com.mudar.helixcache.service;
 
 import com.mudar.helixcache.cluster.NodeHealthTracker;
 import com.mudar.helixcache.enums.NodeStatus;
+import com.mudar.helixcache.exception.HelixValidationException;
 import com.mudar.helixcache.model.Node;
 import com.mudar.helixcache.model.NodeHealth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -14,7 +16,7 @@ import org.springframework.web.client.RestClient;
 @RequiredArgsConstructor
 public class NodeHealthService {
 
-    private NodeHealthTracker nodeHealthTracker;
+    private final NodeHealthTracker nodeHealthTracker;
     private final RestClient restClient;
 
     public void addNode(Node node) {
@@ -26,6 +28,9 @@ public class NodeHealthService {
                 .get()
                 .uri("http://" + nodeAddress + "/cluster/ping")
                 .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
+                    throw new HelixValidationException("Node returned" + response.getStatusCode());
+                }))
                 .body(String.class);
     }
 

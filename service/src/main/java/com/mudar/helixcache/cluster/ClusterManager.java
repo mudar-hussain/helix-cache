@@ -20,7 +20,7 @@ public class ClusterManager {
     private final ClusterProperties clusterProperties;
     private final NodeHealthService nodeHealthService;
     private final ConsistentHashRing hashRing = new ConsistentHashRing();
-    private Node localNode;
+    private Node localNode = null;
 
     @PostConstruct
     private void initialize() {
@@ -74,6 +74,10 @@ public class ClusterManager {
 
     public String getLocalNodeId() {
         return localNode.id();
+    }
+
+    public Node getLocalNode() {
+        return localNode;
     }
 
 }
