@@ -3,12 +3,14 @@ package com.mudar.helixcache.cluster;
 import com.mudar.helixcache.config.ClusterProperties;
 import com.mudar.helixcache.config.NodeProperties;
 import com.mudar.helixcache.model.Node;
+import com.mudar.helixcache.model.VirtualNode;
 import com.mudar.helixcache.service.NodeHealthService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -78,6 +80,14 @@ public class ClusterManager {
 
     public Node getLocalNode() {
         return localNode;
+    }
+
+    public List<VirtualNode> getRingNodes() {
+        return hashRing.getVirtualNodes();
+    }
+
+    public Collection<Node> getActiveNodes() {
+        return hashRing.getNodes();
     }
 
 }

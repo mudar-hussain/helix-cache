@@ -1,6 +1,8 @@
 package com.mudar.helixcache.service;
 
 import com.mudar.helixcache.cluster.NodeHealthTracker;
+import com.mudar.helixcache.dto.CacheStats;
+import com.mudar.helixcache.dto.NodeInfoResponse;
 import com.mudar.helixcache.enums.NodeStatus;
 import com.mudar.helixcache.exception.HelixValidationException;
 import com.mudar.helixcache.model.Node;
@@ -59,7 +61,39 @@ public class NodeHealthService {
 
     public boolean isDown(String nodeId) {
         return nodeHealthTracker.isDown(nodeId);
+    }
 
+    public NodeStatus getNodeStatus(String nodeId) {
+        return nodeHealthTracker.getStatus(nodeId);
+    }
 
+    public NodeHealth getNodeHealth(String nodeId) {
+        return nodeHealthTracker.getNodeHealth(nodeId);
+    }
+
+    public int getRemoteKeyCount2(Node node) {
+        try {
+            NodeInfoResponse nodeInfo = restClient.get()
+                    .uri("http://" + node.address() + "/cluster/ping")
+                    .retrieve()
+                    .body(NodeInfoResponse.class);
+            return nodeInfo != null ? nodeInfo.cacheSize() : 0;
+        } catch (Exception e) {
+            log.warn("Could not fetch key count from node {}: {}", node.id(), e.getMessage());
+            return -1; //signals "unreachable"
+        }
+    }
+
+    public int getRemoteKeyCount(Node node) {
+        try {
+            CacheStats cacheStats = restClient.get()
+                    .uri("http://" + node.address() + "/cluster/stats")
+                    .retrieve()
+                    .body(CacheStats.class);
+            return cacheStats != null ? cacheStats.size() : 0;
+        } catch (Exception e) {
+            log.warn("Could not fetch key count from node {}: {}", node.id(), e.getMessage());
+            return -1; //signals "unreachable"
+        }
     }
 }
