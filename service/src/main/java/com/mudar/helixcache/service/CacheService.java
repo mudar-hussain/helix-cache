@@ -1,11 +1,13 @@
 package com.mudar.helixcache.service;
 
 import com.mudar.helixcache.cluster.ClusterManager;
-import com.mudar.helixcache.exception.HelixValidationException;
-import com.mudar.helixcache.model.Node;
 import com.mudar.helixcache.dto.CacheStats;
+import com.mudar.helixcache.dto.Hint;
+import com.mudar.helixcache.exception.HelixValidationException;
 import com.mudar.helixcache.model.Cache;
+import com.mudar.helixcache.model.Node;
 import com.mudar.helixcache.store.CacheStore;
+import com.mudar.helixcache.store.HintedHandOffStore;
 import com.mudar.helixcache.transport.ClientNode;
 import com.mudar.helixcache.transport.LocalNode;
 import com.mudar.helixcache.utils.HelixConstant;
@@ -27,6 +29,7 @@ public class CacheService {
     private final ClientNode clientNode;
     private final LocalNode localNode;
     private final ClusterManager clusterManager;
+    private final HintedHandOffStore hintedHandOffStore;
 
     public String addCache(String key, String value, LocalDateTime expiresAt) {
         HelixUtils.validateKey(key);
@@ -47,8 +50,9 @@ public class CacheService {
                 successMsg = result;
                 log.info("Cache written to replica {}: {}", replica.id(), result);
             } catch (Exception e) {
-                log.warn("Replication to {} failed for key '{}': {}", replica.id(), key, e.getMessage());
+                log.warn("Replication to {} failed for key '{}': {} - storing hint", replica.id(), key, e.getMessage());
                 failures.add(replica.id() + ": " + e.getMessage());
+                hintedHandOffStore.add(new Hint(key, value, expiresAt, replica.id(), replica.address(), HelixUtils.getCurrentTimestamp().toLocalDateTime()));
             }
         }
         log.info("Write quorum for key '{}': {}/{} succeeded (required: {})", key, successCount, replicas.size(), writeQuorum);
