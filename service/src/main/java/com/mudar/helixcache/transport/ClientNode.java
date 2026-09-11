@@ -4,12 +4,14 @@ import com.mudar.helixcache.exception.HelixValidationException;
 import com.mudar.helixcache.model.Cache;
 import com.mudar.helixcache.model.Node;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -63,5 +65,17 @@ public class ClientNode {
                     throw new HelixValidationException(body);
                 })
                 .body(String.class);
+    }
+
+    public List<Cache> fetchCacheListForNode(Node node, String targetNodeId) {
+        return restClient
+                .get()
+                .uri("http://" + node.address() + "/internal/cache/sync?targetNodeId={targetNodeId}", targetNodeId)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
+                    String body = new String(response.getBody().readAllBytes());
+                    throw new HelixValidationException(body);
+                }))
+                .body(new ParameterizedTypeReference<List<Cache>>() {});
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -43,5 +44,10 @@ public class InternalCacheController {
     @GetMapping("/hints")
     public ResponseEntity<Map<String, Integer>> getHintQueueDepth() {
         return ResponseEntity.ok(hintedHandOffStore.getQueueDepths());
+    }
+
+    @GetMapping("/sync")
+    public ResponseEntity<List<Cache>> getCacheListForNode(@RequestParam String targetNodeId) {
+        return ResponseEntity.ok(cacheService.getCacheListForNode(targetNodeId));
     }
 }

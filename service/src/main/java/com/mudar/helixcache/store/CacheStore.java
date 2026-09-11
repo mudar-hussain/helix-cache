@@ -5,6 +5,8 @@ import com.mudar.helixcache.utils.HelixConstant;
 import com.mudar.helixcache.utils.HelixUtils;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -46,6 +48,10 @@ public class CacheStore {
 
     public int size() {
         return cacheMap.size();
+    }
+
+    public Collection<Cache> getAll() {
+        return Collections.unmodifiableCollection(cacheMap.values());
     }
 
 }

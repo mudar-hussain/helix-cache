@@ -3,6 +3,7 @@ package com.mudar.helixcache.Scheduler;
 import com.mudar.helixcache.cluster.ClusterManager;
 import com.mudar.helixcache.model.Node;
 import com.mudar.helixcache.service.NodeHealthService;
+import com.mudar.helixcache.service.SyncService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,6 +17,7 @@ import java.util.List;
 public class HeartBeatScheduler {
     private final ClusterManager clusterManager;
     private final NodeHealthService nodeHealthService;
+    private final SyncService syncService;
 
     @Scheduled(fixedDelay = 5000)
     public void sendHeartBeats() {
@@ -31,7 +33,9 @@ public class HeartBeatScheduler {
                 //If node was Down and is now responding, add it back to the ring
                 if (!clusterManager.containsNode(peer.id())) {
                     log.info("Node {} recovered: adding back to ring", peer.id());
+                    syncService.syncToRecoveredNode(peer);
                     clusterManager.addNode(peer);
+                    log.info("Node {} re-added to ring after sync", peer.id());
                 }
             } catch (Exception e) {
                 nodeHealthService.recordMiss(peer.id());

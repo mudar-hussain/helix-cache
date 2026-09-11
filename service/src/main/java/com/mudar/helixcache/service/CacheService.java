@@ -165,4 +165,12 @@ public class CacheService {
         return new CacheStats(size());
     }
 
+    public List<Cache> getCacheListForNode(String targetNodeId) {
+        return cacheStore.getAll().stream()
+                .filter(cache -> clusterManager.getReplicas(cache.getKey())
+                        .stream()
+                        .anyMatch(node -> node.id().equals(targetNodeId)))
+                .toList();
+    }
+
 }
