@@ -1,7 +1,6 @@
 package com.mudar.helixcache.transport;
 
 import com.mudar.helixcache.config.NodeProperties;
-import com.mudar.helixcache.dto.CacheStats;
 import com.mudar.helixcache.exception.HelixValidationException;
 import com.mudar.helixcache.model.Cache;
 import com.mudar.helixcache.store.CacheStore;
@@ -47,12 +46,15 @@ public class LocalNode {
         validateExistKey(key);
         Cache cache = cacheStore.get(key);
         if(cache==null) {
+            cacheStore.recordMiss();
             throw new HelixValidationException(HelixConstant.ERROR_KEY_NOT_EXIST);
         }
         if(HelixUtils.isExpired(cache.getExpiresAt())) {
             cacheStore.remove(key);
+            cacheStore.recordMiss();
             throw new HelixValidationException(HelixConstant.ERROR_KEY_EXPIRED);
         }
+        cacheStore.recordHit();
         cache.setLastAccessedAt(HelixUtils.getCurrentTimestamp());
         return cache;
     }
@@ -65,10 +67,6 @@ public class LocalNode {
 
     public int size() {
         return cacheStore.size();
-    }
-
-    public CacheStats getCacheStats() {
-        return new CacheStats(size());
     }
 
     public void validateExistKey(String key) {

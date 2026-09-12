@@ -1,11 +1,14 @@
 package com.mudar.helixcache.service;
 
+import com.mudar.helixcache.cluster.ClusterEventPublisher;
 import com.mudar.helixcache.cluster.ClusterManager;
 import com.mudar.helixcache.dto.CacheStats;
 import com.mudar.helixcache.dto.Hint;
+import com.mudar.helixcache.enums.ClusterEventType;
 import com.mudar.helixcache.exception.HelixValidationException;
 import com.mudar.helixcache.model.Cache;
 import com.mudar.helixcache.model.Node;
+import com.mudar.helixcache.store.AccessTracker;
 import com.mudar.helixcache.store.CacheStore;
 import com.mudar.helixcache.store.HintedHandOffStore;
 import com.mudar.helixcache.transport.ClientNode;
@@ -30,6 +33,8 @@ public class CacheService {
     private final LocalNode localNode;
     private final ClusterManager clusterManager;
     private final HintedHandOffStore hintedHandOffStore;
+    private final ClusterEventPublisher clusterEventPublisher;
+    private final AccessTracker accessTracker;
 
     public String addCache(String key, String value, LocalDateTime expiresAt) {
         HelixUtils.validateKey(key);
@@ -48,18 +53,27 @@ public class CacheService {
                     result = clientNode.replicateCache(replica, key, value, expiresAt);
                 }
                 successCount++;
+                accessTracker.record(key);
+                clusterEventPublisher.publish(ClusterEventType.REPLICA_WRITE, replica.id(), key,
+                        "Key replicated to " + replica.id(), "INFO");
                 successMsg = result;
                 log.info("Cache written to replica {}: {}", replica.id(), result);
             } catch (Exception e) {
                 log.warn("Replication to {} failed for key '{}': {} - storing hint", replica.id(), key, e.getMessage());
                 failures.add(replica.id() + ": " + e.getMessage());
                 pendingHints.add(new Hint(key, value, expiresAt, replica.id(), replica.address(), HelixUtils.getCurrentTimestamp().toLocalDateTime()));
+                clusterEventPublisher.publish(ClusterEventType.REPLICA_FAILED, replica.id(), key,
+                        "Key replication failed: " + e.getMessage(), "WARN");
             }
         }
         log.info("Write quorum for key '{}': {}/{} succeeded (required: {})", key, successCount, replicas.size(), writeQuorum);
         if(successCount>=writeQuorum) {
             pendingHints.forEach(hintedHandOffStore::add);
+            clusterEventPublisher.publish(ClusterEventType.QUORUM_SUCCESS, clusterManager.getLocalNodeId(), key,
+                    "Write quorum met: " + successCount + "/" + replicas.size(), "INFO");
         } else {
+            clusterEventPublisher.publish(ClusterEventType.QUORUM_FAILED, clusterManager.getLocalNodeId(), key,
+                    "Write quorum not met: " + successCount + "/" + replicas.size(), "ERROR");
             throw new HelixValidationException("Write quorum not met: " + successCount + "/" + replicas.size()
                     + " replicas acknowledged. Failures: " + failures);
         }
@@ -87,6 +101,7 @@ public class CacheService {
                     result = clientNode.getCacheFromReplica(replica, key);
                 }
                 responses.add(result);
+                accessTracker.record(key);
                 log.info("Read from replica {}: version={}", replica.id(), result.getVersion());
             } catch (Exception e) {
                 log.warn("Read from replica {} failed for key '{}': {}", replica.id(), key, e.getMessage());
@@ -165,7 +180,12 @@ public class CacheService {
     }
 
     public CacheStats getCacheStats() {
-        return new CacheStats(size());
+        return new CacheStats(
+                cacheStore.size(),
+                cacheStore.getHitCount(),
+                cacheStore.getMissCount(),
+                cacheStore.getHitRatio()
+        );
     }
 
     public List<Cache> getCacheListForNode(String targetNodeId) {

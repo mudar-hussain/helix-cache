@@ -1,6 +1,8 @@
 package com.mudar.helixcache.service;
 
+import com.mudar.helixcache.cluster.ClusterEventPublisher;
 import com.mudar.helixcache.cluster.ClusterManager;
+import com.mudar.helixcache.enums.ClusterEventType;
 import com.mudar.helixcache.model.Cache;
 import com.mudar.helixcache.model.Node;
 import com.mudar.helixcache.transport.ClientNode;
@@ -17,9 +19,11 @@ public class SyncService {
     private final ClusterManager clusterManager;
     private final ClientNode clientNode;
     private final CacheService cacheService;
+    private final ClusterEventPublisher clusterEventPublisher;
 
     public void syncToRecoveredNode(Node recoveredNode) {
         log.info("Starting anti-entropy sync for recovered node {}", recoveredNode.id());
+        clusterEventPublisher.publish(ClusterEventType.SYNC_STARTED, recoveredNode.id(), "Anti-entropy sync started", "INFO");
 
         String localNodeId = clusterManager.getLocalNodeId();
 
@@ -51,5 +55,6 @@ public class SyncService {
             }
         }
         log.info("Anti-entropy sync complete for node {}", recoveredNode.id());
+        clusterEventPublisher.publish(ClusterEventType.SYNC_COMPLETE, recoveredNode.id(), "Anti-entropy sync complete", "INFO");
     }
 }
