@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class CacheStore {
@@ -16,6 +17,19 @@ public class CacheStore {
     //ConcurrentMap uses lock striping or bucket-level locks, allowing multiple threads to read/write concurrently.
     //Iteration does not throw ConcurrentModificationException.
     private final ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<>();
+    private final AtomicLong hitCount = new AtomicLong(0);
+    private final AtomicLong missCount = new AtomicLong(0);
+
+    public void recordHit() { hitCount.incrementAndGet(); }
+    public void recordMiss() { hitCount.decrementAndGet(); }
+    public long getHitCount() { return hitCount.get(); }
+    public long getMissCount() { return missCount.get(); }
+    public double getHitRatio() {
+        long total = hitCount.get() + missCount.get();
+        return total == 0 ? 0.0 : (double) hitCount.get() / total;
+    }
+
+
 
     public String put(String key, Cache cache) {
         HelixUtils.validateKeyCache(key, cache);

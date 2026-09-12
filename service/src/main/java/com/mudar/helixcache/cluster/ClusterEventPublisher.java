@@ -1,4 +1,4 @@
-package com.mudar.helixcache.service;
+package com.mudar.helixcache.cluster;
 
 import com.mudar.helixcache.enums.ClusterEventType;
 import com.mudar.helixcache.model.ClusterEvent;

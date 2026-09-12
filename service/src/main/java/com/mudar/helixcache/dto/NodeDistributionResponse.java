@@ -1,4 +1,7 @@
 package com.mudar.helixcache.dto;
 
-public class NodeDistributionResponse {
-}
+public record NodeDistributionResponse (
+        String nodeId,
+        int keyCount,
+        double percentage
+) { }

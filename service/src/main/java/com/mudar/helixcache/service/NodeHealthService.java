@@ -1,8 +1,10 @@
 package com.mudar.helixcache.service;
 
+import com.mudar.helixcache.cluster.ClusterEventPublisher;
 import com.mudar.helixcache.cluster.NodeHealthTracker;
 import com.mudar.helixcache.dto.CacheStats;
 import com.mudar.helixcache.dto.NodeInfoResponse;
+import com.mudar.helixcache.enums.ClusterEventType;
 import com.mudar.helixcache.enums.NodeStatus;
 import com.mudar.helixcache.exception.HelixValidationException;
 import com.mudar.helixcache.model.Node;
@@ -20,6 +22,7 @@ public class NodeHealthService {
 
     private final NodeHealthTracker nodeHealthTracker;
     private final RestClient restClient;
+    private final ClusterEventPublisher clusterEventPublisher;
 
     public void addNode(Node node) {
         nodeHealthTracker.register(node);
@@ -43,6 +46,7 @@ public class NodeHealthService {
         nodeHealth.recordHit();
         if(previousStatus != NodeStatus.UP) {
             log.info("Node {} is back UP", nodeId);
+            clusterEventPublisher.publish(ClusterEventType.NODE_UP, nodeId, "Node recovered", "INFO");
         }
     }
 
@@ -56,7 +60,13 @@ public class NodeHealthService {
         if(previousStatus != currentStatus) {
             log.warn("Node {} status changed: {} -> {} (missed heartbeats: {})",
                     nodeId, previousStatus, currentStatus, nodeHealth.getMissedHeartbeats());
+            if(currentStatus == NodeStatus.SUSPECT) {
+                clusterEventPublisher.publish(ClusterEventType.NODE_SUSPECT, nodeId, "Node suspect: " + nodeHealth.getMissedHeartbeats() + " missed heartbeats", "WARN");
+            } else if(currentStatus == NodeStatus.DOWN) {
+                clusterEventPublisher.publish(ClusterEventType.NODE_DOWN, nodeId, "Node declared DOWN", "ERROR");
+            }
         }
+
     }
 
     public boolean isDown(String nodeId) {
