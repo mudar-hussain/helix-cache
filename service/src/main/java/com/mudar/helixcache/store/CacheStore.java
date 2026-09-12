@@ -21,7 +21,7 @@ public class CacheStore {
     private final AtomicLong missCount = new AtomicLong(0);
 
     public void recordHit() { hitCount.incrementAndGet(); }
-    public void recordMiss() { missCount.decrementAndGet(); }
+    public void recordMiss() { missCount.incrementAndGet(); }
     public long getHitCount() { return hitCount.get(); }
     public long getMissCount() { return missCount.get(); }
     public double getHitRatio() {
