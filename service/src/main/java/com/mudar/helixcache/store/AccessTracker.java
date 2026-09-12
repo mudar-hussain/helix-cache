@@ -2,7 +2,6 @@ package com.mudar.helixcache.store;
 
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -21,7 +20,7 @@ public class AccessTracker {
         int bucket = currentBucket();
         AtomicLong[] accessBuckets = accessMap.computeIfAbsent(key, k-> {
             AtomicLong[] buckets = new AtomicLong[BUCKET_COUNT];
-            Arrays.fill(buckets, new AtomicLong(0));
+            for(int i = 0; i<BUCKET_COUNT; i++) buckets[i] = new AtomicLong(0);
             return buckets;
         });
         accessBuckets[bucket].incrementAndGet();

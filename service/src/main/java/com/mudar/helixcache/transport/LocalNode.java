@@ -1,7 +1,6 @@
 package com.mudar.helixcache.transport;
 
 import com.mudar.helixcache.config.NodeProperties;
-import com.mudar.helixcache.dto.CacheStats;
 import com.mudar.helixcache.exception.HelixValidationException;
 import com.mudar.helixcache.model.Cache;
 import com.mudar.helixcache.store.CacheStore;

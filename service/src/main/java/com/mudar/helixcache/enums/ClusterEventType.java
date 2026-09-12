@@ -11,7 +11,7 @@ public enum ClusterEventType {
     QUORUM_SUCCESS,
     QUORUM_FAILED,
     HINT_ENQUEUED,
-    HING_DELIVERED,
+    HINT_DELIVERED,
     NODE_UP,
     NODE_SUSPECT,
     NODE_DOWN,
