@@ -1,4 +1,4 @@
-package com.mudar.helixcache.cluster;
+package com.mudar.helixcache.cluster.hashfunction;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;

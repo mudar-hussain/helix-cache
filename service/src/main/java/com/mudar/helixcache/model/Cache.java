@@ -17,7 +17,7 @@ public class Cache {
     private Timestamp createdAt;
     private Timestamp expiresAt;
     private Timestamp lastAccessedAt;
-    private long version = HelixConstant.DEFAULT_CACHE_VERSION;
+    private long version;
 
     public Cache(String key, String value, String primaryNode, Timestamp createdAt, Timestamp expiresAt) {
         this.key = key;
@@ -25,5 +25,15 @@ public class Cache {
         this.primaryNode = primaryNode;
         this.createdAt = createdAt;
         this.expiresAt = expiresAt;
+        this.version = HelixConstant.DEFAULT_CACHE_VERSION;
+    }
+
+    public Cache(String key, String value, String primaryNode, Timestamp createdAt, Timestamp expiresAt, long version) {
+        this.key = key;
+        this.value = value;
+        this.primaryNode = primaryNode;
+        this.createdAt = createdAt;
+        this.expiresAt = expiresAt;
+        this.version = version;
     }
 }

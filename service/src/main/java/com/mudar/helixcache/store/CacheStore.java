@@ -5,6 +5,8 @@ import com.mudar.helixcache.utils.HelixConstant;
 import com.mudar.helixcache.utils.HelixUtils;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -16,8 +18,7 @@ public class CacheStore {
     private final ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<>();
 
     public String put(String key, Cache cache) {
-        HelixUtils.validateKey(key);
-        if(cache == null) throw new NullPointerException(HelixConstant.ERROR_CACHE_REQUIRED);
+        HelixUtils.validateKeyCache(key, cache);
         if(this.cacheMap.put(key, cache) == null) {
             return HelixConstant.SUCCESS_CACHE_ADD;
         }
@@ -27,6 +28,14 @@ public class CacheStore {
 
     public Cache get(String key) {
         return cacheMap.get(key);
+    }
+
+    public Long getNodeVersion(String key) {
+        HelixUtils.validateKey(key);
+        if(cacheMap.containsKey(key)) {
+            return cacheMap.get(key).getVersion();
+        }
+        return 0L;
     }
 
     public Cache remove(String key) {
@@ -39,6 +48,10 @@ public class CacheStore {
 
     public int size() {
         return cacheMap.size();
+    }
+
+    public Collection<Cache> getAll() {
+        return Collections.unmodifiableCollection(cacheMap.values());
     }
 
 }

@@ -16,4 +16,8 @@ public class HelixConstant {
     public static final String ERROR_VALUE_REQUIRED = "Cache value must not be blank";
     public static final String ERROR_EXPIRY_IN_PAST = "Expiry Time must be in the future";
     public static final String INTERNAL_SERVER_ERROR = "Something went wrong. Please try again later.";
+
+    public static final int NODE_SUSPECT_THRESHOLD = 2;
+    public static final int NODE_DOWN_THRESHOLD = 4;
+
 }

@@ -2,6 +2,7 @@ package com.mudar.helixcache.utils;
 
 
 import com.mudar.helixcache.exception.HelixValidationException;
+import com.mudar.helixcache.model.Cache;
 import lombok.NoArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
 
@@ -35,12 +36,12 @@ public class HelixUtils {
         return getCurrentTimestamp().before(timestamp);
     }
 
-    public static void validateKeyValueExpiresAtForCreate(String key, String value, Timestamp expiresAt) {
-        HelixUtils.validateExpiresAtForCreate(expiresAt);
+    public static void validateKeyValueExpiresAt(String key, String value, Timestamp expiresAt) {
+        HelixUtils.validateExpiresAt(expiresAt);
         HelixUtils.validateKeyValue(key, value);
     }
 
-    public static void validateExpiresAtForCreate(Timestamp expiresAt) {
+    public static void validateExpiresAt(Timestamp expiresAt) {
         if(HelixUtils.isExpired(expiresAt)) {
             throw new HelixValidationException(HelixConstant.ERROR_EXPIRY_IN_PAST);
         }
@@ -49,6 +50,11 @@ public class HelixUtils {
     public static void validateKeyValue(String key, String value) {
         HelixUtils.validateKey(key);
         HelixUtils.validateValue(value);
+    }
+
+    public static void validateKeyCache(String key, Cache cache) {
+        validateKey(key);
+        validateCache(cache);
     }
 
     public static void validateKey(String key) {
@@ -60,6 +66,12 @@ public class HelixUtils {
     public static void validateValue(String value) {
         if(Strings.isBlank(value)) {
             throw new HelixValidationException(HelixConstant.ERROR_VALUE_REQUIRED);
+        }
+    }
+
+    public static void validateCache(Cache cache) {
+        if(cache == null) {
+            throw new NullPointerException(HelixConstant.ERROR_CACHE_REQUIRED);
         }
     }
 }

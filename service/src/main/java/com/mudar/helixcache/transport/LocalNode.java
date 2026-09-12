@@ -29,9 +29,18 @@ public class LocalNode {
     }
 
     public String addCache(String key, String value, Timestamp expiresAt) {
-        HelixUtils.validateKeyValueExpiresAtForCreate(key, value, expiresAt);
-        Timestamp createdAt = HelixUtils.getCurrentTimestamp();
-        return cacheStore.put(key, new Cache(key, value, nodeProperties.getId(), createdAt, expiresAt));
+        HelixUtils.validateKeyValueExpiresAt(key, value, expiresAt);
+        Cache cache;
+        if(cacheStore.contains(key)) {
+            cache = cacheStore.get(key);
+            cache.setValue(value);
+            cache.setExpiresAt(expiresAt);
+            cache.setVersion(cache.getVersion()+1);
+        } else {
+            Timestamp createdAt = HelixUtils.getCurrentTimestamp();
+            cache = new Cache(key, value, nodeProperties.getId(), createdAt, expiresAt);
+        }
+        return cacheStore.put(key, cache);
     }
 
     public Cache getCache(String key) {
