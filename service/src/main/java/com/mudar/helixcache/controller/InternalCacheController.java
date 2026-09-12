@@ -46,7 +46,7 @@ public class InternalCacheController {
         return ResponseEntity.ok(hintedHandOffStore.getQueueDepths());
     }
 
-    @GetMapping("/sync")
+    @GetMapping("/sync/node")
     public ResponseEntity<List<Cache>> getCacheListForNode(@RequestParam String targetNodeId) {
         return ResponseEntity.ok(cacheService.getCacheListForNode(targetNodeId));
     }

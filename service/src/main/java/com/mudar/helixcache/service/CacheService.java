@@ -38,6 +38,7 @@ public class CacheService {
         String successMsg = "Cache entry written";
         int successCount = 0;
         List<String> failures = new ArrayList<>();
+        List<Hint> pendingHints = new ArrayList<>();
         for(Node replica: replicas) {
             try{
                 String result;
@@ -52,11 +53,13 @@ public class CacheService {
             } catch (Exception e) {
                 log.warn("Replication to {} failed for key '{}': {} - storing hint", replica.id(), key, e.getMessage());
                 failures.add(replica.id() + ": " + e.getMessage());
-                hintedHandOffStore.add(new Hint(key, value, expiresAt, replica.id(), replica.address(), HelixUtils.getCurrentTimestamp().toLocalDateTime()));
+                pendingHints.add(new Hint(key, value, expiresAt, replica.id(), replica.address(), HelixUtils.getCurrentTimestamp().toLocalDateTime()));
             }
         }
         log.info("Write quorum for key '{}': {}/{} succeeded (required: {})", key, successCount, replicas.size(), writeQuorum);
-        if(successCount<writeQuorum) {
+        if(successCount>=writeQuorum) {
+            pendingHints.forEach(hintedHandOffStore::add);
+        } else {
             throw new HelixValidationException("Write quorum not met: " + successCount + "/" + replicas.size()
                     + " replicas acknowledged. Failures: " + failures);
         }

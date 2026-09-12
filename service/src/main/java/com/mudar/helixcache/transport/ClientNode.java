@@ -70,7 +70,7 @@ public class ClientNode {
     public List<Cache> fetchCacheListForNode(Node node, String targetNodeId) {
         return restClient
                 .get()
-                .uri("http://" + node.address() + "/internal/cache/sync?targetNodeId={targetNodeId}", targetNodeId)
+                .uri("http://" + node.address() + "/internal/cache/sync/node?targetNodeId={targetNodeId}", targetNodeId)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
                     String body = new String(response.getBody().readAllBytes());

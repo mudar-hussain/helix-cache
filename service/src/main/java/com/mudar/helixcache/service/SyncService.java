@@ -24,7 +24,7 @@ public class SyncService {
         String localNodeId = clusterManager.getLocalNodeId();
 
         for(Node peer: clusterManager.getNodes()) {
-            if(peer.id().equals(recoveredNode.id()) && (!clusterManager.containsNode(peer.id()))) continue;
+            if(peer.id().equals(recoveredNode.id()) || (!clusterManager.containsNode(peer.id()))) continue;
             try {
                 List<Cache> cacheListToSync;
                 if(peer.id().equals(localNodeId)) {
