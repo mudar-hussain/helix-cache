@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -36,16 +35,21 @@ public class ClusterEventStreamController {
     @Async
     @EventListener
     public void handleClusterEvent(ClusterEvent clusterEvent) {
-        List<SseEmitter> dead = new ArrayList<>();
-        for(SseEmitter emitter: emitters) {
-            try {
-                emitter.send(SseEmitter.event()
-                                .name(clusterEvent.getClusterEventType().name())
-                                .data(clusterEvent));
-            } catch (IOException e) {
-                dead.add(emitter);
-            }
+        for (SseEmitter emitter : emitters) {
+            sendEvent(emitter, clusterEvent);
         }
-        emitters.removeAll(dead);
+    }
+
+    private void sendEvent(SseEmitter emitter,ClusterEvent clusterEvent) {
+        try {
+            emitter.send(SseEmitter.event()
+                            .name(clusterEvent.getClusterEventType().name())
+                            .data(clusterEvent)
+            );
+        } catch (IOException | IllegalStateException e) {
+            // Client disconnected or emitter is already completed.
+            emitters.remove(emitter);
+            log.debug("Removing disconnected SSE client: {}",e.getMessage());
+        }
     }
 }
