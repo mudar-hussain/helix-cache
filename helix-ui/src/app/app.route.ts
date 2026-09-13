@@ -23,7 +23,7 @@ export const routes: Route[] = [
                 loadComponent: () => import('./features/hot-keys/hot-keys.component').then(m => m.HotKeysComponent),
             },
             {
-                path: 'activity',
+                path: 'log',
                 loadComponent: () => import('./features/activity-log/activity-log.component').then(m => m.ActivityLogComponent),
             },
         ]

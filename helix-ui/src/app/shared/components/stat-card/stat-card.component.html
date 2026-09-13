@@ -6,8 +6,10 @@
     <div style="font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; color:var(--color-text-secondary)">
         {{ label }}
     </div>
-    <div ngIf="sub" style="font-size: 0.65rem; color:var(--color-text-muted); font-family: var(--font-mono);">
-        {{ sub }}
-    </div>
+    @if(sub) {
+        <div style="font-size: 0.65rem; color:var(--color-text-muted); font-family: var(--font-mono);">
+            {{ sub }}
+        </div>
+    }
 
 </div>

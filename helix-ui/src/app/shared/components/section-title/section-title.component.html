@@ -1,5 +1,5 @@
 <div class="d-flex align-items-center gap-2 mb-3">
-    <span ngIf="icon">{{ icon }}</span>
+    @if (icon) {<span>{{ icon }}</span>}
     <span class="text-uppercase fw-bold" style="font-size: 0.6rem; letter-spacing: 2.5px; color: var(--color-text-secondary); white-space: nowrap;">
         {{ text }}
     </span>
