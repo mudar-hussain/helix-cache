@@ -1,0 +1,10 @@
+.hud {
+  position: fixed; inset: 0; display: grid;
+  grid-template-rows: 54px 1fr 46px;
+  grid-template-columns: 260px 1fr 300px;
+}
+
+.topbar {
+  grid-columns: 1 / -1; grid-row: 1;
+  background: linear-gradient(180deg, rgba(2.9.
+}
