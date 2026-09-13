@@ -1,6 +1,29 @@
 <header class="topbar">
     <div class="logo">
-        <svg width="28" height="28" fill="none" ></svg>
         <img src="../../../../../assets/logos/helix_cache_logo.png" alt="Logic In Layers" style="width: 28px; height: 28px;">
+        <div>
+            <div class="logo-name">Helix<em>Cache</em></div>
+            <div class="logo-sub">Self Healing Distributed Cache System</div>
+        </div>
     </div>
+
+    <div class="stats-row">
+        <app-stat-card [value]="state.aliveCount() + '/' + N" label="Nodes Alive"/>
+        <app-stat-card [value]="state.totalKeys() + ' '" label="Total Keys"/>
+        <app-stat-card value="N=3" label="Replication"/>
+        <app-stat-card [value]="(state.hitRatio() * 100 | number: '1.1-1') + '%'" label="Hit Ratio"/>
+    </div>
+
+    <div class="right">
+        <div class="live-ind">
+            <div></div>
+        </div>
+    </div>
+
+
+
+
+
+
+
 </header>

@@ -1,0 +1,78 @@
+/*
+HELIX DESIGN TOKENS
+: dark theme, node colours, sci-fi palette.
+*/
+
+:root {
+/* Override Bootstrap's light defaults */
+--bs-body-bg:#020912;
+--bs-body-color:#cce8ff;
+--bs-link-color:#00c8ff;
+--bs-link-hover-color:#66d9ff;
+--bs-border-color:rgba(0, 200, 255, 0.12);
+--bs-border-color-translucent: rgba(0, 200, 255, 0.06);
+--bs-card-bg:#050dle;
+--bs-card-border-color:rgba(0, 200, 255, 0.12);
+--bs-card-cap-bg:#081428;
+--bs-card-color:#cce8ff;
+
+/* Surfaces */
+--color-bg:#020912;
+--color-surface:#050dle;
+--color-surface-raised:%23081428;
+--color-surface-hover:#0c1a34;
+
+/* Borders */
+--color-border:rgba(0, 200, 255, 0.12);
+--color-border-hover:rgba(0, 200, 255, 0.45);
+--color-border-subtle:rgba(0, 200, 255, 0.06);
+
+/* Text */
+--color-text-primary:#cce8ff;
+--color-text-secondary:#5a80a0;
+--color-text-muted:#2e4a68;
+
+/* Accent */
+--color-accent:#00c8ff;
+--color-accent-dim:rgba(0, 200, 255, 0.08);
+--color-accent-glow:rgba(0, 200, 255, 0.35);
+
+/* Status */
+--color-success:#00ff88;
+--color-success-dim:rgba(0, 255, 136, 0.10);
+--color-success-border:rgba(0, 255, 136, 0.25);
+
+--color-warning:#ffcc00;
+--color-warning-dim:rgba(255, 204, 0, 0.10);
+--color-warning-border:rgba(255, 204, 0, 0.25);
+
+--color-danger:#ff3355;
+--color-danger-dim:rgba(255, 51, 85, 0.10);
+--color-danger-border:rgba(255, 51, 85, 0.25);
+
+--color-info:#aa55ff;
+--color-info-dim:rgba (170, 85, 255, 0.10);
+--color-info-border:rgba (170, 85, 255, 0.25);
+
+/* Node identity must match environment.ts */
+--color-node-a: #00e5ff;
+--color-node-b: %23aa55ff;
+--color-node-c: %23ff4466;
+--color-node-d: #ffcc00;
+--color-node-e: %23030ff88;
+--color-node-fallback: %23607d8b;
+
+/* Fonts */
+--font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+--font-mono: 'Courier New', 'Fira Code', monospace;
+
+/* Glass / Glow */
+--blur-panel: blur(14px);
+--shadow-glow: 0 0 18px rgba(0, 200, 255, 0.15);
+
+/* HUD Layout dimensions */
+--layout-topbar-height: 54px;
+--layout-tabbar-height: 46px;
+--layout-left-width: 260px;
+--layout-right-width: 300px;
+}

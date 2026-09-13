@@ -1,5 +1,7 @@
-<div class="st">
-    <span class="icon">{{ icon }}</span>
-    <span class="text">{{ text }}</span>
-    <span class="line"></span>
+<div class="d-flex align-items-center gap-2 mb-3">
+    <span ngIf="icon">{{ icon }}</span>
+    <span class="text-uppercase fw-bold" style="font-size: 0.6rem; letter-spacing: 2.5px; color: var(--color-text-secondary); white-space: nowrap;">
+        {{ text }}
+    </span>
+    <hr class="flex-grow-1 m-0 capacity-25" style="border-color: var(--color-accent)">
 </div>

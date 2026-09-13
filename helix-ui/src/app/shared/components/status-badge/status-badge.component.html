@@ -1,3 +1,7 @@
-<span class="badge" [ngClass]="'badge--' + status.toLowerCase()">
+<span class="badge" [ngClass]="{
+    'text-bg-success': status === 'UP',
+    'text-bg-warning': status === 'SUSPECT',
+    'text-bg-danger': status === 'DOWN'
+}" [class.anim-blink]="status === 'SUSPECT'">
     {{ label }}
 </span>

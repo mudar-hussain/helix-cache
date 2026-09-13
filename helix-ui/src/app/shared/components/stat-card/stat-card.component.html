@@ -1,6 +1,13 @@
 
-<div class="card">
-    <div class="val">{{ value }}</div>
-    <div class="lbl">{{ label }}</div>
-    <div class="sub" ngIf="sub">{{ sub }}</div>
+<div class="text-center px-3">
+    <div class="fw-black" style="font-size: 1.4rem; color:#fff; text-shadow: var(--shadow-glow);">
+        {{ value }}
+    </div>
+    <div style="font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; color:var(--color-text-secondary)">
+        {{ label }}
+    </div>
+    <div ngIf="sub" style="font-size: 0.65rem; color:var(--color-text-muted); font-family: var(--font-mono);">
+        {{ sub }}
+    </div>
+
 </div>
