@@ -31,6 +31,6 @@ export enum ClusterEventType {
     SYNC_COMPLETE = 'SYNC_COMPLETE'
  };
 export enum TtlOption {
-    never, '10s', '30s', '2m', '5m'
+    'never' = -1, '10s' = 10, '30s' = 30, '2m' = 120, '5m' = 300, '10m' = 600
 }
  

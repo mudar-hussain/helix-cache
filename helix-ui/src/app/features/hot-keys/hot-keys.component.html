@@ -1,0 +1,48 @@
+<div class="hk-shell">
+    <app-section-title icon="" text="Hot Key Predictions" />
+
+    <div class=" hk-header-row">
+        <span class="hk-col-key">Key</span>
+        <span class="hk-col-score">EMA Score</span>
+        <span class="hk-col-rate">Rate/s</span>
+        <span class="hk-col-total">Total</span>
+        <span class="hk-col-status">Status</span>
+    </div>
+
+    @for (p of predictions(); track p.key) {
+        <div class="hk-row" [class.hk-row--hot]="p.predicted">
+            <span class="hk-col-key hk-key" [class.hk-key--hot]="p.predicted">
+                @if (p.predicted) { <span> </span> }
+                {{ p.key }}
+            </span>
+
+            <div class="hk-col-score hk-score">
+                <div class="hk-bar-track">
+                    <div class="hk-bar-fill" [style.width.%]="barWidth(p.emaScore)"
+                        [style.background]="p.predicted? 'var(--color-danger)': 'var(--color-warning)'">
+                    </div>
+                </div>
+                <span class="hk-val">{{ p.emaScore | number: '1.2-2' }}</span>
+            </div>
+
+            <span class="hk-col-rate hk-val">{{ p.recentRate | number: '1.1-1' }}</span>
+
+            <span class="hk-col-total hk-val">{{ p.totalAccess }}</span>
+
+            <span class="hk-col-status">
+                @if (p.predicted) {
+                    <span class="hk-badge hk-badge--hot anim-pulse">HOT</span>
+                } @else {
+                    <span class="hk-badge hk-badge--warm">WARM</span>
+                }
+            </span>
+        </div>
+    }
+
+    @if (predictions().length === 0) {
+        <div class="hk-empty">
+            <div>No hot keys detected</div>
+            <div class="hk-empty-sub"> Polling every 10s</div>
+        </div>
+    }
+</div>

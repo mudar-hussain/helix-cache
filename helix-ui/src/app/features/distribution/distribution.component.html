@@ -1,0 +1,32 @@
+<div class="dist-shell">
+    <app-section-title icon="" text="Key Distribution" />
+
+    @for (entry of distribution(); track entry.nodeId) {
+        <div class="dist-row">
+            <div class="dist-label">
+                <span class="dist-dot" [style.background]="entry.nodeId | nodeColor"></span>
+                <span class="dist-id" [style.color]="entry.nodeId | nodeColor">{{ entry.nodeId }}</span>
+            </div>
+
+            <div class="dist-track">
+                <div class="dist-fill" [style.width.%]="entry.percentage" [style.background]="entry.nodeId | nodeColor">
+                    @if (entry.percentage > 12) {
+                        <span class="dist-pct-in">{{ entry.percentage | number: '1.1-1' }}%</span>
+                    }
+                </div>
+            </div>
+    
+            <div class="dist-right">
+                <span class="dist-keys">{{ entry.keyCount }}</span>
+                @if (entry.percentage <= 12) {
+                    <span class="dist-pct-out">{{ entry.percentage | number: '1.1-1' }}%</span>
+                }
+            </div>
+        </div>
+    }
+
+    @if (distribution().length===0) {
+        <div class="dist-empty">No distribution data yet..</div>
+    }
+    
+</div>

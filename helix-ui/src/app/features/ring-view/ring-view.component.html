@@ -1,0 +1,23 @@
+<div class="ring-wrap">
+    <canvas #canvas class="ring-canvas"></canvas>
+    <div class="ring-legend">
+        @for (node of state.nodes(); track node.nodeId) {
+            <div class="d-flex align-items-center gap-2">
+                <span class="legend-dot" [style.background]="node.nodeId | nodeColor"></span>
+                <span style="font-family:var(--font-mono); font-size:0.65rem; font-weight:700;" [style.color]="node.nodeId | nodeColor">
+                    {{ node.nodeId }}
+                </span>
+                <span class="legend-status" [class.legend-status--up]="node.nodeStatus==='UP'" [class.legend-status--suspect]="node.nodeStatus==='SUSPECT'"
+                [class.legend-status--down]="node.nodeStatus==='DOWN'">
+                    {{ node.nodeStatus }}
+                </span>
+            </div>
+        }
+    </div>
+
+    <div class="ring-stats">
+        <span class="ring-stat">{{ state.ring().length }} vnodes</span>
+        <span class="ring-stat">{{ state.nodes().length}} physical</span>
+    </div>
+
+</div>

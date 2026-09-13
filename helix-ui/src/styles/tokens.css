@@ -11,15 +11,15 @@ HELIX DESIGN TOKENS
 --bs-link-hover-color:#66d9ff;
 --bs-border-color:rgba(0, 200, 255, 0.12);
 --bs-border-color-translucent: rgba(0, 200, 255, 0.06);
---bs-card-bg:#050dle;
+--bs-card-bg:#050d1e;
 --bs-card-border-color:rgba(0, 200, 255, 0.12);
 --bs-card-cap-bg:#081428;
 --bs-card-color:#cce8ff;
 
 /* Surfaces */
 --color-bg:#020912;
---color-surface:#050dle;
---color-surface-raised:%23081428;
+--color-surface:#050d1e;
+--color-surface-raised:#081428;
 --color-surface-hover:#0c1a34;
 
 /* Borders */
@@ -51,16 +51,16 @@ HELIX DESIGN TOKENS
 --color-danger-border:rgba(255, 51, 85, 0.25);
 
 --color-info:#aa55ff;
---color-info-dim:rgba (170, 85, 255, 0.10);
---color-info-border:rgba (170, 85, 255, 0.25);
+--color-info-dim:rgba(170, 85, 255, 0.10);
+--color-info-border:rgba(170, 85, 255, 0.25);
 
 /* Node identity must match environment.ts */
 --color-node-a: #00e5ff;
---color-node-b: %23aa55ff;
---color-node-c: %23ff4466;
+--color-node-b: #aa55ff;
+--color-node-c: #ff4466;
 --color-node-d: #ffcc00;
---color-node-e: %23030ff88;
---color-node-fallback: %23607d8b;
+--color-node-e: #00ff88;
+--color-node-fallback: #607d8b;
 
 /* Fonts */
 --font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -71,7 +71,7 @@ HELIX DESIGN TOKENS
 --shadow-glow: 0 0 18px rgba(0, 200, 255, 0.15);
 
 /* HUD Layout dimensions */
---layout-topbar-height: 54px;
+--layout-topbar-height: 100px;
 --layout-tabbar-height: 46px;
 --layout-left-width: 260px;
 --layout-right-width: 300px;

@@ -1,0 +1,145 @@
+:host {
+    display: block;
+    padding: 24px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.hk-shell {
+    max-width: 780px;
+    margin: 0 auto;
+}
+
+.hk-header-row {
+    display: grid;
+    grid-template-columns: 1fr 180px 70px 70px 70px;
+    gap: 8px;
+    padding: 4px 10px 8px;
+    font-size: 0.55rem;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 4px;
+}
+
+.hk-row {
+    display: grid;
+    grid-template-columns: 1fr 180px 70px 70px 70px;
+    gap: 8px;
+    align-items: center;
+    padding: 7px 10px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    margin-bottom: 2px;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.hk-row:hover {
+    background: var(--color-surface);
+    border-color: var(--color-border);
+}
+
+.hk-row--hot {
+    background: var(--color-danger-dim);
+    border-color: var(--color-danger-border);
+}
+
+.hk-col-key {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hk-col-score {}
+
+.hk-col-rate,
+.hk-col-total {
+    text-align: right;
+}
+
+.hk-col-status {
+    text-align: center;
+}
+
+.hk-key {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-text-primary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.hk-key--hot {
+    color: var(--color-danger);
+    font-weight: 700;
+
+}
+
+.hk-score {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hk-bar-track {
+    flex: 1;
+    height: 6px;
+    background: var(--color-accent-dim);
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.hk-bar-fill {
+    height: 100%;
+    min-width: 2px;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+}
+
+.hk-val {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+}
+
+.hk-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 0.55rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.hk-badge--hot {
+    background: var(--color-danger-dim);
+    color: var(--color-danger);
+    border: 1px solid var(--color-danger-border);
+}
+
+.hk-badge--warm {
+    background: var(--color-warning-dim);
+    color: var(--color-warning);
+    border: 1px solid var(--color-warning-border);
+}
+
+.hk-empty {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+
+.hk-empty-sub {
+    font-size: 0.6rem;
+    margin-top: 6px;
+    color: var(--color-text-muted);
+}

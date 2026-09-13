@@ -1,0 +1,61 @@
+<app-section-title icon="4" text="Write Cache" />
+
+<div class="ops-group">
+    <label class="ops-label">KEY</label>
+    <input class="ops-input" [(ngModel)]="writeKey" placeholder="e.g. user:412" />
+</div>
+
+<div class="ops-group">
+    <label class="ops-label">VALUE</label>
+    <textarea class="ops-input ops-textarea" [(ngModel)]="writeValue" rows="3" placeholder="value.."></textarea>
+</div>
+
+<div class="ops-group">
+    <label class="ops-label">TTL</label>
+    <div class="d-flex gap-1 flex-wrap">
+    @for (opt of ttlOptions; track opt) {
+        <span class="ttl-chip" [class.ttl-chip--active]="writeTtl === opt" (click)="writeTtl = opt">{{ opt }}</span>
+    }
+    </div>
+</div>
+
+<button class="ops-btn ops-btn--accent w-100 mb-3" (click)="onWrite()"> PUT</button>
+
+@if (writeResult()) {
+    <div class="result-box" [class.result-box--ok]="writeResult()!.status==='ok'" [class.result-box--err]="writeResult()!.status==='error'">
+        <div class="result-header"><span>{{ writeResult()!.status==='ok'? 'OK': 'X ERR' }}</span><span>{{ writeResult()!. latencyMs }}ms</span></div>
+        <pre>{{ writeResult()!.body }}</pre>
+    </div>
+}
+
+<hr class="ops-divider" />
+
+<app-section-title icon="Q" text="Read / Delete" />
+
+<div class="ops-group">
+    <label class="ops-label">KEY</label>
+    <input class="ops-input" [(ngModel)]="readKey" placeholder="e.g. user:42" />
+</div>
+
+<div class="d-flex gap-2 mb-3">
+    <button class="ops-btn ops-btn--info flex-grow-1" (click)="onRead()">GET</button>
+    <button class="ops-btn ops-btn--danger" (click)="onDelete()">DEL</button>
+</div>
+
+@if (readResult()) {
+    <div class="result-box result-box--ok">
+        <div class="result-header"><span>✓ HIT</span><span class="ms-auto">v{{ readResult()!.version}}</span></div>
+        <div style="font-family:var(--font-mono); font-size:0.7rem; margin: 4px 0;">{{ readResult()!.key }} {{ readResult()!.value }}</div>
+    </div>
+}
+
+@if (readError()){ 
+    <div class="result-box result-box--err">X {{ readError() }}</div> 
+}
+
+@if (deleteResult()) { 
+    <div class="result-box" [class.result-box-ok]="! deleteResult()!.startsWith('Error')" 
+    [class.result-box--err]="deleteResult()!.startsWith('Error')">
+        {{ deleteResult() }}
+    </div> 
+}

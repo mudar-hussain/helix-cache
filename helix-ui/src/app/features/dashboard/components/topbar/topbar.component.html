@@ -1,29 +1,32 @@
-<header class="topbar">
-    <div class="logo">
-        <img src="../../../../../assets/logos/helix_cache_logo.png" alt="Logic In Layers" style="width: 28px; height: 28px;">
-        <div>
-            <div class="logo-name">Helix<em>Cache</em></div>
-            <div class="logo-sub">Self Healing Distributed Cache System</div>
+<div class="topbar-shell">
+    <div class="topbar-header">
+        <div class="d-flex align-items-center gap-2">
+            <img src="assets/logos/helix_cache_logo.png" alt="HelixCache" style="width: 32px; height: 32px; object-fit:contain;" />
+            <div>
+                <div class="logo-name">Helix<em>Cache</em></div>
+                <div class="logo-sub">Self-Healing Distributed Cache</div>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-4">
+            <app-stat-card [value]="state.aliveCount() + '/' + N" label="Nodes Alive" />
+            <app-stat-card [value]="state.totalKeys().toString()" label="Total Keys" />
+            <app-stat-card value="N=3" label="Replication" />
+            <app-stat-card [value]="(state.hitRatio() * 100 | number: '1.1-1') + '%'" label="Hit Ratio" />
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <div class="live-dot anim-pulse"></div>
+            <span class="live-label">LIVE</span>
         </div>
     </div>
 
-    <div class="stats-row">
-        <app-stat-card [value]="state.aliveCount() + '/' + N" label="Nodes Alive"/>
-        <app-stat-card [value]="state.totalKeys() + ' '" label="Total Keys"/>
-        <app-stat-card value="N=3" label="Replication"/>
-        <app-stat-card [value]="(state.hitRatio() * 100 | number: '1.1-1') + '%'" label="Hit Ratio"/>
-    </div>
-
-    <div class="right">
-        <div class="live-ind">
-            <div></div>
-        </div>
-    </div>
-
-
-
-
-
-
-
-</header>
+    <nav class="tabbar">
+    @for (tab of tabs; track tab.path) {
+        <a class="tab-btn" [routerLink]="tab.path" routerLinkActive="tab-btn--active">
+            <span class="tab-dot" [style.background]="tab.dot"></span>
+            {{ tab.label }}
+        </a>
+    }
+    </nav>
+</div>
