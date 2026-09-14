@@ -64,7 +64,14 @@ Node elements
 
 .travel-dot {
     opacity: 0.9;
-    filter: drop-shadow(00 4px currentColor);
+    filter: drop-shadow(0 0 6px currentColor);
+    animation: dot-travel 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes dot-travel {
+    0% { transform: translate(0, 0); opacity: 0.9; }
+    10% { transform: translate(0, 0); opacity: 0.9; }
+    80% { transform: translate(var(--dx), var(--dy)); opacity: 0.9; }
+    100% { transform: translate(var(--dx), var(--dy)); opacity: 0; }
 }
 
 /* Legend */

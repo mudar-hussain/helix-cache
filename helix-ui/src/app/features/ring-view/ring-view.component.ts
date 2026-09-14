@@ -62,32 +62,25 @@ export class RingViewComponent {
         if (nodes.length < 2) return [];
         const primary = nodes[0];
         const primaryPos = this.getPos(primary.id);
+        const animKey = Date.now();
         return nodes.slice(1)
-            .filter(r => this.nodeStatus(r.id) == 'UP')
+            .filter(r => this.nodeStatus(r.id) === 'UP')
             .map((r, i) => {
-
                 const replicaPos = this.getPos(r.id);
-
+                const dx = replicaPos.x - primaryPos.x;
+                const dy = replicaPos.y - primaryPos.y;
                 return {
-
+                    key: `${r.id}-${animKey}`,
                     id: r.id,
-
-                    x1: primaryPos.x,
-
-                    y1: primaryPos.y,
-
-                    x2: replicaPos.x,
-
-                    y2: replicaPos.y,
-
+                    startX: primaryPos.x,
+                    startY: primaryPos.y,
+                    dx,
+                    dy,
                     color: this.color(primary.id),
-
-                    delay: i * 0.15
-
+                    delay: i * 0.2
                 };
 
             });
-
     });
 
     color(nodeId: string): string { return this.colors[nodeId] ?? '#607d8b'; }

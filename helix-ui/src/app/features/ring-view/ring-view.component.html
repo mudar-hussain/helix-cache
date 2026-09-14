@@ -29,7 +29,18 @@
 
         <!-- Travel dots: primary replicas (animate on DOM entry) -->
 
-        @for (dot of travelDots(); track dot.id) {
+        @for(dot of travelDots(); track dot.key) {
+            <circle [attr.cx]="dot.startX" 
+            [attr.cy]="dot.startY" 
+            r="5" 
+            [attr.fill]="dot.color" class="travel-dot" 
+            [style.--dx]="dot.dx + 'px'" 
+            [style.--dy]="dot.dy + 'px'" 
+            [style.animation-delay]="dot.delay + 's'"
+            />
+        }
+
+        <!-- @for (dot of travelDots(); track dot.id) {
 
         <circle r="5" [attr.fill]="dot.color" class="travel-dot" [style.--x1]="dot.x1" [style.--y1]="dot.y1"
             [style.--x2]="dot.x2" [style.--y2]="dot.y2" [style.animation-delay]="dot.delay + 's'">
@@ -42,11 +53,11 @@
         </circle>
         }
 
-        <!-- Travel dot paths (invisible, used by animateMotion) -->
+        Travel dot paths (invisible, used by animateMotion) 
         @for (dot of travelDots(); track dot.id) {
         <path [attr.id]="'path-' + dot.id" [attr.d]="'M' + dot.x1+','+ dot.y1+' L'+ dot.x2+','+ dot.y2" fill="none"
             stroke="none" />
-        }
+        } -->
 
         <!-- Physical nodes -->
         @for (node of state.nodes(); track node.nodeId) {
