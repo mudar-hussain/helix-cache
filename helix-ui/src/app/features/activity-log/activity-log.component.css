@@ -64,7 +64,7 @@
     align-items: center;
     gap: 8px;
     padding: 5px 10px;
-    border-bottom: 1px solid var (--color-border-subtle);
+    border-bottom: 1px solid var(--color-border-subtle);
     font-family: var(--font-mono);
     font-size: 0.62rem;
     overflow: hidden;

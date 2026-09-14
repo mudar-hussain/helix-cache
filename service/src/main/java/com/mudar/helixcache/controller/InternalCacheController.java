@@ -4,11 +4,9 @@ import com.mudar.helixcache.model.Cache;
 import com.mudar.helixcache.service.CacheService;
 import com.mudar.helixcache.store.HintedHandOffStore;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -21,12 +19,10 @@ public class InternalCacheController {
     private final HintedHandOffStore hintedHandOffStore;
 
     @PutMapping("/{key}")
-    public ResponseEntity<String> addCache(@PathVariable String key,
+    public ResponseEntity<Cache> addCache(@PathVariable String key,
                                            @RequestParam("value") String value,
-                                           @RequestParam(value = "expiresAt", required = false)
-                                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime expiresAt) {
-        String msg = cacheService.writeCacheLocal(key, value, expiresAt);
-        return ResponseEntity.ok(msg);
+                                           @RequestParam(value = "ttlSeconds", required = false) Long ttlSeconds) {
+        return ResponseEntity.ok(cacheService.writeCacheLocal(key, value, ttlSeconds));
     }
 
     @GetMapping("/{key}")

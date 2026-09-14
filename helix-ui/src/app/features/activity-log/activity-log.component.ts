@@ -53,7 +53,7 @@ export class ActivityLogComponent implements OnInit, OnDestroy {
         if (t === ClusterEventType.NODE_UP || t === ClusterEventType.QUORUM_SUCCESS || t === ClusterEventType.SYNC_COMPLETE) {
             return 'var(--color-success)';
         }
-        return 'var (--color-accent)';
+        return 'var(--color-accent)';
     }
 
 }

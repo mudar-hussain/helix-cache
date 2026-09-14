@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
@@ -19,18 +17,18 @@ public class ClientNode {
 
     private final RestClient restClient;
 
-    public String replicateCache(Node node, String key, String value, LocalDateTime expiresAt) {
+    public Cache replicateCache(Node node, String key, String value, Long ttlSeconds) {
         String baseUri = "http://" + node.address() + "/internal/cache/{key}";
-        if(expiresAt != null) {
+        if(ttlSeconds != null) {
             return restClient.put()
-                    .uri(baseUri + "?value={value}&expiresAt={expiresAt}",
-                            key, value, expiresAt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                    .uri(baseUri + "?value={value}&ttlSeconds={ttlSeconds}",
+                            key, value, ttlSeconds)
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
                         String body = new String(response.getBody().readAllBytes());
                         throw new HelixValidationException(body);
                     })
-                    .body(String.class);
+                    .body(Cache.class);
         } else {
             return restClient.put()
                     .uri(baseUri + "?value={value}", key, value)
@@ -39,7 +37,7 @@ public class ClientNode {
                         String body = new String(response.getBody().readAllBytes());
                         throw new HelixValidationException(body);
                     })
-                    .body(String.class);
+                    .body(Cache.class);
         }
     }
 

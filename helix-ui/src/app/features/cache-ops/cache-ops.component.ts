@@ -45,7 +45,7 @@ export class CacheOpsComponent {
     onWrite(): void {
         if (!this.writeKey.trim() || !this.writeValue.trim()) return;
         const t = Date.now();
-        this.cacheApi.putCache(this.writeKey.trim(), this.writeValue.trim(), this.ttlSeconds (this.writeTtl)).subscribe({
+        this.cacheApi.putCache(this.writeKey.trim(), this.writeValue.trim(), this.ttlSeconds(this.writeTtl)).subscribe({
                 next: res => this.writeResult.set({ status: 'ok', statusCode: 200, latencyMs: Date.now() - t, body:
                 JSON.stringify(res, null, 2), primaryNode: res.primaryNode?.id }),
                 error: err => this.writeResult.set({ status: 'error', statusCode: err.status ?? 0, latencyMs: Date.now() - t, body:

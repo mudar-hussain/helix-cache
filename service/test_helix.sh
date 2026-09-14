@@ -425,7 +425,7 @@ TTL_KEY="ttl-test-$(date +%s)"
 EXPIRY_AT=$(date -d "+4 seconds" +"%Y-%m-%dT%H:%M:%S")
 echo -e "${GREEN}-> INFO${NC} - EXPIRY_AT = $EXPIRY_AT (IST)${NC}"
 
-put_code=$(code -X PUT "$A/cache/$TTL_KEY?value=temporary&expiresAt=$EXPIRY_AT")
+put_code=$(code -X PUT "$A/cache/$TTL_KEY?value=temporary&ttlSeconds=4")
 
 if [[ "$put_code" =~ ^2 ]]
 then

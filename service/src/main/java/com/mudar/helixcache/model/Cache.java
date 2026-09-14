@@ -15,25 +15,26 @@ public class Cache {
     private String value;
     private String primaryNode;
     private Timestamp createdAt;
-    private Timestamp expiresAt;
+    private Long ttlSeconds;
     private Timestamp lastAccessedAt;
     private long version;
 
-    public Cache(String key, String value, String primaryNode, Timestamp createdAt, Timestamp expiresAt) {
+    public Cache(String key, String value, String primaryNode, Timestamp createdAt, Long ttlSeconds) {
         this.key = key;
         this.value = value;
         this.primaryNode = primaryNode;
         this.createdAt = createdAt;
-        this.expiresAt = expiresAt;
+        this.lastAccessedAt = createdAt;
+        this.ttlSeconds = ttlSeconds;
         this.version = HelixConstant.DEFAULT_CACHE_VERSION;
     }
 
-    public Cache(String key, String value, String primaryNode, Timestamp createdAt, Timestamp expiresAt, long version) {
+    public Cache(String key, String value, String primaryNode, Timestamp createdAt, Long ttlSeconds, long version) {
         this.key = key;
         this.value = value;
         this.primaryNode = primaryNode;
         this.createdAt = createdAt;
-        this.expiresAt = expiresAt;
+        this.ttlSeconds = ttlSeconds;
         this.version = version;
     }
 }

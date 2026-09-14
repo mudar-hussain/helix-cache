@@ -30,8 +30,7 @@ export class SseService {
             });
 
             eventSource.onerror = (error) => {
-                console.error("SSE connection error:", error);
-                subscriber.error(error);
+                console.error("SSE connection error: ", error);
             };
 
             return () => {

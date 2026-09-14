@@ -54,7 +54,7 @@
 }
 
 @if (deleteResult()) { 
-    <div class="result-box" [class.result-box-ok]="! deleteResult()!.startsWith('Error')" 
+    <div class="result-box" [class.result-box--ok]="! deleteResult()!.startsWith('Error')" 
     [class.result-box--err]="deleteResult()!.startsWith('Error')">
         {{ deleteResult() }}
     </div> 

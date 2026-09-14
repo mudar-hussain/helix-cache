@@ -59,7 +59,7 @@
     flex: 1;
 }
 
-.btn-node-success { 
+.btn-node--success { 
     background: var(--color-success-dim); 
     color: var(--color-success); 
     border-color: var(--color-success-border); 

@@ -50,7 +50,7 @@ export interface CacheResponse {
     version: number;
     primaryNode: Node;
     createdAt: string;
-    expiresAt: string | null;
+    ttlSeconds: string | null;
     lastAccessedAt: string;
 }
 

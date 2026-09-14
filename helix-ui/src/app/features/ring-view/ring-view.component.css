@@ -68,7 +68,7 @@
     border: 1px solid var(--color-border);
     border-radius: 5px;
     padding: 6px 12px;
-    backdrop-filter: blur (8px);
+    backdrop-filter: blur(8px);
 }
 
 .ring-stat {

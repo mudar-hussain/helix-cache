@@ -1,7 +1,10 @@
 <div class="d-flex align-items-center gap-2 mb-3">
-    @if (icon) {<span>{{ icon }}</span>}
-    <span class="text-uppercase fw-bold" style="font-size: 0.6rem; letter-spacing: 2.5px; color: var(--color-text-secondary); white-space: nowrap;">
+    @if (icon) {
+        <i [class]="icon" style="color:var(--color-accent);font-size:0.75rem"></i>
+    }
+    <span class="text-uppercase fw-bold" 
+        style="font-size: 0.6rem; letter-spacing: 2.5px; color: var(--color-text-secondary); white-space: nowrap;">
         {{ text }}
     </span>
-    <hr class="flex-grow-1 m-0 capacity-25" style="border-color: var(--color-accent)">
+    <hr class="flex-grow-1 m-0 opacity-25" style="border-color: var(--color-accent)">
 </div>

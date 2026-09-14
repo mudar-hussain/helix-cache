@@ -13,12 +13,12 @@ export class CacheApiService {
     private readonly base = environment.primaryNode;
 
     putCache(key: string, value: string, ttlSeconds?: number): Observable<CacheResponse> {
-        let params = new HttpParams();
+        let params = new HttpParams().set('value', value);
         if (ttlSeconds !== undefined) {
-            params = params.set('ttl', ttlSeconds.toString());
+            params = params.set('ttlSeconds', ttlSeconds.toString());
         }
         return this.http.put<CacheResponse>(`${this.base}/cache/${encodeURIComponent(key)}`, 
-            value, 
+            null, 
             {headers: { 'Content-Type': 'text/plain' }, params }
         );
     }

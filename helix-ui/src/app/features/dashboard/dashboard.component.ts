@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 import { RouterOutlet } from "@angular/router";
 import { TopbarComponent } from "./components/topbar/topbar.component";
-import { NodeControlComponent } from "../node-control/note-control.component";
+import { NodeControlComponent } from "../node-control/node-control.component";
 import { CacheOpsComponent } from "../cache-ops/cache-ops.component";
 
 
