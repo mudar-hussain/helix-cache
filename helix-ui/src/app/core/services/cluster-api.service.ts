@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { environment } from "../../../environments/environment";
 import { Observable } from "rxjs";
-import { CacheStats, NodeDistributionResponse, NodeStatusResponse, RingNodeResponse } from "../../shared/interfaces/helix.interface";
+import { CacheStats, NodeDistributionResponse, NodeStatusResponse, RingNodeResponse, Node } from "../../shared/interfaces/helix.interface";
 
 @Injectable({
   providedIn: 'root'

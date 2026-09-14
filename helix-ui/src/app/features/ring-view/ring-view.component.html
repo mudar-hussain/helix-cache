@@ -1,23 +1,73 @@
 <div class="ring-wrap">
     <canvas #canvas class="ring-canvas"></canvas>
+    <!-- Search bar -->
+
+    <div class="search-bar">
+        <div class="search-input-wrap">
+            <i class="fa-solid fa-key search-icon"></i>
+            <input class="search-input" [(ngModel)]="searchKey" (keyup.enter)="onSearch()"
+                placeholder="Search key to route..." autocomplete="off" />
+            @if (searchKey) {
+            <button class="search-clear" (click)="clearSearch()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            }
+        </div>
+        <button class="search-btn" (click)="onSearch()" [disabled]="isSearching()">
+            @if (isSearching()) {
+                <i class="fa-solid fa-spinner anim-spin"></i>
+            } @else {
+            <i class="fa-solid fa-magnifying-glass"></i>
+            }
+        </button>
+    </div>
+
+    <!-- Route result panel-->
+    @if (routeNodes().length > 0) {
+    <div class="route-panel">
+        <div class="route-title">
+            <i class="fa-solid fa-route"></i>
+            Route for <span class="route-key">"{{searchKey}}</span>
+        </div>
+        @for (node of routeNodes(); track node.id; let i= $index) {
+        <div class="route-node">
+            <span class="route-badge" [class.route-badge--primary]="i === 0">
+                {{i===0? 'PRIMARY': 'REPLICA ' + i}}
+            </span>
+            <span class="route-id">{{ node.id }}</span>
+            <span class="route-addr">{{ node.host }}:{{node.port}}</span>
+        </div>
+        }
+    </div>
+    }
+    @if (routeError()) {
+    <div class="route-error">
+        <i class="fa-solid fa-triangle-exclamation me-1"></i>{{routeError()}}
+    </div>
+    }
+
+
     <div class="ring-legend">
         @for (node of state.nodes(); track node.nodeId) {
-            <div class="d-flex align-items-center gap-2">
-                <span class="legend-dot" [style.background]="node.nodeId | nodeColor"></span>
-                <span style="font-family:var(--font-mono); font-size:0.65rem; font-weight:700;" [style.color]="node.nodeId | nodeColor">
-                    {{ node.nodeId }}
-                </span>
-                <span class="legend-status" [class.legend-status--up]="node.nodeStatus==='UP'" [class.legend-status--suspect]="node.nodeStatus==='SUSPECT'"
+        <div class="d-flex align-items-center gap-2">
+            <span class="legend-dot" [style.background]="node.nodeId | nodeColor"></span>
+            <span class="legend-id" [style.color]="node.nodeId | nodeColor"> {{node.nodeId }} </span>
+            <span style="font-family:var(--font-mono); font-size:0.65rem; font-weight:700;"
+                [style.color]="node.nodeId | nodeColor">
+                {{ node.nodeId }}
+            </span>
+            <span class="legend-status" [class.legend-status--up]="node.nodeStatus==='UP'"
+                [class.legend-status--suspect]="node.nodeStatus==='SUSPECT'"
                 [class.legend-status--down]="node.nodeStatus==='DOWN'">
-                    {{ node.nodeStatus }}
-                </span>
-            </div>
+                {{ node.nodeStatus }}
+            </span>
+        </div>
         }
     </div>
 
+    <!-- Stats - topright -->
     <div class="ring-stats">
         <span class="ring-stat">{{ state.ring().length }} vnodes</span>
         <span class="ring-stat">{{ state.nodes().length}} physical</span>
     </div>
-
 </div>
