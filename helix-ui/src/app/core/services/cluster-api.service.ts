@@ -29,8 +29,8 @@ export class ClusterApiService {
         return this.http.get<CacheStats>(`${this.base}/cluster/stats`);
     }
 
-    getRouteForKey(key: string): Observable<Node[]> {
-        return this.http.get<Node[]>(`${this.base}/cluster/route/${encodeURIComponent(key)}`);
+    getRouteForKey(key: string): Observable<Node> {
+        return this.http.get<Node>(`${this.base}/cluster/route/${encodeURIComponent(key)}`);
     }
 
     getReplicasForKey(key: string): Observable<Node[]> {

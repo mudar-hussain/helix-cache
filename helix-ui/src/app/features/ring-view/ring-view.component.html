@@ -1,73 +1,132 @@
 <div class="ring-wrap">
-    <canvas #canvas class="ring-canvas"></canvas>
-    <!-- Search bar -->
+    <svg class="ring-svg" [attr.viewBox]="'0 0 '+ width +' '+ height" preserveAspectRatio="xMidYMid meet">
 
-    <div class="search-bar">
-        <div class="search-input-wrap">
-            <i class="fa-solid fa-key search-icon"></i>
-            <input class="search-input" [(ngModel)]="searchKey" (keyup.enter)="onSearch()"
-                placeholder="Search key to route..." autocomplete="off" />
-            @if (searchKey) {
-            <button class="search-clear" (click)="clearSearch()">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            }
-        </div>
-        <button class="search-btn" (click)="onSearch()" [disabled]="isSearching()">
-            @if (isSearching()) {
-                <i class="fa-solid fa-spinner anim-spin"></i>
-            } @else {
-            <i class="fa-solid fa-magnifying-glass"></i>
-            }
-        </button>
-    </div>
+        <!-- Hash ring circle -->
 
-    <!-- Route result panel-->
-    @if (routeNodes().length > 0) {
-    <div class="route-panel">
-        <div class="route-title">
-            <i class="fa-solid fa-route"></i>
-            Route for <span class="route-key">"{{searchKey}}</span>
-        </div>
-        @for (node of routeNodes(); track node.id; let i= $index) {
-        <div class="route-node">
-            <span class="route-badge" [class.route-badge--primary]="i === 0">
-                {{i===0? 'PRIMARY': 'REPLICA ' + i}}
-            </span>
-            <span class="route-id">{{ node.id }}</span>
-            <span class="route-addr">{{ node.host }}:{{node.port}}</span>
-        </div>
+        <circle [attr.cx]="cx" [attr.cy]="cy" [attr.r]="ringR" fill="none" stroke="rgba(0,200,255,0.18)"
+            stroke-width="1.5" />
+
+        <!-- Pentagon edges -->
+        @if (nodePositions().length > 0) {
+        <polygon [attr.points]="edgePoints()" fill="none" stroke="rgba(0, 200, 255, 0.10)" stroke-width="1" />
         }
-    </div>
-    }
-    @if (routeError()) {
-    <div class="route-error">
-        <i class="fa-solid fa-triangle-exclamation me-1"></i>{{routeError()}}
-    </div>
-    }
+
+        <!-- Spokes -->
+        @for (p of nodePositions(); track p.id) {
+
+        <line [attr.x1]="cx" [attr.yl]="cy" [attr.x2]="p.x" [attr.y2]="p.y"
+            [attr.stroke]="color(p.id) + (isHighlit(p.id) ? '55' : '22')"
+            [attr.stroke-width]="isHighlit(p.id) ? 1.5 : 1" />
+        }
+
+        <!-- Virtual nodes on ring -->
+        @for (vn of vnodePositions(); track vn.hash) {
+        <polygon [attr.points]="pentagonPoints(vn.x, vn.y, isHighlit(vn.nodeId) ? 7 : 5)"
+            [attr.fill]="color(vn.nodeId) + (isHighlit(vn.nodeId) ? '88' : '55')"
+            [attr.stroke]="color(vn.nodeId) + (isHighlit(vn.nodeId) ? ' ff': 'cc' )"
+            [attr.stroke-width]="isHighlit(vn.nodeId) ? 1.5 : 1" />
+        }
+
+        <!-- Travel dots: primary replicas (animate on DOM entry) -->
+
+        @for (dot of travelDots(); track dot.id) {
+
+        <circle r="5" [attr.fill]="dot.color" class="travel-dot" [style.--x1]="dot.x1" [style.--y1]="dot.y1"
+            [style.--x2]="dot.x2" [style.--y2]="dot.y2" [style.animation-delay]="dot.delay + 's'">
+
+            <animateMotion dur="0.8s" [attr.begin]="dot.delay +'s'" fill="freeze" calcMode="spline"
+                keySplines="0.4 0 0.2 1" keyTimes="0:1">
 
 
+                <mpath [attr.href]="'#path-' + dot.id" />
+
+
+            </animateMotion>
+
+        </circle>
+        }
+
+        <!-- Travel dot paths (invisible, used by animateMotion) -->
+        @for (dot of travelDots(); track dot.id) {
+        <path (attr.id]="path-' + dot. id" [attr.d]="'M' + dot.x1+','+ dot.y1+' L'+ dot.x2+','+ dot.y2" fill="none"
+            stroke="none" />
+        }
+
+        <!-- Physical nodes -->
+        @for (node of state.nodes(); track node.nodeId) {
+        <g [attr.transform]="'translate('+ getPos(node.nodeId).x+','+ getPos(node.nodeId).y +')'">
+
+            <!-- Glow -->
+            <circle [attr.r]="isPrimary(node.nodeId) ? 38 : isHighlit(node.nodeId) ? 32 : 28"
+                [attr.fill]="color(node.nodeId) + (isPrimary(node.nodeId) ? '25' : isHighlit (node.nodeId) ? '18':'12')"
+                class=" node-glow" />
+
+            <!-- Outer ring pulse for primary-->
+
+            @if (isPrimary(node.nodeId)) {
+
+            <circle r="24" fill="none" [attr.stroke]="color (node.nodeId) + 'cc'" stroke-width="1.5"
+                class="primary-ring" />
+            }
+
+
+            <!-- Pentagon body -->>
+
+            <polygon [attr.points]="pentagonPoints(0, 0, isHighlit(node.nodeId) ? 22 : 18)"
+                [attr.fill]="color(node.nodeId)+ (node.nodeStatus === 'DOWN' ? '18' : isHighlit(node.nodeId) ? '40' : '28' )"
+                [attr.stroke]="color(node.nodeId) + (node.nodeStatus === 'DOWN' ? '55' : isHighlit (node.nodeId) ? 'ff' : 'cc')"
+                [attr.stroke-width]="isHighlit(node.nodeId) ? 2: 1.5" class="node-pentagon"
+                [class.node-pentagon--suspect]="node.nodeStatus === 'SUSPECT'" />
+
+            <!-- Crown for primary -->
+            @if(isPrimary(node.nodeId)) {
+            <text y="-26" text-anchor="middle" class="crown" [attr.fill]="color(node.nodeId) "></text>
+            }
+
+            <!--P-7-R1/R2 role label -->
+
+            @if(isHighlit(node.nodeId)) {
+            <text y="4" text-anchor="middle" class="node-role" [attr.fill]="color (node.nodeId)">
+                {{ replicaLabel(node.nodeId) }}
+            </text>
+            }
+            <!-- Node id -->
+            <text [attr.y]="isHighlit(node.nodeId) ? 34 : 30" text-anchor="middle" class="node-label"
+                [attr.fill]="color(node.nodeId) + (isHighlit(node.nodeId) ? 'ff' : 'aa')">
+                {{ node.nodeId}}
+            </text>
+
+            <!-- Key count -->
+            <text [attr.y]="isHighlit(node.nodeId) ? 44 : 40" text-anchor="middle" class="node-keys">
+                {{ node.keyCount}} keys
+            </text>
+        </g>
+        }
+
+        <!-- Center dot -->
+        <circle [attr.cx]="cx" (attr.cy)="cy" r="4" fill="rgba(0,200,255,0.6)" />
+    </svg>
+
+
+
+    <!-- Legend -->
     <div class="ring-legend">
         @for (node of state.nodes(); track node.nodeId) {
         <div class="d-flex align-items-center gap-2">
             <span class="legend-dot" [style.background]="node.nodeId | nodeColor"></span>
-            <span class="legend-id" [style.color]="node.nodeId | nodeColor"> {{node.nodeId }} </span>
-            <span style="font-family:var(--font-mono); font-size:0.65rem; font-weight:700;"
-                [style.color]="node.nodeId | nodeColor">
-                {{ node.nodeId }}
-            </span>
-            <span class="legend-status" [class.legend-status--up]="node.nodeStatus==='UP'"
-                [class.legend-status--suspect]="node.nodeStatus==='SUSPECT'"
-                [class.legend-status--down]="node.nodeStatus==='DOWN'">
-                {{ node.nodeStatus }}
+            <span class="legend-id" [style.color]="node.nodeId | nodeColor">{{ node.nodeId}}</span>
+            <span class="legend-status" [class.legend-status--up]="node.nodeStatus === 'UP'"
+                [class.legend-status--suspect]="node.nodeStatus === 'SUSPECT'"
+                [class.legend-status--down]="node.nodeStatus === 'DOWN'">
+                {{node.nodeStatus}}
             </span>
         </div>
-        }
+    }
     </div>
 
-    <!-- Stats - topright -->
-    <div class="ring-stats">
-        <span class="ring-stat">{{ state.ring().length }} vnodes</span>
-        <span class="ring-stat">{{ state.nodes().length}} physical</span>
-    </div>
+    <!-- Stats -->
+     <div class="ring-stats">
+        <span class="ring-stat">{{state.ring().length}}</span>
+        <span class="ring-stat">{{state.nodes().length}}</span>
+     </div>
 </div>

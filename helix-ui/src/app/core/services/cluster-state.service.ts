@@ -2,7 +2,7 @@ import { computed, inject, Injectable, OnDestroy, signal } from "@angular/core";
 import { ClusterApiService } from "./cluster-api.service";
 import { SseService } from "./sse.service";
 import { interval, startWith, Subscription, switchMap } from "rxjs";
-import { CacheStats, NodeStatusResponse, RingNodeResponse } from "../../shared/interfaces/helix.interface";
+import { CacheStats, Node, NodeStatusResponse, RingNodeResponse } from "../../shared/interfaces/helix.interface";
 import { ClusterEventType, NodeStatus } from "../enums/helix.enum";
 import { environment } from "../../../environments/environment";
 
@@ -25,6 +25,8 @@ export class ClusterStateService implements OnDestroy {
     readonly hitRatio = computed(() => this.stats()?.hitRatio ?? 0);
 
     readonly events$ = this.sse.events$;
+    readonly routeNodes = signal<Node[]>([]);
+    private highlightTimer: ReturnType<typeof setTimeout> | null = null;
 
     constructor() {
         this.startPolling();
@@ -33,6 +35,21 @@ export class ClusterStateService implements OnDestroy {
 
     ngOnDestroy() {
         this.subs.unsubscribe();
+    }
+
+    setRouteNodes(nodes: Node[]): void {
+        if(this.highlightTimer) {
+            clearTimeout(this.highlightTimer);
+        }
+        this.routeNodes.set(nodes);
+        this.highlightTimer = setTimeout(() => this.routeNodes.set([]), 2000);
+    }
+
+    clearRouteNodes(): void {
+        if(this.highlightTimer) {
+            clearTimeout(this.highlightTimer);
+        }
+        this.routeNodes.set([]);
     }
 
     private startPolling() {
