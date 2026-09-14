@@ -1,4 +1,4 @@
-<app-section-title icon="4" text="Write Cache" />
+<app-section-title icon="fa-solid fa-pen-to-square" text="Write Cache" />
 
 <div class="ops-group">
     <label class="ops-label">KEY</label>
@@ -19,18 +19,23 @@
     </div>
 </div>
 
-<button class="ops-btn ops-btn--accent w-100 mb-3" (click)="onWrite()"> PUT</button>
+<button class="ops-btn ops-btn--accent w-100 mb-3" (click)="onWrite()">
+    <i class="fa-solid fa-upload me-1"></i> PUT
+</button>
 
 @if (writeResult()) {
     <div class="result-box" [class.result-box--ok]="writeResult()!.status==='ok'" [class.result-box--err]="writeResult()!.status==='error'">
-        <div class="result-header"><span>{{ writeResult()!.status==='ok'? 'OK': 'X ERR' }}</span><span>{{ writeResult()!. latencyMs }}ms</span></div>
+        <div class="result-header">
+            <i [class]="writeResult()!.status==='ok' ? 'fa-solid fa-check' : 'fa-solid fa-xmark'"></i>
+            <span>{{ writeResult()!.status==='ok'? 'HTTP 200 OK': 'X ERR' }}</span><span>{{ writeResult()!. latencyMs }}ms</span>
+        </div>
         <pre>{{ writeResult()!.body }}</pre>
     </div>
 }
 
 <hr class="ops-divider" />
 
-<app-section-title icon="Q" text="Read / Delete" />
+<app-section-title icon="fa-solid fa-magnifying-glass" text="Read / Delete" />
 
 <div class="ops-group">
     <label class="ops-label">KEY</label>
@@ -38,19 +43,23 @@
 </div>
 
 <div class="d-flex gap-2 mb-3">
-    <button class="ops-btn ops-btn--info flex-grow-1" (click)="onRead()">GET</button>
-    <button class="ops-btn ops-btn--danger" (click)="onDelete()">DEL</button>
+    <button class="ops-btn ops-btn--info flex-grow-1" (click)="onRead()">
+        <i class="fa-solid fa-magnifying-glass me-1"></i>GET
+    </button>
+    <button class="ops-btn ops-btn--danger" (click)="onDelete()">
+        <i class="fa-regular fa-trash-can me-1"></i>DEL
+    </button>
 </div>
 
 @if (readResult()) {
     <div class="result-box result-box--ok">
-        <div class="result-header"><span>✓ HIT</span><span class="ms-auto">v{{ readResult()!.version}}</span></div>
+        <div class="result-header"><span><i class="fa-solid fa-check fa-buzz"></i> HIT</span><span class="ms-auto">v{{ readResult()!.version}}</span></div>
         <div style="font-family:var(--font-mono); font-size:0.7rem; margin: 4px 0;">{{ readResult()!.key }} {{ readResult()!.value }}</div>
     </div>
 }
 
 @if (readError()){ 
-    <div class="result-box result-box--err">X {{ readError() }}</div> 
+    <div class="result-box result-box--err"><i class="fa-solid fa-xmark fa-buzz"></i> {{ readError() }}</div> 
 }
 
 @if (deleteResult()) { 

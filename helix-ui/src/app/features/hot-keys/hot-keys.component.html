@@ -1,5 +1,5 @@
 <div class="hk-shell">
-    <app-section-title icon="" text="Hot Key Predictions" />
+    <app-section-title icon="fa-solid fa-fire" text="Hot Key Predictions" />
 
     <div class="hk-header-row">
         <span class="hk-col-key">Key</span>
@@ -41,7 +41,9 @@
 
     @if (predictions().length === 0) {
         <div class="hk-empty">
-            <div>No hot keys detected</div>
+            <div>
+                <i class="fa-solid fa-exclamation fa-buzz"></i>
+                No hot keys detected</div>
             <div class="hk-empty-sub"> Polling every 10s</div>
         </div>
     }

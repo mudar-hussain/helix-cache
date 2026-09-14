@@ -1,4 +1,4 @@
-<app-section-title icon="O" text="Cluster Nodes" />
+<app-section-title icon="fa-solid fa-server" text="Cluster Nodes" />
 
 @for (node of state.nodes(); track node.nodeId) {
     <div class="node-card" [class.node-card--down]="node.nodeStatus === 'DOWN'">
@@ -17,16 +17,20 @@
 
         <div class="d-flex gap-1">
             @if (node.nodeStatus !== 'UP') {
-                <button class="btn-node btn-node--success w-100" (click)="resume(node)"> Resume</button>
+                <button class="btn-node btn-node--success w-100" (click)="resume(node)">
+                    <i class="fa-solid fa-play me-1"></i> Revive</button>
             } @else {
-                <button class="btn-node btn-node--danger" (click)="pause(node)"> Pause</button>
-                <button class="btn-node btn-node--warning" (click)="slow(node)"> Slow</button>
+                <button class="btn-node btn-node--danger" (click)="pause(node)">
+                    <i class="fa-solid fa-pause me-1"></i> Fail</button>
+                <button class="btn-node btn-node--warning" (click)="slow(node)">
+                    <i class="fa-solid fa-triangle-exclamation me-1"></i> Stress</button>
             }
         </div>
     </div>
 }
 
 @if (state.nodes().length === 0) {
-    <div class="text-center py-4" style="color:var(--color-text-muted); font-size:0.75rem;">Connecting...</div>
+    <div class="text-center py-4" style="color:var(--color-text-muted); font-size:0.75rem;">
+        <i class="fa-solid fa-spinner anim-spin d-block mb-2" style="font-size:1.2rem;"></i>Connecting...</div>
 }
 

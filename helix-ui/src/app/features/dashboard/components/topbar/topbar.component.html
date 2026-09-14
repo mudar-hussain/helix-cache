@@ -24,7 +24,7 @@
     <nav class="tabbar">
     @for (tab of tabs; track tab.path) {
         <a class="tab-btn" [routerLink]="tab.path" routerLinkActive="tab-btn--active">
-            <span class="tab-dot" [style.background]="tab.dot"></span>
+            <i [class]="tab.icon" style="font-size:0.65rem"></i>
             {{ tab.label }}
         </a>
     }

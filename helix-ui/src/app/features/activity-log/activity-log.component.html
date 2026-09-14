@@ -1,13 +1,14 @@
 <div class="log-shell">
     <div class="log-header">
         <app-section-title icon="fa-solid fa-tower-broadcast" text="SSE Live Stream" />
-        <button class="clear-btn" (click)="clear()">CLEAR</button>
+        <button class="clear-btn" (click)="clear()">
+            <i class="fa-regular fa-trash-can fa-buzz me-1"></i>CLEAR</button>
     </div>
 
     <div class="log-body" autoScroll [appAutoScroll]="events().length">
         @if (events().length === 0) {
             <div class="log-empty">
-                <span class="anim-pulse" style="font-size:1.4rem;"></span>
+                <i class="fa-solid fa-spinner fa-buzz anim-pulse" style="font-size:1.4rem;color:var(--color-accent)"></i>
                 <span>Waiting for cluster events...</span>
             </div>
 
