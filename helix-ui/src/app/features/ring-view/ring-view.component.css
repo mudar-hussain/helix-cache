@@ -36,13 +36,13 @@ Node elements
 }
 
 .crown {
-    font-size: 14px;
+    font-size: 25px;
     font-family: serif;
-    filter: drop-shadow(00 4px currentColor);
+    filter: drop-shadow(0 0 4px currentColor);
 }
 
 .node-role {
-    font-size: 9px;
+    font-size: 13px;
     font-weight: 900;
     font-family: 'Courier New', monospace;
 }

@@ -31,7 +31,7 @@ export class RingViewComponent {
         const nodes = this.state.nodes();
         const nodesLength = nodes.length || 5;
         return nodes.map((n, i) => {
-            const a = (2 * Math.PI * nodesLength / nodesLength) - Math.PI / 2;
+            const a = (2 * Math.PI * i / nodesLength) - Math.PI / 2;
             return { id: n.nodeId, x: this.cx + this.nodeR * Math.cos(a), y: this.cy + this.nodeR * Math.sin(a) };
         });
     });
@@ -82,7 +82,7 @@ export class RingViewComponent {
 
                     color: this.color(primary.id),
 
-                    delay: i * 10.15
+                    delay: i * 0.15
 
                 };
 
@@ -96,7 +96,7 @@ export class RingViewComponent {
 
     replicaLabel(nodeId: string): string {
         const idx = this.state.routeNodes().findIndex(n => n.id === nodeId);
-        return idx === 0 ? 'P' : 'R${idx)';
+        return idx === 0 ? 'P' : `R${idx}`;
     }
 
     getPos(nodeId: string): NodePos {
@@ -107,13 +107,13 @@ export class RingViewComponent {
 
     nodeStatus(nodeId: string): string {
 
-        return this.state.nodes().find(n => n.nodeId = nodeId)?.nodeStatus ?? '';
+        return this.state.nodes().find(n => n.nodeId === nodeId)?.nodeStatus ?? '';
     }
 
     pentagonPoints(cx: number, cy: number, r: number): string {
         return Array.from({ length: 5 }, (_, i) => {
             const a = (2 * Math.PI * i / 5) - Math.PI / 2;
             return `${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`;
-        }).join('');
+        }).join(' ');
     }
 }

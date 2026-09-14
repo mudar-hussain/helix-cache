@@ -14,7 +14,7 @@
         <!-- Spokes -->
         @for (p of nodePositions(); track p.id) {
 
-        <line [attr.x1]="cx" [attr.yl]="cy" [attr.x2]="p.x" [attr.y2]="p.y"
+        <line [attr.x1]="cx" [attr.y1]="cy" [attr.x2]="p.x" [attr.y2]="p.y"
             [attr.stroke]="color(p.id) + (isHighlit(p.id) ? '55' : '22')"
             [attr.stroke-width]="isHighlit(p.id) ? 1.5 : 1" />
         }
@@ -35,12 +35,8 @@
             [style.--x2]="dot.x2" [style.--y2]="dot.y2" [style.animation-delay]="dot.delay + 's'">
 
             <animateMotion dur="0.8s" [attr.begin]="dot.delay +'s'" fill="freeze" calcMode="spline"
-                keySplines="0.4 0 0.2 1" keyTimes="0:1">
-
-
+                keySplines="0.4 0 0.2 1" keyTimes="0;1">
                 <mpath [attr.href]="'#path-' + dot.id" />
-
-
             </animateMotion>
 
         </circle>
@@ -48,7 +44,7 @@
 
         <!-- Travel dot paths (invisible, used by animateMotion) -->
         @for (dot of travelDots(); track dot.id) {
-        <path (attr.id]="path-' + dot. id" [attr.d]="'M' + dot.x1+','+ dot.y1+' L'+ dot.x2+','+ dot.y2" fill="none"
+        <path [attr.id]="'path-' + dot.id" [attr.d]="'M' + dot.x1+','+ dot.y1+' L'+ dot.x2+','+ dot.y2" fill="none"
             stroke="none" />
         }
 
@@ -80,7 +76,7 @@
 
             <!-- Crown for primary -->
             @if(isPrimary(node.nodeId)) {
-            <text y="-26" text-anchor="middle" class="crown" [attr.fill]="color(node.nodeId) "></text>
+            <text y="-26" text-anchor="middle" class="crown" [attr.fill]="color(node.nodeId)">👑</text>
             }
 
             <!--P-7-R1/R2 role label -->
@@ -104,7 +100,7 @@
         }
 
         <!-- Center dot -->
-        <circle [attr.cx]="cx" (attr.cy)="cy" r="4" fill="rgba(0,200,255,0.6)" />
+        <circle [attr.cx]="cx" [attr.cy]="cy" r="4" fill="rgba(0,200,255,0.6)" />
     </svg>
 
 
