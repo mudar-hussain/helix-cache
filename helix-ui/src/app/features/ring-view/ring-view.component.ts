@@ -1,8 +1,11 @@
 import { CommonModule } from "@angular/common";
 import { NodeColorPipe } from "../../shared/components/node-color.pipe";
-import { Component, computed, inject } from "@angular/core";
+import { Component, computed, inject, OnInit, signal } from "@angular/core";
 import { environment } from "../../../environments/environment";
 import { ClusterStateService } from "../../core/services/cluster-state.service";
+import { interval, startWith, Subscription, switchMap } from "rxjs";
+import { NodeDistributionResponse } from "../../shared/interfaces/helix.interface";
+import { ClusterApiService } from "../../core/services/cluster-api.service";
 
 
 interface NodePos { id: string; x: number; y: number; }
@@ -14,9 +17,10 @@ interface NodePos { id: string; x: number; y: number; }
     templateUrl: './ring-view.component.html',
     styleUrl: './ring-view.component.css',
 })
-export class RingViewComponent {
+export class RingViewComponent implements OnInit {
 
     protected readonly state = inject(ClusterStateService);
+    protected readonly clusterApi = inject(ClusterApiService);
     private readonly colors: Record<string, string> = Object.fromEntries(
         environment.nodes.map(n => [n.id, n.color])
     );
@@ -26,6 +30,9 @@ export class RingViewComponent {
     readonly cy = this.height / 2;
     readonly ringR = Math.min(this.width, this.height) * 0.30;
     readonly nodeR = Math.min(this.width, this.height) * 0.42;
+
+    private sub = new Subscription();
+    readonly distribution = signal<NodeDistributionResponse[]>([]);
 
     readonly nodePositions = computed<NodePos[]>(() => {
         const nodes = this.state.nodes();
@@ -82,6 +89,25 @@ export class RingViewComponent {
 
             });
     });
+
+    ngOnInit(): void {
+        this.sub.add(
+            interval(environment.pollIntervals.distribution)
+                .pipe(
+                    startWith(0),
+                    switchMap(() => this.clusterApi.getDistribution())
+                )
+                .subscribe(data => this.distribution.set(data))
+        );
+    }
+
+    getDistributionPercentage(nodeId: string): string {
+        const node = this.distribution().find(
+            item => item.nodeId === nodeId
+        );
+
+        return node ? `${node.percentage.toFixed(2)}%` : '0%';
+    }
 
     color(nodeId: string): string { return this.colors[nodeId] ?? '#607d8b'; }
     isHighlit(nodeId: string): boolean { return this.highlighted().has(nodeId); }

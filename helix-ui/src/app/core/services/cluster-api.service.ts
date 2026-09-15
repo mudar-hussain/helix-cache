@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { environment } from "../../../environments/environment";
-import { Observable } from "rxjs";
+import { catchError, Observable } from "rxjs";
 import { CacheStats, NodeDistributionResponse, NodeStatusResponse, RingNodeResponse, Node } from "../../shared/interfaces/helix.interface";
 
 @Injectable({
@@ -10,34 +10,41 @@ import { CacheStats, NodeDistributionResponse, NodeStatusResponse, RingNodeRespo
 export class ClusterApiService {
     
     private readonly http = inject(HttpClient);
-    private readonly base = environment.primaryNode;
+
+    private withFallBack<T>(path: string): Observable<T> {
+        const nodes = environment.nodes;
+        return nodes.reduce((acc$, node, i) => {
+            if (i===0) return this.http.get<T>(`${node.baseUrl}${path}`);
+            return acc$.pipe(
+                catchError(() => this.http.get<T>(`${node.baseUrl}${path}`))
+            );
+        }, null as any as Observable<T>);
+    
+    }
 
     //Cluster API
     getNodes(): Observable<NodeStatusResponse[]> {
-        return this.http.get<NodeStatusResponse[]>(`${this.base}/cluster/nodes`);
+        return this.withFallBack('/cluster/nodes');
     }
 
     getRing(): Observable<RingNodeResponse[]> {
-        return this.http.get<RingNodeResponse[]>(`${this.base}/cluster/ring`);
+        return this.withFallBack('/cluster/ring');
     }
 
     getDistribution(): Observable<NodeDistributionResponse[]> {
-        return this.http.get<NodeDistributionResponse[]>(`${this.base}/cluster/distribution`);
+        return this.withFallBack('/cluster/distribution');
     }
 
     getStats(): Observable<CacheStats> {
-        return this.http.get<CacheStats>(`${this.base}/cluster/stats`);
+        return this.withFallBack('cluster/stats');
     }
 
     getRouteForKey(key: string): Observable<Node> {
-        return this.http.get<Node>(`${this.base}/cluster/route/${encodeURIComponent(key)}`);
+        return this.withFallBack(`cluster/route/${encodeURIComponent(key)}`);
     }
 
     getReplicasForKey(key: string): Observable<Node[]> {
-        return this.http.get<Node[]>(`${this.base}/cluster/replicas/${encodeURIComponent(key)}`);
+        return this.withFallBack(`/cluster/replicas/${encodeURIComponent(key)}`);
     }
-
-
-    
 
 }

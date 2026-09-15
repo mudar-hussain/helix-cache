@@ -15,10 +15,6 @@ export const routes: Route[] = [
                 loadComponent: () => import('./features/ring-view/ring-view.component').then(m => m.RingViewComponent),
             },
             {
-                path: 'distribution',
-                loadComponent: () => import('./features/distribution/distribution.component').then(m => m.DistributionComponent),
-            },
-            {
                 path: 'hot-keys',
                 loadComponent: () => import('./features/hot-keys/hot-keys.component').then(m => m.HotKeysComponent),
             },

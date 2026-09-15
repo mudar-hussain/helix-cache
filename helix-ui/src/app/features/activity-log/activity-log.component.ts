@@ -7,7 +7,6 @@ import { SectionTitleComponent } from '../../shared/components/section-title/sec
 import { AutoScrollDirective } from '../../shared/directives/auto-scroll.directive';
 import { ClusterEventType } from '../../core/enums/helix.enum';
 
-const MAX_EVENTS = 200;
 
 @Component({
     selector: 'app-activity-log',
@@ -16,30 +15,16 @@ const MAX_EVENTS = 200;
     templateUrl: './activity-log.component.html',
     styleUrl: './activity-log.component.css',
 })
-export class ActivityLogComponent implements OnInit, OnDestroy {
-
-    // private readonly clusterStateService = inject(ClusterStateService);
-
-    private sub = new Subscription();
-
-    readonly events = signal<ClusterEvent []>([]);
+export class ActivityLogComponent {
 
     constructor(private clusterStateService: ClusterStateService) {}
 
-    ngOnInit(): void {
-        this.sub.add(
-            this.clusterStateService.events$.subscribe(ev => {
-                this.events.update (prev => [ev, ... prev].slice(0, MAX_EVENTS));
-            })
-        );
-    }
-
-    ngOnDestroy(): void {
-        this.sub.unsubscribe();
+    get events() { 
+        return this.clusterStateService.eventLog; 
     }
 
     clear(): void {
-        this.events.set([]);
+        this.clusterStateService.eventLog.set([]);
     }
 
     eventColor (ev: ClusterEvent): string {

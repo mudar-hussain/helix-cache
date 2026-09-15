@@ -40,25 +40,6 @@
             />
         }
 
-        <!-- @for (dot of travelDots(); track dot.id) {
-
-        <circle r="5" [attr.fill]="dot.color" class="travel-dot" [style.--x1]="dot.x1" [style.--y1]="dot.y1"
-            [style.--x2]="dot.x2" [style.--y2]="dot.y2" [style.animation-delay]="dot.delay + 's'">
-
-            <animateMotion dur="0.8s" [attr.begin]="dot.delay +'s'" fill="freeze" calcMode="spline"
-                keySplines="0.4 0 0.2 1" keyTimes="0;1">
-                <mpath [attr.href]="'#path-' + dot.id" />
-            </animateMotion>
-
-        </circle>
-        }
-
-        Travel dot paths (invisible, used by animateMotion) 
-        @for (dot of travelDots(); track dot.id) {
-        <path [attr.id]="'path-' + dot.id" [attr.d]="'M' + dot.x1+','+ dot.y1+' L'+ dot.x2+','+ dot.y2" fill="none"
-            stroke="none" />
-        } -->
-
         <!-- Physical nodes -->
         @for (node of state.nodes(); track node.nodeId) {
         <g [attr.transform]="'translate('+ getPos(node.nodeId).x+','+ getPos(node.nodeId).y +')'">
@@ -105,7 +86,7 @@
 
             <!-- Key count -->
             <text [attr.y]="isHighlit(node.nodeId) ? 44 : 40" text-anchor="middle" class="node-keys">
-                {{ node.keyCount}} keys
+                {{ node.keyCount}} keys ({{ getDistributionPercentage(node.nodeId)}})
             </text>
         </g>
         }

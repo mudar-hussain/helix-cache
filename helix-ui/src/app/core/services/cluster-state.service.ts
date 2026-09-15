@@ -2,7 +2,7 @@ import { computed, inject, Injectable, OnDestroy, signal } from "@angular/core";
 import { ClusterApiService } from "./cluster-api.service";
 import { SseService } from "./sse.service";
 import { interval, startWith, Subscription, switchMap } from "rxjs";
-import { CacheStats, Node, NodeStatusResponse, RingNodeResponse } from "../../shared/interfaces/helix.interface";
+import { ClusterEvent, CacheStats, Node, NodeStatusResponse, RingNodeResponse } from "../../shared/interfaces/helix.interface";
 import { ClusterEventType, NodeStatus } from "../enums/helix.enum";
 import { environment } from "../../../environments/environment";
 
@@ -27,6 +27,9 @@ export class ClusterStateService implements OnDestroy {
     readonly events$ = this.sse.events$;
     readonly routeNodes = signal<Node[]>([]);
     private highlightTimer: ReturnType<typeof setTimeout> | null = null;
+
+    private readonly MAX_EVENTS = 200;
+    readonly eventLog = signal<ClusterEvent[]>([]);
 
     constructor() {
         this.startPolling();
@@ -72,10 +75,11 @@ export class ClusterStateService implements OnDestroy {
         //on any node status change, refresh the nodes and ring state
         this.subs.add(
             this.events$.subscribe(event => {
-                if ([ClusterEventType.NODE_UP, ClusterEventType.NODE_DOWN, ClusterEventType.NODE_SUSPECT].includes(event.clusterEventType)) {
-                    this.clusterApi.getNodes().subscribe(nodes => this.nodes.set(nodes));
-                        this.clusterApi.getRing().subscribe(ring => this.ring.set(ring));
-                }
+                this.eventLog.update(prev => [event, ...prev].slice(0, this.MAX_EVENTS));
+                // if ([ClusterEventType.NODE_UP, ClusterEventType.NODE_DOWN, ClusterEventType.NODE_SUSPECT].includes(event.clusterEventType)) {
+                //     this.clusterApi.getNodes().subscribe(nodes => this.nodes.set(nodes));
+                //         this.clusterApi.getRing().subscribe(ring => this.ring.set(ring));
+                // }
             })
         );
     }

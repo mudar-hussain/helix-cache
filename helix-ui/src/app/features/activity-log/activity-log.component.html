@@ -14,9 +14,9 @@
 
         }
 
-        @for (ev of events(); track ev.eventTimeStamp + ev.clusterEventType) {
+        @for (ev of events(); track ev.eventTimestamp + ev.clusterEventType) {
             <div class="log-row anim-slide-up">
-                <span class="log-time">{{ ev.eventTimeStamp | date: 'HH:mm:ss' }}</span>
+                <span class="log-time">{{ ev.eventTimestamp | date: 'HH:mm:ss' }}</span>
                 <span class="log-type" [style.color]="eventColor (ev)">{{ ev.clusterEventType }}</span>
                 @if (ev.nodeId) {
                     <span class="log-node">{{ ev.nodeId }}</span>

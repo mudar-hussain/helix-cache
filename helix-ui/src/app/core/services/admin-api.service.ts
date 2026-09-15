@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { Observable } from "rxjs";
+import { catchError, Observable } from "rxjs";
 import { HotKeyPredictionResponse } from "../../shared/interfaces/helix.interface";
 import { environment } from "../../../environments/environment";
 
@@ -26,7 +26,10 @@ export class AdminApiService {
     }
 
     getPrediction(): Observable<HotKeyPredictionResponse[]> {
-        return this.http.get<HotKeyPredictionResponse[]>(`${this.base}/admin/stats/predictions`);
+        return environment.nodes.slice(1).reduce(
+            (acc$, node) => acc$.pipe(catchError(() => this.http.get<HotKeyPredictionResponse[]>(`${node.baseUrl}/admin/stats/predictions`))),
+            this.http.get<HotKeyPredictionResponse[]>(`${environment.nodes[0].baseUrl}/admin/stats/predictions`)
+        );
     }
 
 }

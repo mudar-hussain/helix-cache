@@ -33,7 +33,7 @@ public class NodeHealthService {
                 .uri("http://" + nodeAddress + "/cluster/ping")
                 .retrieve()
                 .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
-                    throw new HelixValidationException("Node returned" + response.getStatusCode());
+                    throw new HelixValidationException("Node returned " + response.getStatusCode());
                 }))
                 .body(String.class);
     }

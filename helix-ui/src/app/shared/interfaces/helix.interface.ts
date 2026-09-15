@@ -60,7 +60,7 @@ export interface ClusterEvent {
     key: string | null;
     detail: string;
     severity: Severity;
-    eventTimeStamp: string;
+    eventTimestamp: string;
 }
 
 export interface OpResult {

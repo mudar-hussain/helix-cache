@@ -48,6 +48,7 @@ export class CacheOpsComponent {
 
     onWrite(): void {
         if (!this.writeKey.trim() || !this.writeValue.trim()) return;
+        this.resetResult();
         const t = Date.now();
         this.state.clearRouteNodes();
         this.cacheApi.putCache(this.writeKey.trim(), this.writeValue.trim(), this.ttlSeconds(this.writeTtl)).subscribe({
@@ -69,8 +70,7 @@ export class CacheOpsComponent {
 
     onRead(): void {
         if (!this.readKey.trim()) return;
-        this.readResult.set(null);
-        this.readError.set(null);
+        this.resetResult();
         this.state.clearRouteNodes();
         this.cacheApi.getCache(this.readKey.trim()).subscribe({
             next: res => {
@@ -87,12 +87,19 @@ export class CacheOpsComponent {
 
     onDelete(): void {
         if (!this.readKey.trim()) return;
-        this.deleteResult.set(null);
+        this.resetResult();
         this.state.clearRouteNodes();
         this.cacheApi.deleteCache(this.readKey.trim()).subscribe({
             next: () => { this.deleteResult.set('Deleted'); this.readResult.set(null); },
             error: err => this.deleteResult.set('Error: ' + err.message),
         });
+    }
+
+    resetResult(): void {
+        this.writeResult.set(null);
+        this.readResult.set(null);
+        this.readError.set(null);
+        this.deleteResult.set(null);
     }
 
 }

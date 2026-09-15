@@ -1,3 +1,34 @@
+.ops-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.ops-group--key {
+    flex: 0.9;
+}
+
+.ops-group--value {
+    flex: 1.6;
+}
+
+.ops-group--value .ops-textarea {
+    min-height: 42px;
+    resize: vertical;
+}
+
+@media (max-width: 640px) {
+    .ops-row {
+        flex-direction: column;
+    }
+
+    .ops-group--key,
+    .ops-group--value {
+        flex: 1;
+        width: 100%;
+    }
+}
 .ops-group {
     margin-bottom: 8px;
 }
@@ -41,14 +72,15 @@
 }
 
 .ttl-chip {
-    padding: 2px 8px;
-    border-radius: 3px;
+    padding: 2px 7px;
+    border-radius: 5px;
     font-size: 0.6rem;
     font-weight: 900;
     cursor: pointer;
     border: 1px solid var(--color-border);
     color: var(--color-text-secondary);
     transition: all 0.15s;
+    margin-right: 5px;
 }
 
 .ttl-chip:hover,
