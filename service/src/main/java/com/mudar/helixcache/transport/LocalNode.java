@@ -17,7 +17,7 @@ public class LocalNode {
     private final CacheStore cacheStore;
     private final NodeProperties nodeProperties;
 
-    public Cache addCache(String key, String value, Long ttlSeconds) {
+    public Cache addCache(String key, String value, Long ttlSeconds, String primaryNode) {
         HelixUtils.validateKeyValue(key, value);
         Cache cache;
         if(cacheStore.contains(key)) {
@@ -27,7 +27,7 @@ public class LocalNode {
             cache.setVersion(cache.getVersion()+1);
         } else {
             Timestamp createdAt = HelixUtils.getCurrentTimestamp();
-            cache = new Cache(key, value, nodeProperties.getId(), createdAt, ttlSeconds);
+            cache = new Cache(key, value, primaryNode, createdAt, ttlSeconds);
         }
         cacheStore.put(key, cache);
         return cache;

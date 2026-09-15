@@ -12,7 +12,7 @@
     grid-area: topbar; 
     border-bottom: 1px solid var(--color-border);
     background: rgba(2,9,18,0.97); 
-    backdrop-filter: blur (14px); 
+    backdrop-filter: blur(14px); 
     z-index: 10; 
 }
 

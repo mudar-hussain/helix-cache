@@ -2,7 +2,7 @@ import { computed, inject, Injectable, OnDestroy, signal } from "@angular/core";
 import { ClusterApiService } from "./cluster-api.service";
 import { SseService } from "./sse.service";
 import { interval, startWith, Subscription, switchMap } from "rxjs";
-import { ClusterEvent, CacheStats, Node, NodeStatusResponse, RingNodeResponse } from "../../shared/interfaces/helix.interface";
+import { ClusterEvent, CacheStats, Node, NodeStatusResponse, RingNodeResponse, ReplicaNodes } from "../../shared/interfaces/helix.interface";
 import { ClusterEventType, NodeStatus } from "../enums/helix.enum";
 import { environment } from "../../../environments/environment";
 
@@ -25,7 +25,7 @@ export class ClusterStateService implements OnDestroy {
     readonly hitRatio = computed(() => this.stats()?.hitRatio ?? 0);
 
     readonly events$ = this.sse.events$;
-    readonly routeNodes = signal<Node[]>([]);
+    readonly replicaNodes = signal<ReplicaNodes | null>(null);
     private highlightTimer: ReturnType<typeof setTimeout> | null = null;
 
     private readonly MAX_EVENTS = 200;
@@ -40,19 +40,19 @@ export class ClusterStateService implements OnDestroy {
         this.subs.unsubscribe();
     }
 
-    setRouteNodes(nodes: Node[]): void {
+    setReplicaNodes(replica: ReplicaNodes): void {
         if(this.highlightTimer) {
             clearTimeout(this.highlightTimer);
         }
-        this.routeNodes.set(nodes);
-        this.highlightTimer = setTimeout(() => this.routeNodes.set([]), 2000);
+        this.replicaNodes.set(replica);
+        this.highlightTimer = setTimeout(() => this.replicaNodes.set(null), 2000);
     }
 
-    clearRouteNodes(): void {
+    clearReplicaNodes(): void {
         if(this.highlightTimer) {
             clearTimeout(this.highlightTimer);
         }
-        this.routeNodes.set([]);
+        this.replicaNodes.set(null);
     }
 
     private startPolling() {
@@ -76,10 +76,10 @@ export class ClusterStateService implements OnDestroy {
         this.subs.add(
             this.events$.subscribe(event => {
                 this.eventLog.update(prev => [event, ...prev].slice(0, this.MAX_EVENTS));
-                // if ([ClusterEventType.NODE_UP, ClusterEventType.NODE_DOWN, ClusterEventType.NODE_SUSPECT].includes(event.clusterEventType)) {
-                //     this.clusterApi.getNodes().subscribe(nodes => this.nodes.set(nodes));
-                //         this.clusterApi.getRing().subscribe(ring => this.ring.set(ring));
-                // }
+                if ([ClusterEventType.NODE_UP, ClusterEventType.NODE_DOWN, ClusterEventType.NODE_SUSPECT].includes(event.clusterEventType)) {
+                    this.clusterApi.getNodes().subscribe(nodes => this.nodes.set(nodes));
+                        this.clusterApi.getRing().subscribe(ring => this.ring.set(ring));
+                }
             })
         );
     }

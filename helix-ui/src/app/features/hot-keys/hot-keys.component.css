@@ -1,23 +1,20 @@
 :host {
     display: block;
-    padding: 24px;
-    height: 100%;
-    overflow-y: auto;
 }
 
 .hk-shell {
-    max-width: 780px;
-    margin: 0 auto;
+    max-width: 100%;
+    margin: 0;
 }
 
 .hk-header-row {
     display: grid;
-    grid-template-columns: 1fr 180px 70px 70px 70px;
+    grid-template-columns: 60px 85px 50px 50px 50px;
     gap: 8px;
     padding: 4px 10px 8px;
     font-size: 0.55rem;
     font-weight: 900;
-    letter-spacing: 1.5px;
+    letter-spacing: 1.8px;
     text-transform: uppercase;
     color: var(--color-text-secondary);
     border-bottom: 1px solid var(--color-border);
@@ -26,7 +23,7 @@
 
 .hk-row {
     display: grid;
-    grid-template-columns: 1fr 180px 70px 70px 70px;
+    grid-template-columns: 60px 85px 50px 50px 50px;
     gap: 8px;
     align-items: center;
     padding: 7px 10px;
@@ -50,9 +47,32 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    width: 9ch;          /* exactly 9 characters wide */
+    min-width: 9ch;
+    max-width: 9ch;
+    display: inline-block;
+    position: relative;
 }
 
-.hk-col-score {}
+.hk-key-text {
+    display: inline-block;
+    transform: translateX(0);
+    transition: transform .35s ease;
+}
+
+/* Slide only when hovering the key cell */
+.hk-col-key:hover .hk-key-text {
+    animation: key-slide 2s linear infinite alternate;
+}
+
+@keyframes key-slide {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(calc(-100% + 4ch));
+    }
+}
 
 .hk-col-rate,
 .hk-col-total {

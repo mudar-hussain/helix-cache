@@ -6,12 +6,13 @@ import { CacheApiService } from "../../core/services/cache-api.service";
 import { CacheResponse, Node, OpResult } from "../../shared/interfaces/helix.interface";
 import { ClusterApiService } from "../../core/services/cluster-api.service";
 import { ClusterStateService } from "../../core/services/cluster-state.service";
+import { HotKeysComponent } from "../hot-keys/hot-keys.component";
 
 
 @Component({
     selector: 'app-cache-ops',
     standalone: true,
-    imports: [CommonModule, FormsModule, SectionTitleComponent],
+    imports: [CommonModule, FormsModule, SectionTitleComponent, HotKeysComponent],
     templateUrl: './cache-ops.component.html',
     styleUrl: './cache-ops.component.css',
 })
@@ -28,6 +29,7 @@ export class CacheOpsComponent {
     ttlOptions = ['never', '10s', '30s', '2m', '10m'];
 
     writeResult = signal<OpResult | null>(null);
+    writeError = signal<OpResult | null>(null);
     readResult = signal<CacheResponse | null>(null);
     readError = signal<string | null>(null);
     deleteResult = signal<string | null>(null);
@@ -50,48 +52,61 @@ export class CacheOpsComponent {
         if (!this.writeKey.trim() || !this.writeValue.trim()) return;
         this.resetResult();
         const t = Date.now();
-        this.state.clearRouteNodes();
         this.cacheApi.putCache(this.writeKey.trim(), this.writeValue.trim(), this.ttlSeconds(this.writeTtl)).subscribe({
             next: res => {
-                this.writeResult.set({ status: 'ok', statusCode: 200, latencyMs: Date.now() - t, body: JSON.stringify(res, null, 2), primaryNode: res.primaryNode?.id });
+                this.writeResult.set({ latencyMs: Date.now() - t, body: res });
 
                 // key exists - highlight primary node
                 this.clusterApi.getReplicasForKey(this.writeKey.trim()).subscribe({
-                    next: nodes => this.state.setRouteNodes(nodes),
+                    next: replica => this.state.setReplicaNodes(replica),
                     error: () => { }
                 });
             },
-            error: err => this.writeResult.set({
-                status: 'error', statusCode: err.status ?? 0, latencyMs: Date.now() - t, body:
-                    err.message
+            error: err => this.writeError.set({
+                latencyMs: Date.now() - t, 
+                body: err.message
             }),
         });
     }
 
     onRead(): void {
-        if (!this.readKey.trim()) return;
+        const key = this.readKey.trim();
+        if (!key) return;
         this.resetResult();
-        this.state.clearRouteNodes();
-        this.cacheApi.getCache(this.readKey.trim()).subscribe({
+        this.cacheApi.getCache(key).subscribe({
             next: res => {
                 this.readResult.set(res);
                 // key exists - highlight primary node
-                this.clusterApi.getReplicasForKey(this.readKey.trim()).subscribe({
-                    next: nodes => this.state.setRouteNodes(nodes),
+                this.clusterApi.getReplicasForKey(key).subscribe({
+                    next: replica => this.state.setReplicaNodes(replica),
                     error: () => { }
                 });
             },
-            error: err => this.readError.set(err.status === 404 ? 'Key not found' : err.message),
+            error: err => {
+                if(err.status === 404) {
+                    this.readError.set('Key not found');
+                } else {
+                    const msg = err.error?.message ?? err.error ?? err.message;
+                    this.readError.set(msg);
+                }
+            }
         });
     }
 
     onDelete(): void {
-        if (!this.readKey.trim()) return;
+        const key = this.readKey.trim();
+        if (!key) return;
         this.resetResult();
-        this.state.clearRouteNodes();
-        this.cacheApi.deleteCache(this.readKey.trim()).subscribe({
-            next: () => { this.deleteResult.set('Deleted'); this.readResult.set(null); },
-            error: err => this.deleteResult.set('Error: ' + err.message),
+        this.cacheApi.deleteCache(key).subscribe({
+            next: res => { this.deleteResult.set(res); },
+            error: err => {
+                const msg = err.error?.message ?? err.error ?? err.message;
+                if(msg.text === 'Cache entry removed successfully') {
+                    this.deleteResult.set(msg.text);
+                } else {
+                    this.deleteResult.set('Error: ' + msg.text);
+                }
+            }
         });
     }
 
@@ -100,6 +115,7 @@ export class CacheOpsComponent {
         this.readResult.set(null);
         this.readError.set(null);
         this.deleteResult.set(null);
+        this.state.clearReplicaNodes();
     }
 
 }

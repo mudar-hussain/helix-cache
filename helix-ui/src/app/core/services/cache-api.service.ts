@@ -1,7 +1,7 @@
 import { inject, Injectable } from "@angular/core";
 import { CacheResponse } from "../../shared/interfaces/helix.interface";
-import { catchError, Observable } from "rxjs";
-import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+import { catchError, Observable, throwError } from "rxjs";
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from "@angular/common/http";
 import { environment } from "../../../environments/environment";
 
 @Injectable({
@@ -38,9 +38,25 @@ export class CacheApiService {
             }
         };
 
+        const shouldFallback = (error: HttpErrorResponse): boolean => {
+            console.log(error);
+            return (
+            error.status === 0 ||     // Network / connection failure
+            error.status === 502 ||   // Bad Gateway
+            error.status === 503 ||   // Service unavailable
+            error.status === 504      // Gateway timeout
+            );
+        };
+
         return environment.nodes.slice(1).reduce(
             (acc$, node) =>
-                acc$.pipe(catchError(() => request(node.baseUrl))),
+                acc$.pipe(catchError((error: HttpErrorResponse) => {
+                    if(!shouldFallback(error)) {
+                        return throwError(() => error);
+                    }
+                    return request(node.baseUrl);
+                })
+            ),
             request(environment.nodes[0].baseUrl)
         );
     }

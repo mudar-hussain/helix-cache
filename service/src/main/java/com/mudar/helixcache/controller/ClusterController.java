@@ -4,6 +4,7 @@ import com.mudar.helixcache.cluster.NodeStateManager;
 import com.mudar.helixcache.dto.*;
 import com.mudar.helixcache.enums.NodeStatus;
 import com.mudar.helixcache.model.Node;
+import com.mudar.helixcache.model.ReplicaNodes;
 import com.mudar.helixcache.service.CacheService;
 import com.mudar.helixcache.service.ClusterService;
 import com.mudar.helixcache.utils.HelixUtils;
@@ -49,7 +50,7 @@ public class ClusterController {
     }
 
     @GetMapping("/replicas/{key}")
-    public ResponseEntity<List<Node>> getReplicas(@PathVariable String key) {
+    public ResponseEntity<ReplicaNodes> getReplicas(@PathVariable String key) {
         return ResponseEntity.ok(clusterService.getReplicas(key));
     }
 

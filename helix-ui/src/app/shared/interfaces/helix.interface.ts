@@ -44,6 +44,12 @@ export interface Node {
     port: number;
 }
 
+export interface ReplicaNodes {
+    key: string;
+    primaryNode: Node;
+    replicaNodes: Node[];
+}
+
 export interface CacheResponse {
     key: string;
     value: string;
@@ -64,11 +70,8 @@ export interface ClusterEvent {
 }
 
 export interface OpResult {
-    status: 'ok' | 'error';
-    statusCode: number;
     latencyMs: number;
-    body: string;
-    primaryNode?: string;
+    body: CacheResponse;
 }
 
 export interface NodeConfig {

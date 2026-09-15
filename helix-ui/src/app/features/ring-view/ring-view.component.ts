@@ -54,23 +54,30 @@ export class RingViewComponent implements OnInit {
         })
     );
 
-    readonly highlighted = computed(() =>
-        new Set<string>(this.state.routeNodes().map(n => n.id))
-    );
+    readonly highlighted = computed(() => {
+        const highlightedNodes = new Set<string>();
+        const replicaNodes = this.state.replicaNodes(); 
+        if(replicaNodes === null) return highlightedNodes;
+        highlightedNodes.add(replicaNodes?.primaryNode.id)
+        for(const node of replicaNodes.replicaNodes) {
+            highlightedNodes.add(node.id);
+        }
+        return highlightedNodes;
+    });
 
     readonly primaryId = computed(() =>
-        this.state.routeNodes().length > 0 ? this.state.routeNodes()[0].id : null
+        this.state.replicaNodes()?.primaryNode.id ?? null
     );
 
     // Replica travel dots primary each active replica
 
     readonly travelDots = computed(() => {
-        const nodes = this.state.routeNodes();
-        if (nodes.length < 2) return [];
-        const primary = nodes[0];
-        const primaryPos = this.getPos(primary.id);
+        const replicaNodes = this.state.replicaNodes();
+        if (replicaNodes === null) return [];
+        const primaryNodeId = replicaNodes.primaryNode.id;
+        const primaryPos = this.getPos(primaryNodeId);
         const animKey = Date.now();
-        return nodes.slice(1)
+        return replicaNodes.replicaNodes
             .filter(r => this.nodeStatus(r.id) === 'UP')
             .map((r, i) => {
                 const replicaPos = this.getPos(r.id);
@@ -83,7 +90,7 @@ export class RingViewComponent implements OnInit {
                     startY: primaryPos.y,
                     dx,
                     dy,
-                    color: this.color(primary.id),
+                    color: this.color(primaryNodeId),
                     delay: i * 0.2
                 };
 
@@ -114,8 +121,14 @@ export class RingViewComponent implements OnInit {
     isPrimary(nodeId: string): boolean { return this.primaryId() === nodeId; }
 
     replicaLabel(nodeId: string): string {
-        const idx = this.state.routeNodes().findIndex(n => n.id === nodeId);
-        return idx === 0 ? 'P' : `R${idx}`;
+        const replicaNodes = this.state.replicaNodes(); 
+        if(replicaNodes == null) return '';      
+        if(nodeId === replicaNodes.primaryNode.id) {
+            return 'P';
+        } else {
+            const idx = replicaNodes?.replicaNodes.findIndex(n => n.id === nodeId); 
+            return `R${idx+1}`;
+        }
     }
 
     getPos(nodeId: string): NodePos {

@@ -41,33 +41,4 @@ export class SseService {
         });
     }
 
-    private buildStream(): Observable<ClusterEvent> {
-        const perNode$ = environment.nodes.map(node =>
-            new Observable<ClusterEvent>(subscriber => {
-                const eventSource = new EventSource(`${node.baseUrl}/cluster/events/stream`);
-                (Object.values(ClusterEventType) as string[]).forEach(eventType => {
-                    eventSource.addEventListener(eventType, (event: MessageEvent) => {
-                        try {
-                            const clusterEvent: ClusterEvent = JSON.parse(event.data);
-                            subscriber.next(clusterEvent);
-                        } catch (error) {
-                            console.error(`SSE parse error [${node.id}]:`, error);
-                        }
-                    });
-                });
-
-                eventSource.onerror = (error) => {
-                    console.error(`SSE connection error on [${node.id}]: `, error);
-                };
-
-                return () => {
-                    eventSource.close();
-                }
-            })
-        );
-
-        // merge to all 
-        return merge(...perNode$).pipe(share());
-    }
-
 }

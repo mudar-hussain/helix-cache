@@ -8,6 +8,7 @@ import com.mudar.helixcache.dto.RingNodeResponse;
 import com.mudar.helixcache.enums.NodeStatus;
 import com.mudar.helixcache.model.Node;
 import com.mudar.helixcache.model.NodeHealth;
+import com.mudar.helixcache.model.ReplicaNodes;
 import com.mudar.helixcache.utils.HelixUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -91,8 +92,11 @@ public class ClusterService {
         return ringNodeResponseList;
     }
 
-    public List<Node> getReplicas(String key) {
-        return clusterManager.getReplicas(key);
+    public ReplicaNodes getReplicas(String key) {
+        List<Node> allNodes = clusterManager.getReplicas(key);
+        Node primaryNode = allNodes.get(0);
+        List<Node> replicas = allNodes.stream().filter(node -> !node.id().equals(primaryNode.id())).toList();
+        return new ReplicaNodes(key, primaryNode, replicas);
     }
 
     public Node getLocalNode() {

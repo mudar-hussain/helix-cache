@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { environment } from "../../../environments/environment";
 import { catchError, Observable } from "rxjs";
-import { CacheStats, NodeDistributionResponse, NodeStatusResponse, RingNodeResponse, Node } from "../../shared/interfaces/helix.interface";
+import { CacheStats, NodeDistributionResponse, NodeStatusResponse, RingNodeResponse, Node, ReplicaNodes } from "../../shared/interfaces/helix.interface";
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +43,7 @@ export class ClusterApiService {
         return this.withFallBack(`cluster/route/${encodeURIComponent(key)}`);
     }
 
-    getReplicasForKey(key: string): Observable<Node[]> {
+    getReplicasForKey(key: string): Observable<ReplicaNodes> {
         return this.withFallBack(`/cluster/replicas/${encodeURIComponent(key)}`);
     }
 

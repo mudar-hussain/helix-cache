@@ -43,11 +43,12 @@ public class CacheService {
         int successCount = 0;
         List<String> failures = new ArrayList<>();
         List<Hint> pendingHints = new ArrayList<>();
+        String primaryNode = replicas.get(0).id();
         for(Node replica: replicas) {
             try{
                 Cache temp;
                 if(replica.id().equals(clusterManager.getLocalNodeId())) {
-                    temp = localNode.addCache(key, value, ttlSeconds);
+                    temp = localNode.addCache(key, value, ttlSeconds, primaryNode);
                 } else {
                     temp = clientNode.replicateCache(replica, key, value, ttlSeconds);
                 }
@@ -80,7 +81,9 @@ public class CacheService {
     }
 
     public Cache writeCacheLocal(String key, String value, Long ttlSeconds) {
-        return localNode.addCache(key, value, ttlSeconds);
+        List<Node> replicas = clusterManager.getReplicas(key);
+        String primaryNode = replicas.get(0).id();
+        return localNode.addCache(key, value, ttlSeconds, primaryNode);
     }
 
     public Cache getCache(String key) {
@@ -133,7 +136,7 @@ public class CacheService {
         List<Node> replicas = clusterManager.getReplicas(key);
         int writeQuorum = clusterManager.getWriteQuorum();
 
-        String successMsg = "Cache entry removed";
+        String successMsg = HelixConstant.SUCCESS_CACHE_REMOVED;
         int successCount = 0;
         List<String> failures = new ArrayList<>();
 

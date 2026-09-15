@@ -14,7 +14,7 @@
 
         }
 
-        @for (ev of events(); track ev.eventTimestamp + ev.clusterEventType) {
+        @for (ev of events(); track $index) {
             <div class="log-row anim-slide-up">
                 <span class="log-time">{{ ev.eventTimestamp | date: 'HH:mm:ss' }}</span>
                 <span class="log-type" [style.color]="eventColor (ev)">{{ ev.clusterEventType }}</span>

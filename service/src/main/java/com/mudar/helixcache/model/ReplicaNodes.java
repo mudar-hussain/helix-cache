@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 
 import java.util.List;
 
-@AllArgsConstructor
-public class Replica {
-    private String key;
-    private Node primaryNode;
-    private List<Node> replicaNodes;
+public record ReplicaNodes (
+        String key,
+        Node primaryNode,
+        List<Node> replicaNodes
+) {
 }
