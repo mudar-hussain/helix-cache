@@ -1,0 +1,146 @@
+:host {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.ring-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.ring-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/*
+Node elements
+*/
+.node-glow {
+    transition: r 0.4s ease, fill 0.4s ease;
+}
+
+.node-pentagon {
+    transition: all 0.3s ease;
+}
+
+.node-pentagon--suspect {
+    animation: hx-blink 0.9s ease-in-out infinite;
+}
+
+.primary-ring {
+    animation: hx-pulse 1.5s ease-in-out infinite;
+}
+
+.crown {
+    font-size: 25px;
+    font-family: serif;
+    filter: drop-shadow(0 0 4px currentColor);
+}
+
+.node-role {
+    font-size: 13px;
+    font-weight: 900;
+    font-family: 'Courier New', monospace;
+}
+
+.node-label {
+    font-size: 9px;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    transition: fill 0.3s ease;
+}
+
+.node-keys {
+    font-size: 8px;
+    fill: rgba(200, 232, 255, 0.5);
+    font-family: 'Courier New', monospace;
+}
+
+/* Travel dot */
+
+.travel-dot {
+    opacity: 0.9;
+    filter: drop-shadow(0 0 6px currentColor);
+    animation: dot-travel 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes dot-travel {
+    0% { transform: translate(0, 0); opacity: 0.9; }
+    10% { transform: translate(0, 0); opacity: 0.9; }
+    80% { transform: translate(var(--dx), var(--dy)); opacity: 0.9; }
+    100% { transform: translate(var(--dx), var(--dy)); opacity: 0; }
+}
+
+/* Legend */
+.ring-legend {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: rgba(2, 9, 18, 0.75);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    padding: 8px 12px;
+    backdrop-filter: blur(8px);
+}
+
+.legend-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.legend-id {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    min-width: 58px;
+}
+
+.legend-status {
+    font-size: 0.55rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase
+}
+
+.legend-status--up {
+    color: var(--color-success);
+}
+
+.legend-status--suspect {
+    color: var(--color-warning);
+    animation: hx-blink 0.9s ease-in-out infinite;
+}
+
+.legend-status--down {
+    color: var(--color-danger);
+}
+
+/* Stats */
+.ring-stats {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    gap: 10px;
+    background: rgba(2, 9, 18, 0.75);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    padding: 6px 12px;
+    backdrop-filter: blur(8px);
+}
+
+.ring-stat {
+    font-size: 0.6rem;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+}

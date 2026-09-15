@@ -1,0 +1,36 @@
+@keyframes hx-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+@keyframes hx-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.15; }
+}
+
+@keyframes hx-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes hx-glow-ring {
+    0%, 100% { box-shadow: 0 0 6px var(--color-accent-glow); }
+    50% { box-shadow: 0 0 20px var(--color-accent-glow); }
+}
+
+@keyframes hx-slide-in-up {
+    from { transform: translateY(8px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes hx-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.anim-pulse { animation: hx-pulse 1.4s ease-in-out infinite; }
+.anim-blink { animation: hx-blink 0.9s ease-in-out infinite; }
+.anim-spin  { animation: hx-spin 2.0s linear infinite; }
+.anim-glow  { animation: hx-glow-ring 2.0s ease-in-out infinite; }
+.anim-slide-up { animation: hx-slide-in-up 0.18s ease both; }
+.anim-fade-in { animation: hx-fade-in 0.18s ease both; }

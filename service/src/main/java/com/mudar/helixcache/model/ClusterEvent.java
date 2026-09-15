@@ -1,5 +1,6 @@
 package com.mudar.helixcache.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mudar.helixcache.enums.ClusterEventType;
 import com.mudar.helixcache.utils.HelixUtils;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import org.springframework.context.ApplicationEvent;
 import java.sql.Timestamp;
 
 @Getter
+@JsonIgnoreProperties({"source", "timestamp"})
 public class ClusterEvent extends ApplicationEvent {
     private final ClusterEventType clusterEventType;
     private final String nodeId;

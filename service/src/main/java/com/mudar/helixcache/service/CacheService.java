@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -36,32 +35,32 @@ public class CacheService {
     private final ClusterEventPublisher clusterEventPublisher;
     private final AccessTracker accessTracker;
 
-    public String addCache(String key, String value, LocalDateTime expiresAt) {
+    public Cache addCache(String key, String value, Long ttlSeconds) {
         HelixUtils.validateKey(key);
         List<Node> replicas = clusterManager.getReplicas(key);
         int writeQuorum = clusterManager.getWriteQuorum();
-        String successMsg = "Cache entry written";
+        Cache cache = null;
         int successCount = 0;
         List<String> failures = new ArrayList<>();
         List<Hint> pendingHints = new ArrayList<>();
         for(Node replica: replicas) {
             try{
-                String result;
+                Cache temp;
                 if(replica.id().equals(clusterManager.getLocalNodeId())) {
-                    result = localNode.addCacheWithLocalDateTime(key, value, expiresAt);
+                    temp = localNode.addCache(key, value, ttlSeconds);
                 } else {
-                    result = clientNode.replicateCache(replica, key, value, expiresAt);
+                    temp = clientNode.replicateCache(replica, key, value, ttlSeconds);
                 }
                 successCount++;
                 accessTracker.record(key);
                 clusterEventPublisher.publish(ClusterEventType.REPLICA_WRITE, replica.id(), key,
                         "Key replicated to " + replica.id(), "INFO");
-                successMsg = result;
-                log.info("Cache written to replica {}: {}", replica.id(), result);
+                cache = temp;
+                log.info("Cache with key '{}' written to replica {}", cache.getKey(), replica.id());
             } catch (Exception e) {
                 log.warn("Replication to {} failed for key '{}': {} - storing hint", replica.id(), key, e.getMessage());
                 failures.add(replica.id() + ": " + e.getMessage());
-                pendingHints.add(new Hint(key, value, expiresAt, replica.id(), replica.address(), HelixUtils.getCurrentTimestamp().toLocalDateTime()));
+                pendingHints.add(new Hint(key, value, replica.id(), replica.address(), HelixUtils.getCurrentTimestamp().toLocalDateTime(), ttlSeconds));
                 clusterEventPublisher.publish(ClusterEventType.REPLICA_FAILED, replica.id(), key,
                         "Key replication failed: " + e.getMessage(), "WARN");
             }
@@ -77,11 +76,11 @@ public class CacheService {
             throw new HelixValidationException("Write quorum not met: " + successCount + "/" + replicas.size()
                     + " replicas acknowledged. Failures: " + failures);
         }
-        return successMsg;
+        return cache;
     }
 
-    public String writeCacheLocal(String key, String value, LocalDateTime expiresAt) {
-        return localNode.addCacheWithLocalDateTime(key, value, expiresAt);
+    public Cache writeCacheLocal(String key, String value, Long ttlSeconds) {
+        return localNode.addCache(key, value, ttlSeconds);
     }
 
     public Cache getCache(String key) {

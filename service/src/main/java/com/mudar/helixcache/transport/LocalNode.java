@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -18,28 +17,20 @@ public class LocalNode {
     private final CacheStore cacheStore;
     private final NodeProperties nodeProperties;
 
-
-    public String addCacheWithLocalDateTime(String key, String value, LocalDateTime expiresAt) {
-        if(expiresAt != null) {
-            return addCache(key, value, HelixUtils.convertToTimestamp(expiresAt));
-        } else {
-            return addCache(key, value, null);
-        }
-    }
-
-    public String addCache(String key, String value, Timestamp expiresAt) {
-        HelixUtils.validateKeyValueExpiresAt(key, value, expiresAt);
+    public Cache addCache(String key, String value, Long ttlSeconds) {
+        HelixUtils.validateKeyValue(key, value);
         Cache cache;
         if(cacheStore.contains(key)) {
             cache = cacheStore.get(key);
             cache.setValue(value);
-            cache.setExpiresAt(expiresAt);
+            cache.setTtlSeconds(ttlSeconds);
             cache.setVersion(cache.getVersion()+1);
         } else {
             Timestamp createdAt = HelixUtils.getCurrentTimestamp();
-            cache = new Cache(key, value, nodeProperties.getId(), createdAt, expiresAt);
+            cache = new Cache(key, value, nodeProperties.getId(), createdAt, ttlSeconds);
         }
-        return cacheStore.put(key, cache);
+        cacheStore.put(key, cache);
+        return cache;
     }
 
     public Cache getCache(String key) {
@@ -49,7 +40,7 @@ public class LocalNode {
             cacheStore.recordMiss();
             throw new HelixValidationException(HelixConstant.ERROR_KEY_NOT_EXIST);
         }
-        if(HelixUtils.isExpired(cache.getExpiresAt())) {
+        if(cache.getTtlSeconds() != null && cache.getTtlSeconds()>0 && HelixUtils.isExpired(HelixUtils.addSeconds(cache.getCreatedAt(), cache.getTtlSeconds()))) {
             cacheStore.remove(key);
             cacheStore.recordMiss();
             throw new HelixValidationException(HelixConstant.ERROR_KEY_EXPIRED);

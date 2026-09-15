@@ -43,8 +43,7 @@ public class SyncService {
                                 recoveredNode,
                                 cache.getKey(),
                                 cache.getValue(),
-                                cache.getExpiresAt() != null
-                                        ? cache.getExpiresAt().toLocalDateTime() : null
+                                cache.getTtlSeconds()
                         );
                     } catch (Exception e) {
                         log.warn("Failed to sync key '{}' to {}: {}", cache.getKey(), recoveredNode.id(), e.getMessage());

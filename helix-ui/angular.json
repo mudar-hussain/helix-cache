@@ -51,8 +51,9 @@
             ],
             "styles": [
               "src/custom-theme.scss",
-              "src/styles.css",
-              "@angular/material/prebuilt-themes/azure-blue.css"
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
+              "src/styles.css"
             ]
           },
           "configurations": {
@@ -106,6 +107,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "assets"
               }
             ],
             "styles": [

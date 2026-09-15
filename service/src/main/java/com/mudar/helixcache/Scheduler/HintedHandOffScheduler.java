@@ -29,7 +29,7 @@ public class HintedHandOffScheduler {
             log.info("Flushing {} hints to recovered node {}", pendingHints.size(), node.id());
             for(Hint hint: pendingHints) {
                 try {
-                    clientNode.replicateCache(node, hint.key(), hint.value(), hint.expiresAt());
+                    clientNode.replicateCache(node, hint.key(), hint.value(), hint.ttlSeconds());
                     hintedHandOffStore.removeHint(node.id(), hint);
                     log.info("Hint delivered to {}: key='{}'", node.id(), hint.key());
                 } catch (Exception e) {

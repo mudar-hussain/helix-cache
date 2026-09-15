@@ -1,0 +1,82 @@
+<app-section-title icon="fa-brands fa-uncharted fa-buzz" text="Cache Operations" />
+
+<div class="ops-row">
+    <div class="ops-group ops-group--key">
+        <label class="ops-label">KEY</label>
+        <input
+            class="ops-input"
+            [(ngModel)]="writeKey"
+            placeholder="user:412" />
+    </div>
+
+    <div class="ops-group ops-group--value">
+        <label class="ops-label">VALUE</label>
+        <input
+            class="ops-input"
+            [(ngModel)]="writeValue"
+            rows="2"
+            placeholder="value..."/>
+    </div>
+</div>
+
+<div class="ops-group mb-3">
+    <label class="ops-label">TTL: 
+        @for (opt of ttlOptions; track opt) {
+            <span class="ttl-chip" [class.ttl-chip--active]="writeTtl === opt" (click)="writeTtl = opt">{{ opt }}</span>
+        }
+    </label>
+</div>
+
+<button class="ops-btn ops-btn--accent w-100" (click)="onWrite()">
+    <i class="fa-solid fa-upload me-1"></i> ADD CACHE
+</button>
+
+@if (writeResult()) {
+    <div class="result-box" [class.result-box--ok]="writeResult()!.status==='ok'" [class.result-box--err]="writeResult()!.status==='error'">
+        <div class="result-header">
+            <i [class]="writeResult()!.status==='ok' ? 'fa-solid fa-check' : 'fa-solid fa-xmark'"></i>
+            <span>{{ writeResult()!.status==='ok'? 'HTTP 200 OK': 'X ERR' }}</span><span>{{ writeResult()!. latencyMs }}ms</span>
+        </div>
+        <pre>{{ writeResult()!.body }}</pre>
+    </div>
+}
+
+<hr class="ops-divider" />
+
+<app-section-title icon="fa-solid fa-magnifying-glass" text="Read / Delete" />
+
+<div class="ops-group">
+    <label class="ops-label">KEY</label>
+    <input class="ops-input" [(ngModel)]="readKey" placeholder="e.g. user:42" />
+</div>
+
+<div class="d-flex gap-2 mb-3">
+    <button class="ops-btn ops-btn--info flex-grow-1" (click)="onRead()">
+        <i class="fa-solid fa-magnifying-glass me-1"></i>READ CACHE
+    </button>
+    <button class="ops-btn ops-btn--danger" (click)="onDelete()">
+        <i class="fa-regular fa-trash-can me-1"></i>DEL
+    </button>
+</div>
+
+@if (readResult()) {
+    <div class="result-box result-box--ok">
+        <div class="result-header"><span><i class="fa-solid fa-check fa-buzz"></i> HIT</span><span class="ms-auto">v{{ readResult()!.version}}</span></div>
+        <div style="font-family:var(--font-mono); font-size:0.7rem; margin: 4px 0;">{{ readResult()!.key }} {{ readResult()!.value }}</div>
+    </div>
+}
+
+@if (readError()){ 
+    <div class="result-box result-box--err"><i class="fa-solid fa-xmark fa-buzz"></i> {{ readError() }}</div> 
+}
+
+@if (deleteResult()) { 
+    <div class="result-box" [class.result-box--ok]="! deleteResult()!.startsWith('Error')" 
+    [class.result-box--err]="deleteResult()!.startsWith('Error')">
+        {{ deleteResult() }}
+    </div> 
+}
+
+<hr class="ops-divider" />
+
+<app-section-title icon="fa-solid fa-fire" text="Hot Keys" />

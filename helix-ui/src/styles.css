@@ -1,4 +1,15 @@
-/* You can add global styles to this file, and also import other style files */
+@import './styles/tokens.css';
+@import './styles/animations.css';
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body {
+    height: 100%;
+    overflow: hidden;
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    margin: 0;
+}
+
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border-hover); border-radius: 999px; }
