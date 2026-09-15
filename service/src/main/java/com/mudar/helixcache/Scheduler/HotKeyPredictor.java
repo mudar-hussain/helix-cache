@@ -54,7 +54,7 @@ public class HotKeyPredictor {
         //Sort hottest first
         predictionResponseList = predictionResponseList.stream()
                 .sorted((a,b) -> Double.compare(b.emaScore(), a.emaScore()))
-                .limit(10)
+                .limit(8)
                 .toList();
         synchronized (lastPredictions) {
             lastPredictions.clear();

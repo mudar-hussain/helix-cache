@@ -13,7 +13,7 @@
 }
 
 .logo-name { 
-    font-size: 1rem; 
+    font-size: 1.3rem; 
     font-weight: 900; 
     color: var(--color-text-primary); 
     letter-spacing: 1px; 
@@ -26,62 +26,8 @@
 
 .logo-sub { 
     font-size: 0.55rem; 
+    font-weight: 600;
     letter-spacing: 2px; 
     text-transform: uppercase; 
     color: var(--color-text-secondary); 
 } 
-
-.live-dot { 
-    width: 8px; 
-    height: 8px; 
-    border-radius: 50%; 
-    background: var(--color-success); 
-    box-shadow: 0 0 8px var(--color-success); 
-}
-
-.live-label {
-    font-size: 0.55rem; 
-    font-weight: 900; 
-    letter-spacing: 3px; 
-    color: var(--color-success); 
-}
-
-.tabbar { 
-    display: flex; 
-    align-items: stretch; 
-    height: 38px; 
-    border-top: 1px solid var(--color-border); 
-}
-
-.tab-btn { 
-    display: flex; 
-    align-items: center; 
-    gap: 6px; 
-    padding: 0 20px; 
-    font-size: 0.6rem; 
-    font-weight: 900; 
-    letter-spacing: 1.5px; 
-    text-transform: uppercase; 
-    color: var(--color-text-secondary); 
-    text-decoration: none; 
-    border-right: 1px solid var(--color-border); 
-    transition: color 0.15s, background 0.15s; 
-}
-
-.tab-btn:hover { 
-    color: var(--color-text-primary); 
-    background: var(--color-accent-dim); 
-}
-
-.tab-btn--active { 
-    color: var(--color-accent) !important; 
-    background: rgba(0,200,255,0.07); 
-    border-bottom: 2px solid var(--color-accent); 
-}
-
-.tab-dot { 
-    width: 5px; 
-    height: 5px; 
-    border-radius: 50%; 
-    flex-shrink: 0; 
-}

@@ -19,10 +19,4 @@ export const environment = {
 
     hotKeyThreshold: 2.0,
 
-    TABS: [
-      { path: 'ring', label: 'Hash Ring', dot: '#00c8ff', icon: 'fa-solid fa-circle-nodes'},
-      { path: 'hot-keys', label: 'Hot Keys', dot: '#ff4466', icon: 'fa-solid fa-fire'},
-      { path: 'log', label: 'Full Log', dot: '#00ff88', icon: 'fa-solid fa-tower-broadcast'},
-    ]
-
   } as const;

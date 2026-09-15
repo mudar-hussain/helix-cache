@@ -3,7 +3,7 @@
     display: grid;
     grid-template-rows: var(--layout-topbar-height) 1fr;
     grid-template-columns: var(--layout-left-width) 1fr var(--layout-right-width);
-    grid-template-areas: "topbar topbar topbar" "left center right";
+    grid-template-areas: "topbar center right" "left center right";
     overflow: hidden;
     background: var(--color-bg);
 }

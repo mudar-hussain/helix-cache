@@ -1,7 +1,7 @@
 import { computed, inject, Injectable, OnDestroy, signal } from "@angular/core";
 import { ClusterApiService } from "./cluster-api.service";
 import { SseService } from "./sse.service";
-import { interval, startWith, Subscription, switchMap } from "rxjs";
+import { catchError, EMPTY, interval, startWith, Subscription, switchMap } from "rxjs";
 import { ClusterEvent, CacheStats, Node, NodeStatusResponse, RingNodeResponse, ReplicaNodes } from "../../shared/interfaces/helix.interface";
 import { ClusterEventType, NodeStatus } from "../enums/helix.enum";
 import { environment } from "../../../environments/environment";
@@ -10,7 +10,6 @@ import { environment } from "../../../environments/environment";
   providedIn: 'root'
 })
 export class ClusterStateService implements OnDestroy {
-    private readonly clusterApi = inject(ClusterApiService);
     private readonly sse = inject(SseService);
     private subs = new Subscription();
 
@@ -31,7 +30,7 @@ export class ClusterStateService implements OnDestroy {
     private readonly MAX_EVENTS = 200;
     readonly eventLog = signal<ClusterEvent[]>([]);
 
-    constructor() {
+    constructor(private clusterApi: ClusterApiService) {
         this.startPolling();
         this.subscribeToNodeEvents();
     }
@@ -56,18 +55,21 @@ export class ClusterStateService implements OnDestroy {
     }
 
     private startPolling() {
-        const {nodes, distribution } = environment.pollIntervals;
+        const {nodes, distribution} = environment.pollIntervals;
         this.subs.add(
-            interval(nodes).pipe(startWith(0), switchMap(() => this.clusterApi.getNodes()))
-            .subscribe(nodes => this.nodes.set(nodes))
+            interval(nodes).pipe(startWith(0), switchMap(() => this.clusterApi.getNodes()
+                .pipe(catchError(() => EMPTY)))
+            ).subscribe(nodes => this.nodes.set(nodes))
         );
         this.subs.add(
-            interval(nodes).pipe(startWith(0), switchMap(() => this.clusterApi.getRing()))
-            .subscribe(ring => this.ring.set(ring))
+            interval(nodes).pipe(startWith(0), switchMap(() => this.clusterApi.getRing()
+                .pipe(catchError(() => EMPTY)))
+            ).subscribe(ring => this.ring.set(ring))
         );
         this.subs.add(
-            interval(distribution).pipe(startWith(0), switchMap(() => this.clusterApi.getStats()))
-            .subscribe(stats => this.stats.set(stats))
+            interval(distribution).pipe(startWith(0), switchMap(() => this.clusterApi.getStats()
+                .pipe(catchError(() => EMPTY)))
+            ).subscribe(stats => this.stats.set(stats))
         );
     }
 

@@ -6,6 +6,7 @@ import { ClusterStateService } from "../../core/services/cluster-state.service";
 import { interval, startWith, Subscription, switchMap } from "rxjs";
 import { NodeDistributionResponse } from "../../shared/interfaces/helix.interface";
 import { ClusterApiService } from "../../core/services/cluster-api.service";
+import { StatCardComponent } from "../../shared/components/stat-card/stat-card.component";
 
 
 interface NodePos { id: string; x: number; y: number; }
@@ -13,7 +14,7 @@ interface NodePos { id: string; x: number; y: number; }
 @Component({
     selector: 'app-ring-view',
     standalone: true,
-    imports: [CommonModule, NodeColorPipe],
+    imports: [CommonModule, NodeColorPipe, StatCardComponent],
     templateUrl: './ring-view.component.html',
     styleUrl: './ring-view.component.css',
 })
@@ -21,6 +22,7 @@ export class RingViewComponent implements OnInit {
 
     protected readonly state = inject(ClusterStateService);
     protected readonly clusterApi = inject(ClusterApiService);
+    protected readonly N = environment.nodes.length;
     private readonly colors: Record<string, string> = Object.fromEntries(
         environment.nodes.map(n => [n.id, n.color])
     );

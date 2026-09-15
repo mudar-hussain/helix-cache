@@ -1,4 +1,17 @@
 <div class="ring-wrap">
+
+    <div class="corner ctl"></div>
+    <div class="corner ctr"></div>
+    <div class="corner cbl"></div>
+    <div class="corner cbr"></div>
+
+
+    <!-- Live Indicator -->
+    <div class="d-flex align-items-center gap-2 live-indicator">
+        <div class="live-dot anim-pulse"></div>
+        <span class="live-label">LIVE</span>
+    </div>
+
     <svg class="ring-svg" [attr.viewBox]="'0 0 '+ width +' '+ height" preserveAspectRatio="xMidYMid meet">
 
         <!-- Hash ring circle -->
@@ -30,14 +43,8 @@
         <!-- Travel dots: primary replicas (animate on DOM entry) -->
 
         @for(dot of travelDots(); track dot.key) {
-            <circle [attr.cx]="dot.startX" 
-            [attr.cy]="dot.startY" 
-            r="5" 
-            [attr.fill]="dot.color" class="travel-dot" 
-            [style.--dx]="dot.dx + 'px'" 
-            [style.--dy]="dot.dy + 'px'" 
-            [style.animation-delay]="dot.delay + 's'"
-            />
+        <circle [attr.cx]="dot.startX" [attr.cy]="dot.startY" r="5" [attr.fill]="dot.color" class="travel-dot"
+            [style.--dx]="dot.dx + 'px'" [style.--dy]="dot.dy + 'px'" [style.animation-delay]="dot.delay + 's'" />
         }
 
         <!-- Physical nodes -->
@@ -97,7 +104,7 @@
 
 
 
-    <!-- Legend -->
+    <!-- Node Legend -->
     <div class="ring-legend">
         @for (node of state.nodes(); track node.nodeId) {
         <div class="d-flex align-items-center gap-2">
@@ -109,12 +116,22 @@
                 {{node.nodeStatus}}
             </span>
         </div>
-    }
+        }
     </div>
 
-    <!-- Stats -->
-     <div class="ring-stats">
-        <span class="ring-stat">{{state.ring().length}}</span>
-        <span class="ring-stat">{{state.nodes().length}}</span>
-     </div>
+
+    <div class="stats-legend">
+        <app-stat-card class="stats-card" [value]="state.aliveCount() + '/' + N" label="Nodes Alive" />
+        <app-stat-card class="stats-card" [value]="state.totalKeys().toString()" label="Total Keys" />
+        <app-stat-card class="stats-card" value="N=3" label="Replication" />
+        <app-stat-card class="stats-card" [value]="(state.hitRatio() * 100 | number: '1.1-1') + '%'" label="Hit Ratio" />
+    </div>
+    <!-- Stats Legend -->
+    <!-- <div class="stats-legend">
+            <app-stat-card [value]="state.aliveCount() + '/' + N" label="Nodes Alive" />
+            <app-stat-card [value]="state.totalKeys().toString()" label="Total Keys" />
+            <app-stat-card value="N=3" label="Replication" />
+            <app-stat-card [value]="(state.hitRatio() * 100 | number: '1.1-1') + '%'" label="Hit Ratio" />
+    </div> -->
+
 </div>

@@ -1,32 +1,18 @@
 <div class="topbar-shell">
     <div class="topbar-header">
         <div class="d-flex align-items-center gap-2">
-            <img src="./../../../../../assets/logos/helix_cache_logo.png" alt="HelixCache" style="width: 32px; height: 32px; object-fit:contain;" />
+            <img src="assets/logos/helix_logo.png" alt="HelixCache" style="width: 60px; height: 55px; object-fit:contain;" />
             <div>
                 <div class="logo-name">Helix<em>Cache</em></div>
-                <div class="logo-sub">Self-Healing Distributed Cache</div>
+                <div class="logo-sub">Self-Healing <br/> Distributed Cache</div>
             </div>
         </div>
 
-        <div class="d-flex align-items-center gap-4">
+        <!-- <div class="d-flex align-items-center gap-4">
             <app-stat-card [value]="state.aliveCount() + '/' + N" label="Nodes Alive" />
             <app-stat-card [value]="state.totalKeys().toString()" label="Total Keys" />
             <app-stat-card value="N=3" label="Replication" />
             <app-stat-card [value]="(state.hitRatio() * 100 | number: '1.1-1') + '%'" label="Hit Ratio" />
-        </div>
-
-        <div class="d-flex align-items-center gap-2">
-            <div class="live-dot anim-pulse"></div>
-            <span class="live-label">LIVE</span>
-        </div>
+        </div> -->
     </div>
-
-    <nav class="tabbar">
-    @for (tab of tabs; track tab.path) {
-        <a class="tab-btn" [routerLink]="tab.path" routerLinkActive="tab-btn--active">
-            <i [class]="tab.icon" style="font-size:0.65rem"></i>
-            {{ tab.label }}
-        </a>
-    }
-    </nav>
 </div>

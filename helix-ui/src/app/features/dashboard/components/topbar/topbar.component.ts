@@ -8,13 +8,12 @@ import { environment } from "../../../../../environments/environment";
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [CommonModule, RouterLink, RouterLinkActive, StatCardComponent],
+    imports: [CommonModule, StatCardComponent],
     templateUrl: './topbar.component.html',
     styleUrl: './topbar.component.css',
 })
 export class TopbarComponent {
     protected readonly state = inject(ClusterStateService);
-    protected readonly tabs = environment.TABS;
     protected readonly N = environment.nodes.length;
 
     get replication() {

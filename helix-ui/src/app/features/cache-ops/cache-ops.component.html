@@ -45,7 +45,7 @@
         <div style="font-family:var(--font-mono); font-size:0.7rem; margin: 4px 0;">
             Key: {{ writeResult()!.body.key }} <br/> 
             Value: {{ writeResult()!.body.value }} <br/>
-            <span *ngIf="writeResult()!.body.ttlSeconds">Time to Live: {{ readResult()!.ttlSeconds }} sec<br/></span>
+            <span *ngIf="writeResult()!.body.ttlSeconds">Time to Live: {{ writeResult()!.body.ttlSeconds }} sec<br/></span>
             Primary Node: {{ writeResult()!.body.primaryNode }} <br/>
             Created At: {{ writeResult()!.body.createdAt }}<br/>
         </div>
@@ -96,7 +96,6 @@
         <div class="result-header"><span><i class="fa-solid fa-xmark fa-buzz"></i> HTTP 404 Not Found</span></div>
         <div style="font-family:var(--font-mono); font-size:0.7rem; margin: 4px 0;">{{ readError() }}</div>
     </div>
-    <div class="result-box result-box--err"><i class="fa-solid fa-xmark fa-buzz"></i> {{ readError() }}</div> 
 }
 
 @if (deleteResult()) { 
