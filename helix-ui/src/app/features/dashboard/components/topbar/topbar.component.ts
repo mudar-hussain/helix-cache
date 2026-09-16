@@ -1,6 +1,4 @@
 import { Component, inject } from "@angular/core";
-import { StatCardComponent } from "../../../../shared/components/stat-card/stat-card.component";
-import { RouterLink, RouterLinkActive } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { ClusterStateService } from "../../../../core/services/cluster-state.service";
 import { environment } from "../../../../../environments/environment";
@@ -8,7 +6,7 @@ import { environment } from "../../../../../environments/environment";
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [CommonModule, StatCardComponent],
+    imports: [CommonModule],
     templateUrl: './topbar.component.html',
     styleUrl: './topbar.component.css',
 })

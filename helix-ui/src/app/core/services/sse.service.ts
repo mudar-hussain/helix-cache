@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { environment } from "../../../environments/environment";
 import { ClusterEvent } from "../../shared/interfaces/helix.interface";
-import { merge, Observable, share } from "rxjs";
+import { distinctUntilChanged, merge, Observable, share } from "rxjs";
 import { ClusterEventType } from "../enums/helix.enum";
 
 
@@ -15,7 +15,11 @@ export class SseService {
     // readonly events$: Observable<ClusterEvent> = this.buildStream().pipe(share());
     readonly events$: Observable<ClusterEvent> = merge(
         ...environment.nodes.map(node => this.nodeStream(node.baseUrl))
-    ).pipe(share());
+    ).pipe(
+        distinctUntilChanged((a,b) => a.clusterEventType === b.clusterEventType
+                                        && a.nodeId === b.nodeId
+                                        && a.eventTimestamp === b.eventTimestamp),
+        share());
 
     private nodeStream(baseUrl: string): Observable<ClusterEvent> {
         return new Observable<ClusterEvent>(subscriber => {

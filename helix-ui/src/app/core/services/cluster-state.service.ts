@@ -79,8 +79,8 @@ export class ClusterStateService implements OnDestroy {
             this.events$.subscribe(event => {
                 this.eventLog.update(prev => [event, ...prev].slice(0, this.MAX_EVENTS));
                 if ([ClusterEventType.NODE_UP, ClusterEventType.NODE_DOWN, ClusterEventType.NODE_SUSPECT].includes(event.clusterEventType)) {
-                    this.clusterApi.getNodes().subscribe(nodes => this.nodes.set(nodes));
-                        this.clusterApi.getRing().subscribe(ring => this.ring.set(ring));
+                    this.subs.add(this.clusterApi.getNodes().subscribe(nodes => this.nodes.set(nodes)));
+                    this.subs.add(this.clusterApi.getRing().subscribe(ring => this.ring.set(ring)));
                 }
             })
         );
