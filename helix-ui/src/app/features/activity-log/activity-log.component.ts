@@ -28,15 +28,17 @@ export class ActivityLogComponent {
 
     //Modal state
     readonly modalOpen = signal(false);
+    readonly miniModalOpen = signal(false);
+    readonly miniModalEvent = signal<ClusterEventEntry | null>(null);
 
-    constructor(private clusterStateService: ClusterStateService, ) { }
+    constructor(private clusterStateService: ClusterStateService,) { }
 
     get events() {
         return this.clusterStateService.eventLog;
     }
 
     // Mini-log: always shows the 8 most-recent entries, no filter
-    readonly miniEvents: any = computed((): any => this.clusterStateService.eventLog().slice(0, 8));
+    readonly miniEvents: any = computed((): any => this.clusterStateService.eventLog());
 
     // Modal log: applies both category + node filters
     readonly filteredEvents: any = computed((): any => {
@@ -67,6 +69,16 @@ export class ActivityLogComponent {
 
     nodeColor(nodeId: string): string {
         return this.nodeColors[nodeId] ?? 'var(--color-accent)';
+    }
+
+
+    openMiniModal(entry: ClusterEventEntry): void {
+        this.miniModalEvent.set(entry);
+        this.miniModalOpen.set(true);
+    }
+
+    closeMiniModal(): void {
+        this.miniModalOpen.set(false);
     }
 
 }

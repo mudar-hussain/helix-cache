@@ -6,32 +6,35 @@
             <button class="action-btn" (click)="openModal()">
                 <i class="fa-solid fa-expand me-1"></i>View All
             </button>
-            <button class="action-btn action-btn--danger" (click)="clear()">
-                <i class="fa-solid fa-trash-can me-1"></i>Clear
-            </button>
         </div>
     </div>
 
     <div class="log-body" autoScroll [appAutoScroll]="events().length">
         @if (events().length === 0) {
         <div class="log-empty">
-            <i class="fa-solid fa-spinner fa-buzz anim-pulse" style="font-size:1.2rem; color: var(--color-accent)"></i>
+            <i class="fa-solid fa-satellite-dish anim-pulse"></i>
             <span>Waiting for cluster events...</span>
         </div>
         }
 
         @for (entry of miniEvents(); track $index) {
-        <div class="log-row">
+        <div class="log-row" style="display: flex;justify-content: space-between;" (click)="openMiniModal(entry)">
+            <div class="log-row" style="padding-right: 0px;">
             <span class="log-time">{{ entry.lastTimestamp | date: 'HH:mm:ss' }}</span>
             <span class="log-badge" [style.background]="badgeColor(entry)">{{ badgeLabel(entry) }}</span>
-            <span class="log-node" [style.color]="nodeColor(entry.event.nodeId)">{{ entry.event.nodeId }}</span>
-            <span class="log-detail">{{ entry.event.detail }}</span>
+            <!-- <span class="log-detail">{{ entry.event.detail }}</span> -->
             @if (entry.event.key) {
             <span class="log-key">{{ entry.event.key }}</span>
             }
+            </div>
+            <div class="log-row" style="padding-left: 0px;">
+                <div>
             @if (entry.count > 1) {
             <span class="log-count">x{{ entry.count }}</span>
             }
+            </div>
+            <span class="log-node" [style.color]="nodeColor(entry.event.nodeId)">{{ entry.event.nodeId }}</span>
+            </div>
         </div>
         }
     </div>
@@ -104,10 +107,6 @@
                     {{ badgeLabel(entry)}}
                 </span>
 
-                <span class="log-node" [style.color]="nodeColor(entry.event.nodeId)">
-                    {{ entry.event.nodeId }}
-                </span>
-
                 <span class="log-detail">{{ entry.event.detail }}</span>
 
                 @if (entry.event.key) {
@@ -119,6 +118,10 @@
                 <span class="log-count" title="Received {{ entry.count}} times">x{{ entry.count }}</span>
                 }
 
+                <span class="log-node" [style.color]="nodeColor(entry.event.nodeId)">
+                    {{ entry.event.nodeId }}
+                </span>
+
                 <span class="log-sev" [class.sev--info]="entry.event.severity === 'INFO'"
                     [class.sev--warn]="entry.event.severity === 'WARN'"
                     [class.sev--error]="entry.event.severity ==='ERROR'">
@@ -126,6 +129,55 @@
                 </span>
             </div>
             }
+        </div>
+    </div>
+</div>
+}
+
+
+<!-- Event Detail Modal -->
+@if(miniModalOpen()) {
+<div class="mini-modal-backdrop" (click)="closeMiniModal()">
+    <div class="mini-modal-box" (click)="$event.stopPropagation()">
+        <div class="mini-modal-header">
+            <span class="mini-modal-title" [style.color]="badgeColor(miniModalEvent()!)">
+                {{ badgeLabel(miniModalEvent()!) }} {{ miniModalEvent()!.count > 1 ? ' (x' + miniModalEvent()!.count + ')' : '' }}
+            </span>
+
+            <button class="mini-modal-close" (click)="closeMiniModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="mini-modal-body">
+            <div class="mini-modal-field">
+                <span class="mini-modal-label">TIME</span>
+                <span>{{ miniModalEvent()!.event.eventTimestamp | date: 'HH:mm:ss.SSS'}}</span>
+            </div>
+
+            <div class="mini-modal-field">
+                <span class="mini-modal-label">NODE</span>
+                <span>{{ miniModalEvent()!.event.nodeId}}</span>
+            </div>
+
+            <div class="mini-modal-field">
+                <span class="mini-modal-label">KEY</span>
+                <span>{{ miniModalEvent()!.event.key ?? '-'}}</span>
+            </div>
+
+            <div class="mini-modal-field">
+                <span class="mini-modal-label">DETAIL</span>
+                <span>{{ miniModalEvent()!.event.detail }}</span>
+            </div>
+
+            <div class="mini-modal-field">
+                <span class="mini-modal-label">SEVERITY</span>
+                <span [class.sev--info]="miniModalEvent()!.event.severity === 'INFO'"
+                    [class.sev--warn]="miniModalEvent()!.event.severity === 'WARN'"
+                    [class.sev--error]="miniModalEvent()!.event.severity ==='ERROR'">
+                    {{ miniModalEvent()!.event.severity }}
+                </span>
+            </div>
         </div>
     </div>
 </div>

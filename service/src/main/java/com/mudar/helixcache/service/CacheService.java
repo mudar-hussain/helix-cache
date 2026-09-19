@@ -62,6 +62,8 @@ public class CacheService {
                 log.warn("Replication to {} failed for key '{}': {} - storing hint", replica.id(), key, e.getMessage());
                 failures.add(replica.id() + ": " + e.getMessage());
                 pendingHints.add(new Hint(key, value, replica.id(), replica.address(), HelixUtils.getCurrentTimestamp().toLocalDateTime(), ttlSeconds));
+                clusterEventPublisher.publish(ClusterEventType.HINT_ENQUEUED, replica.id(), key,
+                        "Hint stored for offline node " + replica.id(), "WARN");
                 clusterEventPublisher.publish(ClusterEventType.REPLICA_FAILED, replica.id(), key,
                         "Key replication failed: " + e.getMessage(), "WARN");
             }
@@ -69,6 +71,8 @@ public class CacheService {
         log.info("Write quorum for key '{}': {}/{} succeeded (required: {})", key, successCount, replicas.size(), writeQuorum);
         if(successCount>=writeQuorum) {
             pendingHints.forEach(hintedHandOffStore::add);
+            clusterEventPublisher.publish(ClusterEventType.CACHE_PUT, clusterManager.getLocalNodeId(), key,
+                    "Key written successfully", "INFO");
             clusterEventPublisher.publish(ClusterEventType.QUORUM_SUCCESS, clusterManager.getLocalNodeId(), key,
                     "Write quorum met: " + successCount + "/" + replicas.size(), "INFO");
         } else {
@@ -112,6 +116,8 @@ public class CacheService {
         }
         if(responses.size() < readQuorum) {
             if (responses.isEmpty()) {
+                clusterEventPublisher.publish(ClusterEventType.CACHE_MISS, clusterManager.getLocalNodeId(), key,
+                        "Key not found on any replica", "WARN");
                 throw new HelixValidationException(
                         failures.isEmpty() ? "No Replicas Available" : failures.get(0).split(": ", 2)[1]
                 );
@@ -122,9 +128,12 @@ public class CacheService {
             );
         }
 
-        return responses.stream()
+        Cache result =  responses.stream()
                 .max(Comparator.comparingLong(Cache::getVersion))
                 .orElseThrow(() -> new HelixValidationException(HelixConstant.ERROR_KEY_NOT_EXIST));
+        clusterEventPublisher.publish(ClusterEventType.CACHE_GET, clusterManager.getLocalNodeId(), key,
+                "Key read successfully", "INFO");
+        return result;
     }
 
     public Cache readCacheLocal(String key) {
@@ -170,6 +179,9 @@ public class CacheService {
             throw new HelixValidationException("Delete quorum not met: " + successCount + "/" + replicas.size()
                     + " replicas acknowledged. Failures: " + failures);
         }
+
+        clusterEventPublisher.publish(ClusterEventType.CACHE_DELETE, clusterManager.getLocalNodeId(), key,
+                "Key deleted: " + successCount + "/" + replicas.size() + " replicas", "INFO");
         return successMsg;
     }
 

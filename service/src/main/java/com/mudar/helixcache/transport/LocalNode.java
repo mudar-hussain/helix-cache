@@ -1,6 +1,9 @@
 package com.mudar.helixcache.transport;
 
+import com.mudar.helixcache.cluster.ClusterEventPublisher;
+import com.mudar.helixcache.cluster.ClusterManager;
 import com.mudar.helixcache.config.NodeProperties;
+import com.mudar.helixcache.enums.ClusterEventType;
 import com.mudar.helixcache.exception.HelixValidationException;
 import com.mudar.helixcache.model.Cache;
 import com.mudar.helixcache.store.CacheStore;
@@ -15,7 +18,8 @@ import java.sql.Timestamp;
 @RequiredArgsConstructor
 public class LocalNode {
     private final CacheStore cacheStore;
-    private final NodeProperties nodeProperties;
+    private final ClusterEventPublisher clusterEventPublisher;
+    private final ClusterManager clusterManager;
 
     public Cache addCache(String key, String value, Long ttlSeconds, String primaryNode) {
         HelixUtils.validateKeyValue(key, value);
@@ -43,6 +47,8 @@ public class LocalNode {
         if(cache.getTtlSeconds() != null && cache.getTtlSeconds()>0 && HelixUtils.isExpired(HelixUtils.addSeconds(cache.getCreatedAt(), cache.getTtlSeconds()))) {
             cacheStore.remove(key);
             cacheStore.recordMiss();
+            clusterEventPublisher.publish(ClusterEventType.CACHE_EXPIRED, clusterManager.getLocalNodeId(), key,
+                    "Key has expired and will be removed from the cache", "INFO");
             throw new HelixValidationException(HelixConstant.ERROR_KEY_EXPIRED);
         }
         cacheStore.recordHit();

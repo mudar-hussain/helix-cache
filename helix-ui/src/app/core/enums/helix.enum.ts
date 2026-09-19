@@ -13,6 +13,7 @@ export enum Severity {
 }
 
 export enum ClusterEventType { 
+    HEARTBEAT = 'HEARTBEAT',
     CACHE_PUT = 'CACHE_PUT',
     CACHE_GET = 'CACHE_GET',
     CACHE_DELETE = 'CACHE_DELETE',

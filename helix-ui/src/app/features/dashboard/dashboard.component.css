@@ -20,7 +20,7 @@
     grid-area: left; 
     border-right: 1px solid var(--color-border);
     background: rgba(3,10,26,0.95); 
-    overflow-y: auto; 
+    overflow: hidden;
     padding: 12px 10px; 
 }
 
@@ -34,6 +34,6 @@
     grid-area: right; 
     border-left: 1px solid var(--color-border); 
     background: rgba(3,10,26,0.95); 
-    overflow-y: auto; 
+    overflow: hidden; 
     padding: 12px 10px; 
 }

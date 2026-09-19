@@ -1,6 +1,6 @@
 package com.mudar.helixcache.controller;
 
-import com.mudar.helixcache.Scheduler.HotKeyPredictor;
+import com.mudar.helixcache.scheduler.HotKeyPredictor;
 import com.mudar.helixcache.cluster.NodeStateManager;
 import com.mudar.helixcache.dto.HotKeyPredictionResponse;
 import com.mudar.helixcache.store.AccessTracker;

@@ -89,7 +89,8 @@ export class ClusterStateService implements OnDestroy {
 
     private appendEvent(event: ClusterEvent): void {
         this.eventLog.update(prev => {
-            if (MERGEABLE_TYPES.has(event.clusterEventType)) {
+            if (MERGEABLE_TYPES.has(event.clusterEventType)
+        ) {
 
                 // Find the most-recent entry that matches this event's merge key
                 const mergeKey = (e: ClusterEventEntry) =>
@@ -98,10 +99,11 @@ export class ClusterStateService implements OnDestroy {
                     e.event.detail === event.detail;
 
                 const idx = prev.findIndex(mergeKey);
-                if (idx !== -1) {
+                console.log(idx);
+                if (idx !== -1 && idx<5) {
 
                     // Merge: bump count + update timestamp on existing entry
-                    const updated: any[] = [...prev];
+                    const updated: ClusterEventEntry[] = [...prev];
                     updated[idx] = {
                         ...updated[idx],
                         count: updated[idx].count + 1,

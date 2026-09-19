@@ -1,4 +1,4 @@
-package com.mudar.helixcache.Scheduler;
+package com.mudar.helixcache.scheduler;
 
 import com.mudar.helixcache.cluster.ClusterEventPublisher;
 import com.mudar.helixcache.dto.HotKeyPredictionResponse;

@@ -1,7 +1,9 @@
-package com.mudar.helixcache.Scheduler;
+package com.mudar.helixcache.scheduler;
 
+import com.mudar.helixcache.cluster.ClusterEventPublisher;
 import com.mudar.helixcache.cluster.ClusterManager;
 import com.mudar.helixcache.dto.Hint;
+import com.mudar.helixcache.enums.ClusterEventType;
 import com.mudar.helixcache.store.HintedHandOffStore;
 import com.mudar.helixcache.transport.ClientNode;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ public class HintedHandOffScheduler {
     private final HintedHandOffStore hintedHandOffStore;
     private final ClusterManager clusterManager;
     private final ClientNode clientNode;
+    private final ClusterEventPublisher clusterEventPublisher;
 
     @Scheduled(fixedDelay = 10000)
     public void flushHints() {
@@ -31,6 +34,8 @@ public class HintedHandOffScheduler {
                 try {
                     clientNode.replicateCache(node, hint.key(), hint.value(), hint.ttlSeconds());
                     hintedHandOffStore.removeHint(node.id(), hint);
+                    clusterEventPublisher.publish(ClusterEventType.HINT_ENQUEUED, node.id(), hint.key(),
+                            "Hint replayed to recovered node " + node.id(), "INFO");
                     log.info("Hint delivered to {}: key='{}'", node.id(), hint.key());
                 } catch (Exception e) {
                     log.info("Hint delivered to {} failed for key='{}': {}", node.id(), hint.key(), e.getMessage()); //leave hint in queue for next retry
