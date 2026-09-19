@@ -25,6 +25,7 @@ export class CacheOpsComponent {
     writeValue = '';
     writeTtl = '';
     readKey = '';
+    seedKeys = '12';
     // ttlOptions = Object.keys(TtlOption);
     ttlOptions = ['never', '10s', '30s', '2m', '10m'];
 
@@ -116,6 +117,13 @@ export class CacheOpsComponent {
         this.readError.set(null);
         this.deleteResult.set(null);
         this.state.clearReplicaNodes();
+    }
+
+    onSeedKeys(): void {
+        const seedKeys = this.seedKeys.trim();
+        if(!seedKeys) return;
+        this.resetResult();
+
     }
 
 }

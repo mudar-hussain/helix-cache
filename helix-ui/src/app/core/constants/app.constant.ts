@@ -13,20 +13,24 @@ export const LOG_CATEGORIES: Record<string, ClusterEventType[]> = {
 };
 
 // Badge background colour keyed by event type
-export const BADGE_COLOR: Partial<Record<ClusterEventType, string>> = {
-    [ClusterEventType.NODE_DOWN]: 'var(--color-danger)',
-    [ClusterEventType.REPLICA_FAILED]: 'var(--color-danger)',
-    [ClusterEventType.QUORUM_FAILED]: 'var(--color-danger)',
-    [ClusterEventType.NODE_SUSPECT]: 'var(--color-warning)',
-    [ClusterEventType.NODE_UP]: 'var(--color-success)',
-    [ClusterEventType.QUORUM_SUCCESS]: 'var(--color-success)',
-    [ClusterEventType.SYNC_COMPLETE]: 'var(--color-success)',
-    [ClusterEventType.SYNC_STARTED]: 'var(--color-accent)',
-    [ClusterEventType.REPLICA_WRITE]: 'var(--color-accent)',
-    [ClusterEventType.CACHE_GET]: '#ff9800', // hot-key orange
-    [ClusterEventType.HINT_ENQUEUED]: '#9c6fff',
-    [ClusterEventType.HINT_DELIVERED]: '#9c6fff',
-    [ClusterEventType.HEARTBEAT]: 'var(--color-text-muted)',
+export const BADGE_STYLE: Partial<Record<ClusterEventType, string>> = {
+    [ClusterEventType.HEARTBEAT]: 'background:var(--color-success-dim);color:var(--color-success);border:1px solid var(--color-success-border)',
+    [ClusterEventType.NODE_UP]: 'background:var(--color-success-dim);color:var(--color-success);border:1px solid var(--color-success-border)',
+    [ClusterEventType.NODE_SUSPECT]: 'background:var(--color-warning-dim);color:var(--color-warning);border:1px solid var(--color-warning-border)',
+    [ClusterEventType.NODE_DOWN]: 'background:var(--color-danger-dim);color:var(--color-danger);border:1px solid var(--color-danger-border)',
+    [ClusterEventType.REPLICA_WRITE]: 'background:var(--color-accent-dim);color:var(--color-accent);border:1px solid var(--color-accent-border)',
+    [ClusterEventType.REPLICA_FAILED]: 'background:var(--color-danger-dim);color:var(--color-danger);border:1px solid var(--color-danger-border)',
+    [ClusterEventType.QUORUM_SUCCESS]: 'background:var(--color-accent-dim);color:var(--color-accent);border:1px solid var(--color-accent-border)',
+    [ClusterEventType.QUORUM_FAILED]: 'background:var(--color-danger-dim);color:var(--color-danger);border:1px solid var(--color-danger-border)',
+    [ClusterEventType.SYNC_STARTED]: 'background:var(--color-accent-dim);color:var(--color-accent);border:1px solid var(--color-accent-border)',
+    [ClusterEventType.SYNC_COMPLETE]: 'background:var(--color-info-dim);color:var(--color-info);border:1px solid var(--color-info-border)',
+    [ClusterEventType.CACHE_GET]: 'background:var(--color-info-dim);color:var(--color-info);border:1px solid var(--color-info-border)',
+    [ClusterEventType.CACHE_PUT]: 'background:var(--color-info-dim);color:var(--color-info);border:1px solid var(--color-info-border)',
+    [ClusterEventType.CACHE_MISS]: 'background:var(--color-warning-dim);color:var(--color-warning);border:1px solid var(--color-warning-border)',
+    [ClusterEventType.CACHE_DELETE]: 'background:var(--color-danger-dim);color:var(--color-danger);border:1px solid var(--color-danger-border)',
+    [ClusterEventType.CACHE_EXPIRED]: 'background:var(--color-danger-dim);color:var(--color-danger);border:1px solid var(--color-danger-border)',
+    [ClusterEventType.HINT_ENQUEUED]: 'background:var(--color-info-dim);color:var(--color-info);border:1px solid var(--color-info-border)',
+    [ClusterEventType.HINT_DELIVERED]: 'background:var(--color-info-dim);color:var(--color-info);border:1px solid var(--color-info-border)',
 };
 
 export const MERGEABLE_TYPES = new Set<ClusterEventType>([

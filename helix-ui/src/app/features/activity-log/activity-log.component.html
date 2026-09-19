@@ -1,8 +1,8 @@
 <div class="log-shell">
     <div class="log-header">
-        <app-section-title icon="fa-solid fa-tower-broadcast" text="SSE Live Stream" />
+        <app-section-title icon="fa-solid fa-tower-broadcast anim-pulse" text="SSE Live Stream" />
         <div class="log-header-actions">
-            <span class="live-dot"></span>
+            <!-- <span class="live-dot"></span> -->
             <button class="action-btn" (click)="openModal()">
                 <i class="fa-solid fa-expand me-1"></i>View All
             </button>
@@ -21,7 +21,7 @@
         <div class="log-row" style="display: flex;justify-content: space-between;" (click)="openMiniModal(entry)">
             <div class="log-row" style="padding-right: 0px;">
             <span class="log-time">{{ entry.lastTimestamp | date: 'HH:mm:ss' }}</span>
-            <span class="log-badge" [style.background]="badgeColor(entry)">{{ badgeLabel(entry) }}</span>
+            <span class="log-badge" [style]="badgeColor(entry)">{{ badgeLabel(entry) }}</span>
             <!-- <span class="log-detail">{{ entry.event.detail }}</span> -->
             @if (entry.event.key) {
             <span class="log-key">{{ entry.event.key }}</span>
@@ -49,9 +49,9 @@
         <!-- Header row -->
         <div class="modal-header">
             <div class="modal-title">
-                <i class="fa-solid fa-tower-broadcast me-2" style="color: var(--color-accent)"></i>
-                LIVE ACTIVITY LOG - SSE STREAM
-                <span class="live-dot ms-2"></span>
+                <i class="fa-solid fa-tower-broadcast me-2 anim-pulse" style="color: var(--color-accent)"></i>
+                SERVER SENT EVENTS - LIVE STREAM
+                <!-- <span class="live-dot ms-2"></span> -->
                 <span class="modal-count ms-2">({{ filteredEvents().length }})</span>
             </div>
 
@@ -103,7 +103,7 @@
                 <!-- timestamp: show lastTimestamp; for merged rows also show original -->
                 <span class="log-time">{{ entry.lastTimestamp | date: 'HH:mm:ss' }}</span>
 
-                <span class="log-badge" [style.background]="badgeColor(entry)">
+                <span class="log-badge" [style]="badgeColor(entry)">
                     {{ badgeLabel(entry)}}
                 </span>
 
@@ -140,8 +140,11 @@
 <div class="mini-modal-backdrop" (click)="closeMiniModal()">
     <div class="mini-modal-box" (click)="$event.stopPropagation()">
         <div class="mini-modal-header">
-            <span class="mini-modal-title" [style.color]="badgeColor(miniModalEvent()!)">
-                {{ badgeLabel(miniModalEvent()!) }} {{ miniModalEvent()!.count > 1 ? ' (x' + miniModalEvent()!.count + ')' : '' }}
+            <span class="mini-modal-title" [style]="badgeColor(miniModalEvent()!)">
+                {{ badgeLabel(miniModalEvent()!) }}
+            </span>
+            <span class="mini-modal-title" style="color: azure">
+                {{ miniModalEvent()!.count > 1 ? ' (x' + miniModalEvent()!.count + ')' : '' }}
             </span>
 
             <button class="mini-modal-close" (click)="closeMiniModal()">

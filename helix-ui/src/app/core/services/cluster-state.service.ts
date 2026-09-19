@@ -2,7 +2,7 @@ import { computed, inject, Injectable, OnDestroy, signal } from "@angular/core";
 import { ClusterApiService } from "./cluster-api.service";
 import { SseService } from "./sse.service";
 import { catchError, EMPTY, interval, startWith, Subscription, switchMap } from "rxjs";
-import { ClusterEvent, CacheStats, Node, NodeStatusResponse, RingNodeResponse, ReplicaNodes, ClusterEventEntry } from "../../shared/interfaces/helix.interface";
+import { ClusterEvent, CacheStats, NodeStatusResponse, RingNodeResponse, ReplicaNodes, ClusterEventEntry } from "../../shared/interfaces/helix.interface";
 import { ClusterEventType, NodeStatus } from "../enums/helix.enum";
 import { environment } from "../../../environments/environment";
 import { MERGEABLE_TYPES } from "../constants/app.constant";
@@ -99,7 +99,6 @@ export class ClusterStateService implements OnDestroy {
                     e.event.detail === event.detail;
 
                 const idx = prev.findIndex(mergeKey);
-                console.log(idx);
                 if (idx !== -1 && idx<5) {
 
                     // Merge: bump count + update timestamp on existing entry

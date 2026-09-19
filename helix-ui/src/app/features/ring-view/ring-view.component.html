@@ -15,7 +15,6 @@
     <svg class="ring-svg" [attr.viewBox]="'0 0 '+ width +' '+ height" preserveAspectRatio="xMidYMid meet">
 
         <!-- Hash ring circle -->
-
         <circle [attr.cx]="cx" [attr.cy]="cy" [attr.r]="ringR" fill="none" stroke="rgba(0,200,255,0.18)"
             stroke-width="1.5" />
 
@@ -26,25 +25,24 @@
 
         <!-- Spokes -->
         @for (p of nodePositions(); track p.id) {
-
-        <line [attr.x1]="cx" [attr.y1]="cy" [attr.x2]="p.x" [attr.y2]="p.y"
-            [attr.stroke]="color(p.id) + (isHighlit(p.id) ? '55' : '22')"
-            [attr.stroke-width]="isHighlit(p.id) ? 1.5 : 1" />
+            <line [attr.x1]="cx" [attr.y1]="cy" [attr.x2]="p.x" [attr.y2]="p.y"
+                [attr.stroke]="color(p.id) + (isHighlit(p.id) ? '55' : '22')"
+                [attr.stroke-width]="isHighlit(p.id) ? 1.5 : 1" />
         }
 
         <!-- Virtual nodes on ring -->
         @for (vn of vnodePositions(); track vn.hash) {
-        <polygon [attr.points]="pentagonPoints(vn.x, vn.y, isHighlit(vn.nodeId) ? 7 : 5)"
-            [attr.fill]="color(vn.nodeId) + (isHighlit(vn.nodeId) ? '88' : '55')"
-            [attr.stroke]="color(vn.nodeId) + (isHighlit(vn.nodeId) ? ' ff': 'cc' )"
-            [attr.stroke-width]="isHighlit(vn.nodeId) ? 1.5 : 1" />
+            <polygon [attr.points]="pentagonPoints(vn.x, vn.y, isHighlit(vn.nodeId) ? 7 : 5)"
+                [attr.fill]="color(vn.nodeId) + (isHighlit(vn.nodeId) ? '88' : '55')"
+                [attr.stroke]="color(vn.nodeId) + (isHighlit(vn.nodeId) ? ' ff': 'cc' )"
+                [attr.stroke-width]="isHighlit(vn.nodeId) ? 1.5 : 1" />
         }
 
         <!-- Travel dots: primary replicas (animate on DOM entry) -->
 
         @for(dot of travelDots(); track dot.key) {
-        <circle [attr.cx]="dot.startX" [attr.cy]="dot.startY" r="5" [attr.fill]="dot.color" class="travel-dot"
-            [style.--dx]="dot.dx + 'px'" [style.--dy]="dot.dy + 'px'" [style.animation-delay]="dot.delay + 's'" />
+            <circle [attr.cx]="dot.startX" [attr.cy]="dot.startY" r="5" [attr.fill]="dot.color" class="travel-dot"
+                [style.--dx]="dot.dx + 'px'" [style.--dy]="dot.dy + 'px'" [style.animation-delay]="dot.delay + 's'" />
         }
 
         <!-- Physical nodes -->
@@ -57,16 +55,12 @@
                 class=" node-glow" />
 
             <!-- Outer ring pulse for primary-->
-
             @if (isPrimary(node.nodeId)) {
-
-            <circle r="24" fill="none" [attr.stroke]="color (node.nodeId) + 'cc'" stroke-width="1.5"
-                class="primary-ring" />
+                <circle r="24" fill="none" [attr.stroke]="color (node.nodeId) + 'cc'" stroke-width="1.5"
+                    class="primary-ring" />
             }
 
-
             <!-- Pentagon body -->>
-
             <polygon [attr.points]="pentagonPoints(0, 0, isHighlit(node.nodeId) ? 22 : 18)"
                 [attr.fill]="color(node.nodeId)+ (node.nodeStatus === 'DOWN' ? '18' : isHighlit(node.nodeId) ? '40' : '28' )"
                 [attr.stroke]="color(node.nodeId) + (node.nodeStatus === 'DOWN' ? '55' : isHighlit (node.nodeId) ? 'ff' : 'cc')"
@@ -75,16 +69,16 @@
 
             <!-- Crown for primary -->
             @if(isPrimary(node.nodeId)) {
-            <text y="-26" text-anchor="middle" class="crown" [attr.fill]="color(node.nodeId)">👑</text>
+                <text y="-26" text-anchor="middle" class="crown" [attr.fill]="color(node.nodeId)">👑</text>
             }
 
             <!--P-7-R1/R2 role label -->
-
             @if(isHighlit(node.nodeId)) {
-            <text y="4" text-anchor="middle" class="node-role" [attr.fill]="color (node.nodeId)">
-                {{ replicaLabel(node.nodeId) }}
-            </text>
+                <text y="4" text-anchor="middle" class="node-role" [attr.fill]="color (node.nodeId)">
+                    {{ replicaLabel(node.nodeId) }}
+                </text>
             }
+            
             <!-- Node id -->
             <text [attr.y]="isHighlit(node.nodeId) ? 34 : 30" text-anchor="middle" class="node-label"
                 [attr.fill]="color(node.nodeId) + (isHighlit(node.nodeId) ? 'ff' : 'aa')">
@@ -126,12 +120,5 @@
         <app-stat-card class="stats-card" value="N=3" label="Replication" />
         <app-stat-card class="stats-card" [value]="(state.hitRatio() * 100 | number: '1.1-1') + '%'" label="Hit Ratio" />
     </div>
-    <!-- Stats Legend -->
-    <!-- <div class="stats-legend">
-            <app-stat-card [value]="state.aliveCount() + '/' + N" label="Nodes Alive" />
-            <app-stat-card [value]="state.totalKeys().toString()" label="Total Keys" />
-            <app-stat-card value="N=3" label="Replication" />
-            <app-stat-card [value]="(state.hitRatio() * 100 | number: '1.1-1') + '%'" label="Hit Ratio" />
-    </div> -->
 
 </div>

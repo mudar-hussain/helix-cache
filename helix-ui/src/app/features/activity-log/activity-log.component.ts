@@ -1,12 +1,12 @@
 import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ClusterStateService } from '../../core/services/cluster-state.service';
-import { ClusterEvent, ClusterEventEntry } from '../../shared/interfaces/helix.interface';
+import { ClusterEventEntry } from '../../shared/interfaces/helix.interface';
 import { SectionTitleComponent } from '../../shared/components/section-title/section-title.component';
 import { AutoScrollDirective } from '../../shared/directives/auto-scroll.directive';
 import { ClusterEventType } from '../../core/enums/helix.enum';
 import { environment } from '../../../environments/environment';
-import { BADGE_COLOR, LOG_CATEGORIES } from '../../core/constants/app.constant';
+import { BADGE_STYLE, LOG_CATEGORIES } from '../../core/constants/app.constant';
 
 
 @Component({
@@ -60,7 +60,7 @@ export class ActivityLogComponent {
 
     //Display helpers
     badgeColor(entry: ClusterEventEntry): string {
-        return BADGE_COLOR[entry.event.clusterEventType] ?? 'var(--color-accent)';
+        return BADGE_STYLE[entry.event.clusterEventType] ?? 'var(--color-accent)';
     }
 
     badgeLabel(entry: ClusterEventEntry): string {

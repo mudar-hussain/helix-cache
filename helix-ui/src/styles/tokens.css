@@ -35,6 +35,7 @@ HELIX DESIGN TOKENS
 /* Accent */
 --color-accent:#00c8ff;
 --color-accent-dim:rgba(0, 200, 255, 0.08);
+--color-accent-border:rgba(0, 200, 255, 0.35);
 --color-accent-glow:rgba(0, 200, 255, 0.35);
 
 /* Status */

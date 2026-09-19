@@ -1,12 +1,11 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, signal } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { SectionTitleComponent } from "../../shared/components/section-title/section-title.component";
 import { NodeColorPipe } from "../../shared/components/node-color.pipe";
 import { ClusterStateService } from "../../core/services/cluster-state.service";
 import { AdminApiService } from "../../core/services/admin-api.service";
 import { environment } from "../../../environments/environment";
-import { ClusterEvent, NodeStatusResponse } from "../../shared/interfaces/helix.interface";
-import { ClusterEventType } from "../../core/enums/helix.enum";
+import { NodeStatusResponse } from "../../shared/interfaces/helix.interface";
 import { ActivityLogComponent } from "../activity-log/activity-log.component";
 
 

@@ -74,21 +74,6 @@ Node elements
     100% { transform: translate(var(--dx), var(--dy)); opacity: 0; }
 }
 
-/* Legend */
-.ring-legend {
-    position: absolute;
-    bottom: 16px;
-    left: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    background: rgba(2, 9, 18, 0.75);
-    border: 1px solid var(--color-border);
-    border-radius: 5px;
-    padding: 8px 12px;
-    backdrop-filter: blur(8px);
-}
-
 .legend-dot {
     width: 7px;
     height: 7px;
@@ -182,7 +167,20 @@ Node elements
     border-right: 1.5px solid var(--color-accent);
 }
 
-
+/* Legend */
+.ring-legend {
+    position: absolute;
+    bottom: 24px;
+    left: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: rgba(2, 9, 18, 0.75);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    padding: 8px 12px;
+    backdrop-filter: blur(8px);
+}
 
 /* Stats Legend */
 .stats-legend {
@@ -193,7 +191,8 @@ Node elements
     flex-direction: column;
     gap: 5px;
     background: rgba(2, 9, 18, 0.75);
-    padding: 8px 8px;
+    border-radius: 5px;
+    padding: 8px 12px;
     backdrop-filter: blur(8px);
 }
 
