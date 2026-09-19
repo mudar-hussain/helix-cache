@@ -3,7 +3,7 @@ import { Component, inject, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { SectionTitleComponent } from "../../shared/components/section-title/section-title.component";
 import { CacheApiService } from "../../core/services/cache-api.service";
-import { CacheResponse, Node, OpResult } from "../../shared/interfaces/helix.interface";
+import { CacheResponse, Node, OpResult, SeedRequestResult } from "../../shared/interfaces/helix.interface";
 import { ClusterApiService } from "../../core/services/cluster-api.service";
 import { ClusterStateService } from "../../core/services/cluster-state.service";
 import { HotKeysComponent } from "../hot-keys/hot-keys.component";
@@ -26,6 +26,7 @@ export class CacheOpsComponent {
     writeTtl = '';
     readKey = '';
     seedKeys = '12';
+
     // ttlOptions = Object.keys(TtlOption);
     ttlOptions = ['never', '10s', '30s', '2m', '10m'];
 
@@ -34,6 +35,7 @@ export class CacheOpsComponent {
     readResult = signal<CacheResponse | null>(null);
     readError = signal<string | null>(null);
     deleteResult = signal<string | null>(null);
+    seedLoading = signal(false);
 
 
     private ttlSeconds(ttl: string): number | undefined {
@@ -64,7 +66,7 @@ export class CacheOpsComponent {
                 });
             },
             error: err => this.writeError.set({
-                latencyMs: Date.now() - t, 
+                latencyMs: Date.now() - t,
                 body: err.message
             }),
         });
@@ -120,10 +122,19 @@ export class CacheOpsComponent {
     }
 
     onSeedKeys(): void {
-        const seedKeys = this.seedKeys.trim();
-        if(!seedKeys) return;
+        const n = parseInt(this.seedKeys.trim(), 10);
+        if (isNaN(n) || n <= 0) return;
         this.resetResult();
+        this.seedLoading.set(true);
 
+        this.cacheApi.seedCache(n).subscribe({
+            next: () => {
+                this.seedLoading.set(false);
+                this.state.triggerRingBurst();
+            },
+            error: err => {
+                this.seedLoading.set(false);
+            }
+        });
     }
-
 }

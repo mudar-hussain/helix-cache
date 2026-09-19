@@ -2,8 +2,7 @@ package com.mudar.helixcache.service;
 
 import com.mudar.helixcache.cluster.ClusterEventPublisher;
 import com.mudar.helixcache.cluster.ClusterManager;
-import com.mudar.helixcache.dto.CacheStats;
-import com.mudar.helixcache.dto.Hint;
+import com.mudar.helixcache.dto.*;
 import com.mudar.helixcache.enums.ClusterEventType;
 import com.mudar.helixcache.exception.HelixValidationException;
 import com.mudar.helixcache.model.Cache;
@@ -19,9 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -34,6 +31,7 @@ public class CacheService {
     private final HintedHandOffStore hintedHandOffStore;
     private final ClusterEventPublisher clusterEventPublisher;
     private final AccessTracker accessTracker;
+    private final NodeHealthService nodeHealthService;
 
     public Cache addCache(String key, String value, Long ttlSeconds) {
         HelixUtils.validateKey(key);
@@ -193,13 +191,28 @@ public class CacheService {
         return cacheStore.size();
     }
 
-    public CacheStats getCacheStats() {
-        return new CacheStats(
-                cacheStore.size(),
-                cacheStore.getHitCount(),
-                cacheStore.getMissCount(),
-                cacheStore.getHitRatio()
+    public ClusterStats getCacheStats() {
+        return new ClusterStats(
+                this.getTotalKeyCount(),
+                clusterManager.getReplicationFactor(),
+                clusterManager.getWriteQuorum(),
+                clusterManager.getReadQuorum(),
+                clusterManager.getVirtualNodesPerNode()
         );
+    }
+
+    public int getTotalKeyCount() {
+        List<Node> allNodes = clusterManager.getNodes();
+        Map<String, Integer> counts = new LinkedHashMap<>();
+        for(Node node: allNodes) {
+            if (node.id().equals(clusterManager.getLocalNodeId())) {
+                counts.put(node.id(), this.size());
+            } else {
+                counts.put(node.id(), nodeHealthService.getRemoteKeyCount(node));
+            }
+        }
+        int total = counts.values().stream().mapToInt(Integer::intValue).sum();
+        return total/clusterManager.getReplicationFactor();
     }
 
     public List<Cache> getCacheListForNode(String targetNodeId) {
@@ -208,6 +221,32 @@ public class CacheService {
                         .stream()
                         .anyMatch(node -> node.id().equals(targetNodeId)))
                 .toList();
+    }
+
+    public BulkSeedResult seedCache(int count) {
+        return seedCache(count, "K");
+    }
+
+    public BulkSeedResult seedCache(BulkSeedRequest request) {
+        return seedCache(request.count(), request.prefix() != null ? request.prefix() : "K");
+    }
+
+    public BulkSeedResult seedCache(int count, String prefix) {
+        if(count<=0 || count > 50) {
+            throw new HelixValidationException("Seed count must be between 1 and 500");
+        }
+        int succeeded = 0;
+        for(int i = 1; i<=count; i++) {
+            String key = prefix + i;
+            String value = "seed:value:" + i;
+            try {
+                addCache(key, value, null);
+                succeeded++;
+            } catch (Exception e) {
+                log.warn("Seed failed for key '{}': {}", key, e.getMessage());
+            }
+        }
+        return new BulkSeedResult(count, succeeded, count-succeeded);
     }
 
 }

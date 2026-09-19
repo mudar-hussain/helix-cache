@@ -2,7 +2,7 @@ import { computed, inject, Injectable, OnDestroy, signal } from "@angular/core";
 import { ClusterApiService } from "./cluster-api.service";
 import { SseService } from "./sse.service";
 import { catchError, EMPTY, interval, startWith, Subscription, switchMap } from "rxjs";
-import { ClusterEvent, CacheStats, NodeStatusResponse, RingNodeResponse, ReplicaNodes, ClusterEventEntry } from "../../shared/interfaces/helix.interface";
+import { ClusterEvent, ClusterStats, NodeStatusResponse, RingNodeResponse, ReplicaNodes, ClusterEventEntry } from "../../shared/interfaces/helix.interface";
 import { ClusterEventType, NodeStatus } from "../enums/helix.enum";
 import { environment } from "../../../environments/environment";
 import { MERGEABLE_TYPES } from "../constants/app.constant";
@@ -17,16 +17,22 @@ export class ClusterStateService implements OnDestroy {
     //Reactive state for the cluster
     readonly nodes = signal<NodeStatusResponse[]>([]);
     readonly ring = signal<RingNodeResponse[]>([]);
-    readonly stats = signal<CacheStats | null>(null);
+    readonly stats = signal<ClusterStats | null>(null);
+    readonly ringBurst = signal<number>(0);
 
     //Derived state for the cluster
-    readonly aliveCount = computed(() => this.nodes().filter(node => node.nodeStatus === NodeStatus.UP).length);
-    readonly totalKeys = computed(() => this.stats()?.size ?? 0);
-    readonly hitRatio = computed(() => this.stats()?.hitRatio ?? 0);
+    readonly aliveCount = computed(() => this.nodes().filter(node => node.nodeStatus !== NodeStatus.DOWN).length);
+    readonly totalKeys = computed(() => this.stats()?.totalKeys ?? 0);
+    readonly replicationFactor = computed(() => this.stats()?.replicationFactor ?? 0);
+    readonly virtualNodesPerNode = computed(() => this.stats()?.virtualNodesPerNode ?? 0);
+    readonly writeQuorum = computed(() => this.stats()?.writeQuorum ?? 0);
+    readonly readQuorum = computed(() => this.stats()?.readQuorum ?? 0);
+    readonly virtualNodes = computed(() => this.aliveCount() * this.virtualNodesPerNode());
 
     readonly events$ = this.sse.events$;
     readonly replicaNodes = signal<ReplicaNodes | null>(null);
     private highlightTimer: ReturnType<typeof setTimeout> | null = null;
+    private burstTimer: ReturnType<typeof setTimeout> | null = null;
 
     private readonly MAX_EVENTS = 500;
     readonly eventLog = signal<ClusterEventEntry[]>([]);
@@ -53,6 +59,12 @@ export class ClusterStateService implements OnDestroy {
             clearTimeout(this.highlightTimer);
         }
         this.replicaNodes.set(null);
+    }
+
+    triggerRingBurst(): void {
+        if (this.burstTimer) clearTimeout(this.burstTimer);
+        this.ringBurst.set(Date.now());
+        this.highlightTimer = setTimeout(() => this.replicaNodes.set(null), 2500);
     }
 
     private startPolling() {
@@ -82,6 +94,9 @@ export class ClusterStateService implements OnDestroy {
                 if ([ClusterEventType.NODE_UP, ClusterEventType.NODE_DOWN, ClusterEventType.NODE_SUSPECT].includes(event.clusterEventType)) {
                     this.subs.add(this.clusterApi.getNodes().subscribe(nodes => this.nodes.set(nodes)));
                     this.subs.add(this.clusterApi.getRing().subscribe(ring => this.ring.set(ring)));
+                }
+                if ([ClusterEventType.NODE_UP, ClusterEventType.NODE_DOWN].includes(event.clusterEventType)) {
+                    this.triggerRingBurst();
                 }
             })
         );

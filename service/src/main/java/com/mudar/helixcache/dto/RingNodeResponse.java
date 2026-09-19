@@ -4,5 +4,6 @@ public record RingNodeResponse (
         long hash,
         String nodeId,
         String address,
-        int replicaIndex
+        int replicaIndex,
+        double normalizedPosition
 ) {}

@@ -25,8 +25,8 @@ public class CacheStore {
     public long getHitCount() { return hitCount.get(); }
     public long getMissCount() { return missCount.get(); }
     public double getHitRatio() {
-        long total = hitCount.get() + missCount.get();
-        return total == 0 ? 0.0 : (double) hitCount.get() / total;
+        long total = getHitCount() + getMissCount();
+        return total == 0 ? 0.0 : (double) getHitCount() / total;
     }
 
 

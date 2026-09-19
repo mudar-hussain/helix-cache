@@ -107,11 +107,16 @@
 
 <div class="ops-row">
     <div class="ops-group ops-group--key">
-        <input class="ops-input" [(ngModel)]="seedKeys" placeholder="12" />
+        <input class="ops-input" [(ngModel)]="seedKeys" placeholder="12" min="1" max="50"/>
     </div>
     <div class="ops-group--value">
-        <button class="ops-btn ops-btn--accent w-100" (click)="onSeedKeys()">
-            <i class="fa-solid fa-upload me-1"></i>Seed N Keys
+        <button class="ops-btn ops-btn--accent w-100" (click)="onSeedKeys()" [disabled]="seedLoading()">
+            @if(seedLoading()) {
+                <i class="fa-solid fa-spinner fa-spin me-1"></i>Seeding...
+
+            } @else {
+                <i class="fa-solid fa-seedling me-1"></i> Seed N Keys
+            }
         </button>
     </div>
 </div>

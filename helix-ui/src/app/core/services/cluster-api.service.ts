@@ -1,7 +1,7 @@
 
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { CacheStats, NodeDistributionResponse, NodeStatusResponse, RingNodeResponse, Node, ReplicaNodes } from "../../shared/interfaces/helix.interface";
+import { ClusterStats, NodeDistributionResponse, NodeStatusResponse, RingNodeResponse, Node, ReplicaNodes } from "../../shared/interfaces/helix.interface";
 import { ApiService } from "./api.service";
 
 @Injectable({
@@ -24,7 +24,7 @@ export class ClusterApiService {
         return this.apiService.withFallback('get','/cluster/distribution');
     }
 
-    getStats(): Observable<CacheStats> {
+    getStats(): Observable<ClusterStats> {
         return this.apiService.withFallback('get','/cluster/stats');
     }
 

@@ -85,14 +85,15 @@ public class ClusterService {
                             v.hash(),
                             v.node().id(),
                             v.node().address(),
-                            v.replicaIndex()
+                            v.replicaIndex(),
+                            (double) v.hash() / Long.MAX_VALUE
                     );
                 })
                 .toList();
         return ringNodeResponseList;
     }
 
-    public ReplicaNodes getReplicas(String key) {
+    public ReplicaNodes getReplicaNodes(String key) {
         List<Node> allNodes = clusterManager.getReplicas(key);
         Node primaryNode = allNodes.get(0);
         List<Node> replicas = allNodes.stream().filter(node -> !node.id().equals(primaryNode.id())).toList();

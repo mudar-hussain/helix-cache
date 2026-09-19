@@ -15,6 +15,7 @@ export interface RingNodeResponse {
     nodeId: string;
     address: string;
     replicaIndex: number;
+    normalizedPosition: number;
 }
 
 export interface NodeDistributionResponse {
@@ -31,11 +32,12 @@ export interface HotKeyPredictionResponse {
     predicted: number;
 }
 
-export interface CacheStats {
-    size: number;
-    hitCount: number;
-    missCount: number;
-    hitRatio: number;
+export interface ClusterStats {
+    totalKeys: number;
+    replicationFactor: number;
+    writeQuorum: number;
+    readQuorum: number;
+    virtualNodesPerNode: number;
 }
 
 export interface Node {
@@ -84,4 +86,18 @@ export interface ClusterEventEntry {
     event: ClusterEvent;
     count: number;      // 1 = single event, >1 = merged duplicates
     lastTimestamp: string;      // timestamp of the most-recent merged event
+}
+
+export interface SeedRequestResult {
+    total: number;
+    succeeded: number;      // 1 = single event, >1 = merged duplicates
+    failed: number;      // timestamp of the most-recent merged event
+}
+
+export interface TravelGroup {
+    id: string;
+    fromNodeId: string;
+    toNodeId: string;
+    color: string;      //color of source node
+    dotCount: number
 }

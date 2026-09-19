@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { CacheResponse } from "../../shared/interfaces/helix.interface";
+import { CacheResponse, SeedRequestResult } from "../../shared/interfaces/helix.interface";
 import { Observable } from "rxjs";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { ApiService } from "./api.service";
@@ -44,6 +44,13 @@ export class CacheApiService {
         return this.apiService.withFallback<string>(
             'delete',
             `/cache/${encodeURIComponent(key)}`
+        );
+    }
+
+    seedCache(count: number): Observable<SeedRequestResult> {
+        return this.apiService.withFallback<SeedRequestResult>(
+            'put',
+            `/cache/seed/${encodeURIComponent(count)}`
         );
     }
 }

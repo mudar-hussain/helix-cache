@@ -1,7 +1,9 @@
 package com.mudar.helixcache.cluster;
 
+import com.mudar.helixcache.cluster.hashfunction.Sha256HashFunction;
 import com.mudar.helixcache.config.ClusterProperties;
 import com.mudar.helixcache.config.NodeProperties;
+import com.mudar.helixcache.dto.NodeDistributionResponse;
 import com.mudar.helixcache.model.Node;
 import com.mudar.helixcache.model.VirtualNode;
 import com.mudar.helixcache.service.NodeHealthService;
@@ -21,11 +23,15 @@ public class ClusterManager {
     private final NodeProperties nodeProperties;
     private final ClusterProperties clusterProperties;
     private final NodeHealthService nodeHealthService;
-    private final ConsistentHashRing hashRing = new ConsistentHashRing();
+    private ConsistentHashRing hashRing;
     private Node localNode = null;
 
     @PostConstruct
     private void initialize() {
+        this.hashRing = new ConsistentHashRing(
+                clusterProperties.getVirtualNodesPerNode(),
+                new Sha256HashFunction()
+        );
         this.localNode = new Node(nodeProperties.getId(), nodeProperties.getHost(), nodeProperties.getPort());
         clusterProperties.getNodes().forEach(node -> {
             hashRing.addNode(node);
@@ -72,6 +78,14 @@ public class ClusterManager {
 
     public int getReadQuorum() {
         return clusterProperties.getReadQuorum();
+    }
+
+    public int getReplicationFactor() {
+        return clusterProperties.getReplicationFactor();
+    }
+
+    public int getVirtualNodesPerNode() {
+        return clusterProperties.getVirtualNodesPerNode();
     }
 
     public String getLocalNodeId() {

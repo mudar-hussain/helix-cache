@@ -30,7 +30,7 @@ public class ClusterController {
     private final ClusterService clusterService;
 
     @GetMapping("/stats")
-    public ResponseEntity<CacheStats> getCacheStats() {
+    public ResponseEntity<ClusterStats> getCacheStats() {
         return ResponseEntity.ok(cacheService.getCacheStats());
     }
 
@@ -51,7 +51,7 @@ public class ClusterController {
 
     @GetMapping("/replicas/{key}")
     public ResponseEntity<ReplicaNodes> getReplicas(@PathVariable String key) {
-        return ResponseEntity.ok(clusterService.getReplicas(key));
+        return ResponseEntity.ok(clusterService.getReplicaNodes(key));
     }
 
     @GetMapping("/ring")

@@ -17,5 +17,6 @@ public class ClusterProperties {
     private int replicationFactor = 3;
     private int writeQuorum = 2;
     private int readQuorum = 2;
+    private int virtualNodesPerNode = 10;
     private List<Node> nodes = new ArrayList<>();
 }

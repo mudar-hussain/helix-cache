@@ -2,7 +2,7 @@ package com.mudar.helixcache.service;
 
 import com.mudar.helixcache.cluster.ClusterEventPublisher;
 import com.mudar.helixcache.cluster.NodeHealthTracker;
-import com.mudar.helixcache.dto.CacheStats;
+import com.mudar.helixcache.dto.ClusterStats;
 import com.mudar.helixcache.enums.ClusterEventType;
 import com.mudar.helixcache.enums.NodeStatus;
 import com.mudar.helixcache.exception.HelixValidationException;
@@ -82,11 +82,11 @@ public class NodeHealthService {
 
     public int getRemoteKeyCount(Node node) {
         try {
-            CacheStats cacheStats = restClient.get()
+            ClusterStats clusterStats = restClient.get()
                     .uri("http://" + node.address() + "/cluster/stats")
                     .retrieve()
-                    .body(CacheStats.class);
-            return cacheStats != null ? cacheStats.size() : 0;
+                    .body(ClusterStats.class);
+            return clusterStats != null ? clusterStats.totalKeys() : 0;
         } catch (Exception e) {
             log.warn("Could not fetch key count from node {}: {}", node.id(), e.getMessage());
             return -1; //signals "unreachable"

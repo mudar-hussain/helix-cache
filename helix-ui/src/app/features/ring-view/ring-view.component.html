@@ -31,8 +31,8 @@
         }
 
         <!-- Virtual nodes on ring -->
-        @for (vn of vnodePositions(); track vn.hash) {
-            <polygon [attr.points]="pentagonPoints(vn.x, vn.y, isHighlit(vn.nodeId) ? 7 : 5)"
+        @for (vn of vnodePositions(); track vn.normalizedPosition) {
+            <polygon [attr.points]="pentagonPoints(vn.x, vn.y, isHighlit(vn.nodeId) ? 7 : 4)"
                 [attr.fill]="color(vn.nodeId) + (isHighlit(vn.nodeId) ? '88' : '55')"
                 [attr.stroke]="color(vn.nodeId) + (isHighlit(vn.nodeId) ? ' ff': 'cc' )"
                 [attr.stroke-width]="isHighlit(vn.nodeId) ? 1.5 : 1" />
@@ -45,14 +45,21 @@
                 [style.--dx]="dot.dx + 'px'" [style.--dy]="dot.dy + 'px'" [style.animation-delay]="dot.delay + 's'" />
         }
 
+        @for(dot of burstDots(); track dot.key) {
+            <circle [attr.cx]="dot.startX" [attr.cy]="dot.startY" r="3" [attr.fill]="dot.color" class="travel-dot"
+                [style.--dx]="dot.dx + 'px'" [style.--dy]="dot.dy + 'px'" [style.animation-delay]="dot.delay + 's'" />
+        }
+
         <!-- Physical nodes -->
-        @for (node of state.nodes(); track node.nodeId) {
+        @for (node of clusterState.nodes(); track node.nodeId) {
         <g [attr.transform]="'translate('+ getPos(node.nodeId).x+','+ getPos(node.nodeId).y +')'">
 
             <!-- Glow -->
-            <circle [attr.r]="isPrimary(node.nodeId) ? 38 : isHighlit(node.nodeId) ? 32 : 28"
-                [attr.fill]="color(node.nodeId) + (isPrimary(node.nodeId) ? '25' : isHighlit (node.nodeId) ? '18':'12')"
-                class=" node-glow" />
+             @if (isNodeAlive(node.nodeId)) {
+                <circle [attr.r]="isPrimary(node.nodeId) ? 38 : isHighlit(node.nodeId) ? 32 : 28"
+                    [attr.fill]="color(node.nodeId) + (isPrimary(node.nodeId) ? '25' : isHighlit(node.nodeId) ? '18':'12')"
+                    class="node-glow  anim-pulse" />
+             }
 
             <!-- Outer ring pulse for primary-->
             @if (isPrimary(node.nodeId)) {
@@ -63,7 +70,7 @@
             <!-- Pentagon body -->>
             <polygon [attr.points]="pentagonPoints(0, 0, isHighlit(node.nodeId) ? 22 : 18)"
                 [attr.fill]="color(node.nodeId)+ (node.nodeStatus === 'DOWN' ? '18' : isHighlit(node.nodeId) ? '40' : '28' )"
-                [attr.stroke]="color(node.nodeId) + (node.nodeStatus === 'DOWN' ? '55' : isHighlit (node.nodeId) ? 'ff' : 'cc')"
+                [attr.stroke]="color(node.nodeId) + (node.nodeStatus === 'DOWN' ? '55' : isHighlit(node.nodeId) ? 'ff' : 'cc')"
                 [attr.stroke-width]="isHighlit(node.nodeId) ? 2: 1.5" class="node-pentagon"
                 [class.node-pentagon--suspect]="node.nodeStatus === 'SUSPECT'" />
 
@@ -74,7 +81,7 @@
 
             <!--P-7-R1/R2 role label -->
             @if(isHighlit(node.nodeId)) {
-                <text y="4" text-anchor="middle" class="node-role" [attr.fill]="color (node.nodeId)">
+                <text y="4" text-anchor="middle" class="node-role" [attr.fill]="color(node.nodeId)">
                     {{ replicaLabel(node.nodeId) }}
                 </text>
             }
@@ -100,7 +107,7 @@
 
     <!-- Node Legend -->
     <div class="ring-legend">
-        @for (node of state.nodes(); track node.nodeId) {
+        @for (node of clusterState.nodes(); track node.nodeId) {
         <div class="d-flex align-items-center gap-2">
             <span class="legend-dot" [style.background]="node.nodeId | nodeColor"></span>
             <span class="legend-id" [style.color]="node.nodeId | nodeColor">{{ node.nodeId}}</span>
@@ -115,10 +122,11 @@
 
 
     <div class="stats-legend">
-        <app-stat-card class="stats-card" [value]="state.aliveCount() + '/' + N" label="Nodes Alive" />
-        <app-stat-card class="stats-card" [value]="state.totalKeys().toString()" label="Total Keys" />
-        <app-stat-card class="stats-card" value="N=3" label="Replication" />
-        <app-stat-card class="stats-card" [value]="(state.hitRatio() * 100 | number: '1.1-1') + '%'" label="Hit Ratio" />
+        <app-stat-card class="stats-card" [value]="clusterState.aliveCount() + '/' + N" label="Nodes Alive" />
+        <app-stat-card class="stats-card" [value]="clusterState.totalKeys().toString()" label="Total Keys" />
+        <app-stat-card class="stats-card" [value]="clusterState.replicationFactor().toString()" label="Replication" />
+        <app-stat-card class="stats-card" [value]="clusterState.virtualNodes().toString()" label="Virtual Nodes" />
+        <app-stat-card class="stats-card" [value]="`W=${clusterState.writeQuorum()} R=${clusterState.readQuorum()}`" label="Quorum" />
     </div>
 
 </div>
