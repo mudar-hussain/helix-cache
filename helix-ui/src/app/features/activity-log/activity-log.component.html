@@ -1,43 +1,132 @@
 <div class="log-shell">
     <div class="log-header">
         <app-section-title icon="fa-solid fa-tower-broadcast" text="SSE Live Stream" />
-        <button class="clear-btn" (click)="clear()">
-            <i class="fa-regular fa-trash-can fa-buzz me-1"></i>CLEAR</button>
+        <div class="log-header-actions">
+            <span class="live-dot"></span>
+            <button class="action-btn" (click)="openModal()">
+                <i class="fa-solid fa-expand me-1"></i>View All
+            </button>
+            <button class="action-btn action-btn--danger" (click)="clear()">
+                <i class="fa-solid fa-trash-can me-1"></i>Clear
+            </button>
+        </div>
     </div>
 
     <div class="log-body" autoScroll [appAutoScroll]="events().length">
         @if (events().length === 0) {
-            <div class="log-empty">
-                <i class="fa-solid fa-spinner fa-buzz anim-pulse" style="font-size:1.4rem;color:var(--color-accent)"></i>
-                <span>Waiting for cluster events...</span>
-            </div>
-
+        <div class="log-empty">
+            <i class="fa-solid fa-spinner fa-buzz anim-pulse" style="font-size:1.2rem; color: var(--color-accent)"></i>
+            <span>Waiting for cluster events...</span>
+        </div>
         }
 
-        @for (ev of events(); track $index) {
-            <div class="log-row anim-slide-up">
-                <span class="log-time">{{ ev.eventTimestamp | date: 'HH:mm:ss' }}</span>
-                <span class="log-type" [style.color]="eventColor (ev)">{{ ev.clusterEventType }}</span>
-                @if (ev.nodeId) {
-                    <span class="log-node">{{ ev.nodeId }}</span>
-                }
-
-                @if (ev.key) {
-                    <span class="log-key">{{ ev.key }}</span>
-                }
-
-                <span class="log-detail">{{ ev.detail }}</span>
-
-                <span class="log-sev" 
-                    [class.sev--info]="ev.severity === 'INFO'" 
-                    [class.sev--warn]="ev.severity === 'WARN'"
-                    [class.sev--error]="ev.severity === 'ERROR'">
-
-                    {{ ev.severity }}
-
-                </span>
-
-            </div>
+        @for (entry of miniEvents(); track $index) {
+        <div class="log-row">
+            <span class="log-time">{{ entry.lastTimestamp | date: 'HH:mm:ss' }}</span>
+            <span class="log-badge" [style.background]="badgeColor(entry)">{{ badgeLabel(entry) }}</span>
+            <span class="log-node" [style.color]="nodeColor(entry.event.nodeId)">{{ entry.event.nodeId }}</span>
+            <span class="log-detail">{{ entry.event.detail }}</span>
+            @if (entry.event.key) {
+            <span class="log-key">{{ entry.event.key }}</span>
+            }
+            @if (entry.count > 1) {
+            <span class="log-count">x{{ entry.count }}</span>
+            }
+        </div>
         }
     </div>
 </div>
+
+
+<!-- Full Log Modal -->
+@if(modalOpen()) {
+<div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal-shell" (click)="$event.stopPropagation()">
+
+        <!-- Header row -->
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fa-solid fa-tower-broadcast me-2" style="color: var(--color-accent)"></i>
+                LIVE ACTIVITY LOG - SSE STREAM
+                <span class="live-dot ms-2"></span>
+                <span class="modal-count ms-2">({{ filteredEvents().length }})</span>
+            </div>
+
+            <div class="modal-controls">
+                <button class="action-btn action-btn--danger" (click)="clear()">
+                    <i class="fa-regular fa-trash-can me-1"></i>CLEAR
+                </button>
+
+                <button class="action-btn" (click)="closeModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+
+        <!-- Category filter row -->
+        <div class="filter-row">
+            <span class="filter-label">CATEGORY</span>
+            @for (cat of categories; track cat) {
+            <button class="cat-chip" [class.cat-chip--active]="activeCategory() === cat" (click)="setCategory(cat)">
+                {{ cat }}
+            </button>
+            }
+        </div>
+
+        <!-- Node filter row -->
+        <div class="filter-row">
+            <span class="filter-label">NODE</span>
+            @for (nid of nodeIds; track nid) {
+            <button class="node-chip" [class.node-chip--active]="activeNode() === nid"
+                [style.--chip-color]="nid === 'ALL' ? 'var(--color-accent)': nodeColor(nid)" (click)="setNode(nid) ">
+                {{ nid }}
+            </button>
+            }
+        </div>
+
+        <!-- Log body -->
+        <div class="modal-body" autoScroll [appAutoScroll]="filteredEvents().length">
+            @if (filteredEvents().length === 0) {
+            <div class="log-empty">
+                <i class="fa-solid fa-magnifying-glass" style="font-size:1.2rem;color:var(--color-accent);"></i>
+                <span>No events match the selected filters.</span>
+            </div>
+        }
+
+            @for (entry of filteredEvents(); track $index) {
+            <div class="log-row log-row--modal" [class.log-row--merged]="entry.count > 1">
+
+                <!-- timestamp: show lastTimestamp; for merged rows also show original -->
+                <span class="log-time">{{ entry.lastTimestamp | date: 'HH:mm:ss' }}</span>
+
+                <span class="log-badge" [style.background]="badgeColor(entry)">
+                    {{ badgeLabel(entry)}}
+                </span>
+
+                <span class="log-node" [style.color]="nodeColor(entry.event.nodeId)">
+                    {{ entry.event.nodeId }}
+                </span>
+
+                <span class="log-detail">{{ entry.event.detail }}</span>
+
+                @if (entry.event.key) {
+                <span class="log-key">{{ entry.event.key }}</span>
+                }
+
+                <!-- Merge count badge only visible when > 1 -->
+                @if (entry.count > 1) {
+                <span class="log-count" title="Received {{ entry.count}} times">x{{ entry.count }}</span>
+                }
+
+                <span class="log-sev" [class.sev--info]="entry.event.severity === 'INFO'"
+                    [class.sev--warn]="entry.event.severity === 'WARN'"
+                    [class.sev--error]="entry.event.severity ==='ERROR'">
+                    {{ entry.event.severity }}
+                </span>
+            </div>
+            }
+        </div>
+    </div>
+</div>
+}

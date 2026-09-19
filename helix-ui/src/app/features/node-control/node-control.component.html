@@ -47,10 +47,10 @@
     }
 
     @for (ev of state.eventLog(); track $index) {
-    <div class="mini-log-row" [style.border-left-color]="eventColor(ev)" (click)="openModal(ev) ">
-        <span class="mini-log-time">{{ ev.eventTimestamp | date: 'HH:mm:ss' }}</span>
-        <span class="mini-log-type" [style.color]="eventColor(ev)">{{ ev.clusterEventType }}</span>
-        @if (ev.nodeId) { <span class="mini-log-node">{{ ev.nodeId }}</span> }
+    <div class="mini-log-row" [style.border-left-color]="eventColor(ev.event)" (click)="openModal(ev.event) ">
+        <span class="mini-log-time">{{ ev.lastTimestamp | date: 'HH:mm:ss' }}</span>
+        <span class="mini-log-type" [style.color]="eventColor(ev.event)">{{ ev.event.clusterEventType }}</span>
+        @if (ev.event.nodeId) { <span class="mini-log-node">{{ ev.event.nodeId }}</span> }
     </div>
     }
 </div>

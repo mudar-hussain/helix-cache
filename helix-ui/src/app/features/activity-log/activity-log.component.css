@@ -1,9 +1,11 @@
+/* Host */
 :host {
     display: flex;
     flex-direction: column;
     height: 100%;
 }
 
+/* mini log shell */
 .log-shell {
     display: flex;
     flex-direction: column;
@@ -11,6 +13,7 @@
     padding: 16px 20px 0;
 }
 
+/* header */
 .log-header {
     display: flex;
     align-items: flex-start;
@@ -18,10 +21,41 @@
     flex-shrink: 0;
 }
 
-.clear-btn {
-    font-size: 0.55rem;
+.log-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Pulsing live indicator */
+.live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-success);
+    box-shadow: 0 0 6px var(--color-success);
+    flex-shrink: 0;
+    animation: pulse-dot 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.25;
+    }
+}
+
+/* Generic action button */
+
+.action-btn {
+    font-size: 0.52rem;
     font-weight: 900;
-    letter-spacing: 1.5px;
+    letter-spacing: 1.4px;
     text-transform: uppercase;
     color: var(--color-text-secondary);
     border: 1px solid var(--color-border);
@@ -30,14 +64,21 @@
     background: transparent;
     cursor: pointer;
     transition: color 0.15s, border-color 0.15s;
-    margin-top: -2px;
+    white-space: nowrap;
 }
 
-.clear-btn:hover {
+.action-btn:hover {
     color: var(--color-accent);
     border-color: var(--color-accent);
 }
 
+.action-btn--danger:hover {
+    color: var(--color-danger);
+    border-color: var(--color-danger);
+}
+
+
+/* Log Body */
 .log-body {
     flex: 1;
     overflow-y: auto;
@@ -59,10 +100,11 @@
     letter-spacing: 1px;
 }
 
+/* Shared Log */
 .log-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
     padding: 5px 10px;
     border-bottom: 1px solid var(--color-border-subtle);
     font-family: var(--font-mono);
@@ -78,32 +120,47 @@
     background: rgba(0, 200, 255, 0.04);
 }
 
+.log-row--merged {
+    border-left: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+.log-row--modal {
+    padding: 6px 10px;
+}
+
 .log-time {
     color: var(--color-text-muted);
     flex-shrink: 0;
     font-size: 0.58rem;
+    min-width: 46px;
 }
 
-.log-type {
+.log-badge {
+    font-size: 0.50rem;
     font-weight: 900;
+    letter-spacing: 0.4px;
+    padding: 2px 6px;
+    border-radius: 20px;
+    color: #000;
     flex-shrink: 0;
-    font-size: 0.6rem;
-    letter-spacing: 0.5px;
+    white-space: nowrap;
 }
 
 .log-node {
-    color: var(--color-accent);
     flex-shrink: 0;
-    font-size: 0.6rem;
+    font-size: 0.58rem;
+    font-weight: 700;
+    min-width: 56px;
 }
 
 .log-key {
     color: var(--color-info);
     flex-shrink: 0;
-    max-width: 120px;
+    max-width: 110px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-size: 0.58rem;
 }
 
 .log-detail {
@@ -115,9 +172,20 @@
     font-size: 0.6rem;
 }
 
+.log-count {
+    flex-shrink: 0;
+    font-size: 0.52rem;
+    font-weight: 900;
+    color: var(--color-text-muted);
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 3px;
+    padding: 1px 5px;
+    letter-spacing: 0.5px;
+}
+
 .log-sev {
     flex-shrink: 0;
-    font-size: 0.55rem;
+    font-size: 0.52rem;
     font-weight: 900;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -133,4 +201,145 @@
 
 .sev--error {
     color: var(--color-danger);
+}
+
+/* Modal backdrop */
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-shell {
+    width: min (1160px, 96vw);
+    height: min (720px, 92vh);
+    background: var (--color-surface, #0d1117);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+}
+
+/* Modal header */
+
+modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+modal-title {
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    color: var(--color-text-primary);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+}
+
+.modal-count {
+    font-size: 0.6rem;
+    color: var(--color-text-muted);
+    font-weight: 400;
+    letter-spacing: 0;
+}
+
+.modal-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Filter rows (category + node) */
+
+.filter-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 18px;
+    border-bottom: 1px solid var(--color-border-subtle);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+
+-filter-label {
+    font-size: 0.48rem;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-right: 4px;
+    flex-shrink: 0;
+}
+
+/* Category chips */
+
+.cat-chip {
+    font-size: 0.50rem;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 20px;
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.cat-chip:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+.cat-chip--active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #000;
+}
+
+/* Node chips - use a CSS variable set per-chip for the active colour */
+
+.node-chip {
+    font-size: 0.50rem;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 20px;
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.node-chip:hover {
+    border-color: var(--chip-color);
+    color: var(--chip-color);
+}
+
+.node-chip--active {
+    background: var(--chip-color);
+    border-color: var(--chip-color);
+    color: #000;
+}
+
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
 }

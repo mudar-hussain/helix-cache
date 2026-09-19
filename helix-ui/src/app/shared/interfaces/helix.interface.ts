@@ -79,3 +79,9 @@ export interface NodeConfig {
     baseUrl: string;
     color: string;
 }
+
+export interface ClusterEventEntry {
+    event: ClusterEvent;
+    count: number;      // 1 = single event, >1 = merged duplicates
+    lastTimestamp: string;      // timestamp of the most-recent merged event
+}
