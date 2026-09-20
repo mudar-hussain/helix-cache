@@ -191,9 +191,9 @@ public class CacheService {
         return cacheStore.size();
     }
 
-    public ClusterStats getCacheStats() {
+    public ClusterStats getLocalClusterStats() {
         return new ClusterStats(
-                this.getTotalKeyCount(),
+                cacheStore.size(),
                 clusterManager.getReplicationFactor(),
                 clusterManager.getWriteQuorum(),
                 clusterManager.getReadQuorum(),
@@ -201,18 +201,28 @@ public class CacheService {
         );
     }
 
-    public int getTotalKeyCount() {
+    public ClusterStats getGlobalClusterStats() {
         List<Node> allNodes = clusterManager.getNodes();
-        Map<String, Integer> counts = new LinkedHashMap<>();
+        String localNodeId = clusterManager.getLocalNodeId();
+        int totalRawKeys = 0;
+
         for(Node node: allNodes) {
-            if (node.id().equals(clusterManager.getLocalNodeId())) {
-                counts.put(node.id(), this.size());
+            if(node.id().equals(localNodeId)) {
+                totalRawKeys += cacheStore.size();
             } else {
-                counts.put(node.id(), nodeHealthService.getRemoteKeyCount(node));
+                int remote = nodeHealthService.getRemoteKeyCount(node);
+                if(remote >=0 ) totalRawKeys += remote;
             }
         }
-        int total = counts.values().stream().mapToInt(Integer::intValue).sum();
-        return total/clusterManager.getReplicationFactor();
+
+        int uniqueKeys = totalRawKeys / clusterManager.getReplicationFactor();
+        return new ClusterStats(
+                uniqueKeys,
+                clusterManager.getReplicationFactor(),
+                clusterManager.getWriteQuorum(),
+                clusterManager.getReadQuorum(),
+                clusterManager.getVirtualNodesPerNode()
+        );
     }
 
     public List<Cache> getCacheListForNode(String targetNodeId) {
@@ -233,7 +243,7 @@ public class CacheService {
 
     public BulkSeedResult seedCache(int count, String prefix) {
         if(count<=0 || count > 50) {
-            throw new HelixValidationException("Seed count must be between 1 and 500");
+            throw new HelixValidationException("Seed count must be between 1 and 50");
         }
         int succeeded = 0;
         for(int i = 1; i<=count; i++) {

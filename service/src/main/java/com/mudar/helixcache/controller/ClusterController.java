@@ -30,8 +30,13 @@ public class ClusterController {
     private final ClusterService clusterService;
 
     @GetMapping("/stats")
-    public ResponseEntity<ClusterStats> getCacheStats() {
-        return ResponseEntity.ok(cacheService.getCacheStats());
+    public ResponseEntity<ClusterStats> getLocalClusterStats() {
+        return ResponseEntity.ok(cacheService.getLocalClusterStats());
+    }
+
+    @GetMapping("/stats/global")
+    public ResponseEntity<ClusterStats> getGlobalClusterStats() {
+        return ResponseEntity.ok(cacheService.getGlobalClusterStats());
     }
 
     @GetMapping("/node")
@@ -66,14 +71,6 @@ public class ClusterController {
 
     @GetMapping("/ping")
     public ResponseEntity<Map<String, String>> ping() {
-        if(nodeStateManager.isPaused()) {
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                    .body(Map.of(
-                            "nodeId", clusterService.getLocalNodeId(),
-                            "status", NodeStatus.DOWN.name(),
-                            "reason", "Node is paused (simulated failure)"
-                    ));
-        }
         long delayMs = nodeStateManager.getSlowDelayMs();
         if(delayMs > 0) {
             try {

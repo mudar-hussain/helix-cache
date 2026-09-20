@@ -90,14 +90,6 @@ export interface ClusterEventEntry {
 
 export interface SeedRequestResult {
     total: number;
-    succeeded: number;      // 1 = single event, >1 = merged duplicates
-    failed: number;      // timestamp of the most-recent merged event
-}
-
-export interface TravelGroup {
-    id: string;
-    fromNodeId: string;
-    toNodeId: string;
-    color: string;      //color of source node
-    dotCount: number
+    succeeded: number;      
+    failed: number;      
 }

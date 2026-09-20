@@ -25,7 +25,7 @@ export class ClusterApiService {
     }
 
     getStats(): Observable<ClusterStats> {
-        return this.apiService.withFallback('get','/cluster/stats');
+        return this.apiService.withFallback('get','/cluster/stats/global');
     }
 
     getRouteForKey(key: string): Observable<Node> {
