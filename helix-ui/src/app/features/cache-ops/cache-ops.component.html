@@ -3,26 +3,19 @@
 <div class="ops-row">
     <div class="ops-group ops-group--key">
         <label class="ops-label">KEY</label>
-        <input
-            class="ops-input"
-            [(ngModel)]="writeKey"
-            placeholder="user:412" />
+        <input class="ops-input" [(ngModel)]="writeKey" placeholder="user:412" />
     </div>
 
     <div class="ops-group ops-group--value">
         <label class="ops-label">VALUE</label>
-        <input
-            class="ops-input"
-            [(ngModel)]="writeValue"
-            rows="2"
-            placeholder="value..."/>
+        <input class="ops-input" [(ngModel)]="writeValue" rows="2" placeholder="value..." />
     </div>
 </div>
 
 <div class="ops-group mb-3">
-    <label class="ops-label">TTL: 
+    <label class="ops-label">TTL:
         @for (opt of ttlOptions; track opt) {
-            <span class="ttl-chip" [class.ttl-chip--active]="writeTtl === opt" (click)="writeTtl = opt">{{ opt }}</span>
+        <span class="ttl-chip" [class.ttl-chip--active]="writeTtl === opt" (click)="writeTtl = opt">{{ opt }}</span>
         }
     </label>
 </div>
@@ -32,13 +25,24 @@
 </button>
 
 @if (writeResult()) {
-    <div class="result-box" [class.result-box--ok]="writeResult()!.status==='ok'" [class.result-box--err]="writeResult()!.status==='error'">
-        <div class="result-header">
-            <i [class]="writeResult()!.status==='ok' ? 'fa-solid fa-check' : 'fa-solid fa-xmark'"></i>
-            <span>{{ writeResult()!.status==='ok'? 'HTTP 200 OK': 'X ERR' }}</span><span>{{ writeResult()!. latencyMs }}ms</span>
-        </div>
-        <pre>{{ writeResult()!.body }}</pre>
+<div class="result-box result-box--ok">
+    <div class="result-header"><span><i class="fa-solid fa-check fa-buzz"></i> HTTP 200 OK</span><span>{{
+            writeResult()!.latencyMs }} ms</span><span class="ms-auto">v{{ writeResult()!.body.version}}</span></div>
+    <div style="font-family:var(--font-mono); font-size:0.7rem; margin: 4px 0;">
+        Key: {{ writeResult()!.body.key }} <br />
+        Value: {{ writeResult()!.body.value }} <br />
+        <span *ngIf="writeResult()!.body.ttlSeconds">Time to Live: {{ writeResult()!.body.ttlSeconds }} sec<br /></span>
+        Primary Node: {{ writeResult()!.body.primaryNode }} <br />
+        Created At: {{ writeResult()!.body.createdAt }}<br />
     </div>
+</div>
+}
+
+@if (writeError()){
+<div class="result-box result-box--err">
+    <div class="result-header"><span><i class="fa-solid fa-xmark fa-buzz"></i> HTTP 404 Not Found</span></div>
+    <div style="font-family:var(--font-mono); font-size:0.7rem; margin: 4px 0;">{{ writeError() }}</div>
+</div>
 }
 
 <hr class="ops-divider" />
@@ -60,23 +64,54 @@
 </div>
 
 @if (readResult()) {
-    <div class="result-box result-box--ok">
-        <div class="result-header"><span><i class="fa-solid fa-check fa-buzz"></i> HIT</span><span class="ms-auto">v{{ readResult()!.version}}</span></div>
-        <div style="font-family:var(--font-mono); font-size:0.7rem; margin: 4px 0;">{{ readResult()!.key }} {{ readResult()!.value }}</div>
+<div class="result-box result-box--ok">
+    <div class="result-header"><span><i class="fa-solid fa-check fa-buzz"></i> HTTP 200 OK</span><span
+            class="ms-auto">v{{ readResult()!.version}}</span></div>
+    <div style="font-family:var(--font-mono); font-size:0.7rem; margin: 4px 0;">
+        Key: {{ readResult()!.key }} <br />
+        Value: {{ readResult()!.value }} <br />
+        <span *ngIf="readResult()!.ttlSeconds">Time to Live: {{ readResult()!.ttlSeconds }} sec<br /></span>
+        Primary Node: {{ readResult()!.primaryNode }} <br />
+        Created At: {{ readResult()!.createdAt }}<br />
     </div>
+</div>
 }
 
-@if (readError()){ 
-    <div class="result-box result-box--err"><i class="fa-solid fa-xmark fa-buzz"></i> {{ readError() }}</div> 
+@if (readError()){
+<div class="result-box result-box--err">
+    <div class="result-header"><span><i class="fa-solid fa-xmark fa-buzz"></i> HTTP 404 Not Found</span></div>
+    <div style="font-family:var(--font-mono); font-size:0.7rem; margin: 4px 0;">{{ readError() }}</div>
+</div>
 }
 
-@if (deleteResult()) { 
-    <div class="result-box" [class.result-box--ok]="! deleteResult()!.startsWith('Error')" 
+@if (deleteResult()) {
+<div class="result-box" [class.result-box--ok]="! deleteResult()!.startsWith('Error')"
     [class.result-box--err]="deleteResult()!.startsWith('Error')">
-        {{ deleteResult() }}
-    </div> 
+    {{ deleteResult() }}
+</div>
 }
 
 <hr class="ops-divider" />
 
-<app-section-title icon="fa-solid fa-fire" text="Hot Keys" />
+<!-- Seed Keys -->
+<app-section-title icon="fa-solid fa-seedling" text="Seed Keys" />
+
+<div class="ops-row">
+    <div class="ops-group ops-group--key">
+        <input class="ops-input" [(ngModel)]="seedKeys" placeholder="12" min="1" max="50"/>
+    </div>
+    <div class="ops-group--value">
+        <button class="ops-btn ops-btn--accent w-100" (click)="onSeedKeys()" [disabled]="seedLoading()">
+            @if(seedLoading()) {
+                <i class="fa-solid fa-spinner fa-spin me-1"></i>Seeding...
+
+            } @else {
+                <i class="fa-solid fa-seedling me-1"></i> Seed N Keys
+            }
+        </button>
+    </div>
+</div>
+
+<hr class="ops-divider" />
+
+<app-hot-keys />

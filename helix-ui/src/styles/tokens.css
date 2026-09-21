@@ -35,6 +35,7 @@ HELIX DESIGN TOKENS
 /* Accent */
 --color-accent:#00c8ff;
 --color-accent-dim:rgba(0, 200, 255, 0.08);
+--color-accent-border:rgba(0, 200, 255, 0.35);
 --color-accent-glow:rgba(0, 200, 255, 0.35);
 
 /* Status */
@@ -71,8 +72,7 @@ HELIX DESIGN TOKENS
 --shadow-glow: 0 0 18px rgba(0, 200, 255, 0.15);
 
 /* HUD Layout dimensions */
---layout-topbar-height: 100px;
---layout-tabbar-height: 46px;
---layout-left-width: 260px;
---layout-right-width: 300px;
+--layout-topbar-height: 80px;
+--layout-left-width: 290px;
+--layout-right-width: 310px;
 }

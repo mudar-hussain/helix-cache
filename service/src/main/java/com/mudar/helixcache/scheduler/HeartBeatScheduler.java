@@ -1,6 +1,8 @@
-package com.mudar.helixcache.Scheduler;
+package com.mudar.helixcache.scheduler;
 
+import com.mudar.helixcache.cluster.ClusterEventPublisher;
 import com.mudar.helixcache.cluster.ClusterManager;
+import com.mudar.helixcache.enums.ClusterEventType;
 import com.mudar.helixcache.model.Node;
 import com.mudar.helixcache.service.NodeHealthService;
 import com.mudar.helixcache.service.SyncService;
@@ -18,6 +20,7 @@ public class HeartBeatScheduler {
     private final ClusterManager clusterManager;
     private final NodeHealthService nodeHealthService;
     private final SyncService syncService;
+    private final ClusterEventPublisher clusterEventPublisher;
 
     @Scheduled(fixedDelay = 5000)
     public void sendHeartBeats() {
@@ -29,7 +32,7 @@ public class HeartBeatScheduler {
             try {
                 nodeHealthService.pingNode(peer.address());
                 nodeHealthService.recordHit(peer.id());
-
+                clusterEventPublisher.publish(ClusterEventType.HEARTBEAT, peer.id(), "Heartbeat OK", "INFO");
                 //If node was Down and is now responding, add it back to the ring
                 if (!clusterManager.containsNode(peer.id())) {
                     log.info("Node {} recovered: adding back to ring", peer.id());

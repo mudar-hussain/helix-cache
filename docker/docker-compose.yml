@@ -7,9 +7,9 @@ services:
     environment:
       HELIX_NODE_ID: node-a
       HELIX_HOST: node-a
-      HELIX_PORT: 8080
+      HELIX_PORT: 8081
     ports:
-      - "8081:8080"
+      - "8081:8081"
     networks:
       - helix-network
     healthcheck:
@@ -26,9 +26,9 @@ services:
     environment:
       HELIX_NODE_ID: node-b
       HELIX_HOST: node-b
-      HELIX_PORT: 8080
+      HELIX_PORT: 8082
     ports:
-      - "8082:8080"
+      - "8082:8082"
     networks:
       - helix-network
     healthcheck:
@@ -45,9 +45,9 @@ services:
     environment:
       HELIX_NODE_ID: node-c
       HELIX_HOST: node-c
-      HELIX_PORT: 8080
+      HELIX_PORT: 8083
     ports:
-      - "8083:8080"
+      - "8083:8083"
     networks:
       - helix-network
     healthcheck:
@@ -64,9 +64,9 @@ services:
     environment:
       HELIX_NODE_ID: node-d
       HELIX_HOST: node-d
-      HELIX_PORT: 8080
+      HELIX_PORT: 8084
     ports:
-      - "8084:8080"
+      - "8084:8084"
     networks:
       - helix-network
     healthcheck:
@@ -83,9 +83,9 @@ services:
     environment:
       HELIX_NODE_ID: node-e
       HELIX_HOST: node-e
-      HELIX_PORT: 8080
+      HELIX_PORT: 8085
     ports:
-      - "8085:8080"
+      - "8085:8085"
     networks:
       - helix-network
     healthcheck:

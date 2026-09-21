@@ -1,6 +1,7 @@
 package com.mudar.helixcache.service;
 
 import com.mudar.helixcache.cluster.ClusterManager;
+import com.mudar.helixcache.cluster.NodeStateManager;
 import com.mudar.helixcache.dto.NodeDistributionResponse;
 import com.mudar.helixcache.dto.NodeInfoResponse;
 import com.mudar.helixcache.dto.NodeStatusResponse;
@@ -8,6 +9,7 @@ import com.mudar.helixcache.dto.RingNodeResponse;
 import com.mudar.helixcache.enums.NodeStatus;
 import com.mudar.helixcache.model.Node;
 import com.mudar.helixcache.model.NodeHealth;
+import com.mudar.helixcache.model.ReplicaNodes;
 import com.mudar.helixcache.utils.HelixUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class ClusterService {
     private final ClusterManager clusterManager;
     private final CacheService cacheService;
     private final NodeHealthService nodeHealthService;
+    private final NodeStateManager nodeStateManager;
 
 
     public List<NodeDistributionResponse> getNodeDistributionResponseList() {
@@ -55,7 +58,12 @@ public class ClusterService {
         List<NodeStatusResponse> nodeStatusResponseList = this.getNodes().stream()
                 .map(node -> {
                     boolean isLocal = node.id().equals(localNodeId);
-                    NodeStatus nodeStatus = isLocal ? NodeStatus.UP : nodeHealthService.getNodeStatus(node.id());
+                    NodeStatus nodeStatus;
+                    if(isLocal) {
+                        nodeStatus = nodeStateManager.isPaused() ? NodeStatus.DOWN : NodeStatus.UP;
+                    } else {
+                        nodeStatus = nodeHealthService.getNodeStatus(node.id());
+                    }
                     int keyCount = isLocal ? cacheService.size() : nodeStatus != NodeStatus.DOWN ? nodeHealthService.getRemoteKeyCount(node) : 0;
                     NodeHealth nodeHealth = nodeHealthService.getNodeHealth(node.id());
                     int missedHeartbeats = nodeHealth != null ? nodeHealth.getMissedHeartbeats() : 0;
@@ -84,15 +92,19 @@ public class ClusterService {
                             v.hash(),
                             v.node().id(),
                             v.node().address(),
-                            v.replicaIndex()
+                            v.replicaIndex(),
+                            (double) v.hash() / Long.MAX_VALUE
                     );
                 })
                 .toList();
         return ringNodeResponseList;
     }
 
-    public List<Node> getReplicas(String key) {
-        return clusterManager.getReplicas(key);
+    public ReplicaNodes getReplicaNodes(String key) {
+        List<Node> allNodes = clusterManager.getReplicas(key);
+        Node primaryNode = allNodes.get(0);
+        List<Node> replicas = allNodes.stream().filter(node -> !node.id().equals(primaryNode.id())).toList();
+        return new ReplicaNodes(key, primaryNode, replicas);
     }
 
     public Node getLocalNode() {

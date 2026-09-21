@@ -38,7 +38,7 @@ export class HotKeysComponent implements OnInit, OnDestroy {
 
     barWidth(emaScore: number): number {
         const threshold = environment.hotKeyThreshold;
-        return Math.min(100, (emaScore / (threshold * 3)) * 100);
+        return Math.min(100, (emaScore / threshold) * 100);
     }
 
 }

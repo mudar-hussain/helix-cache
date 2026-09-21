@@ -34,6 +34,7 @@ public class Cache {
         this.value = value;
         this.primaryNode = primaryNode;
         this.createdAt = createdAt;
+        this.lastAccessedAt = createdAt;
         this.ttlSeconds = ttlSeconds;
         this.version = version;
     }

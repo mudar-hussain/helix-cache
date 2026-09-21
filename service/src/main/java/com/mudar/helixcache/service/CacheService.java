@@ -2,8 +2,7 @@ package com.mudar.helixcache.service;
 
 import com.mudar.helixcache.cluster.ClusterEventPublisher;
 import com.mudar.helixcache.cluster.ClusterManager;
-import com.mudar.helixcache.dto.CacheStats;
-import com.mudar.helixcache.dto.Hint;
+import com.mudar.helixcache.dto.*;
 import com.mudar.helixcache.enums.ClusterEventType;
 import com.mudar.helixcache.exception.HelixValidationException;
 import com.mudar.helixcache.model.Cache;
@@ -19,9 +18,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -34,6 +32,7 @@ public class CacheService {
     private final HintedHandOffStore hintedHandOffStore;
     private final ClusterEventPublisher clusterEventPublisher;
     private final AccessTracker accessTracker;
+    private final NodeHealthService nodeHealthService;
 
     public Cache addCache(String key, String value, Long ttlSeconds) {
         HelixUtils.validateKey(key);
@@ -43,11 +42,12 @@ public class CacheService {
         int successCount = 0;
         List<String> failures = new ArrayList<>();
         List<Hint> pendingHints = new ArrayList<>();
+        String primaryNode = replicas.get(0).id();
         for(Node replica: replicas) {
             try{
                 Cache temp;
                 if(replica.id().equals(clusterManager.getLocalNodeId())) {
-                    temp = localNode.addCache(key, value, ttlSeconds);
+                    temp = localNode.addCache(key, value, ttlSeconds, primaryNode);
                 } else {
                     temp = clientNode.replicateCache(replica, key, value, ttlSeconds);
                 }
@@ -61,6 +61,8 @@ public class CacheService {
                 log.warn("Replication to {} failed for key '{}': {} - storing hint", replica.id(), key, e.getMessage());
                 failures.add(replica.id() + ": " + e.getMessage());
                 pendingHints.add(new Hint(key, value, replica.id(), replica.address(), HelixUtils.getCurrentTimestamp().toLocalDateTime(), ttlSeconds));
+                clusterEventPublisher.publish(ClusterEventType.HINT_ENQUEUED, replica.id(), key,
+                        "Hint stored for offline node " + replica.id(), "WARN");
                 clusterEventPublisher.publish(ClusterEventType.REPLICA_FAILED, replica.id(), key,
                         "Key replication failed: " + e.getMessage(), "WARN");
             }
@@ -68,6 +70,8 @@ public class CacheService {
         log.info("Write quorum for key '{}': {}/{} succeeded (required: {})", key, successCount, replicas.size(), writeQuorum);
         if(successCount>=writeQuorum) {
             pendingHints.forEach(hintedHandOffStore::add);
+            clusterEventPublisher.publish(ClusterEventType.CACHE_PUT, clusterManager.getLocalNodeId(), key,
+                    "Key written successfully", "INFO");
             clusterEventPublisher.publish(ClusterEventType.QUORUM_SUCCESS, clusterManager.getLocalNodeId(), key,
                     "Write quorum met: " + successCount + "/" + replicas.size(), "INFO");
         } else {
@@ -80,7 +84,9 @@ public class CacheService {
     }
 
     public Cache writeCacheLocal(String key, String value, Long ttlSeconds) {
-        return localNode.addCache(key, value, ttlSeconds);
+        List<Node> replicas = clusterManager.getReplicas(key);
+        String primaryNode = replicas.get(0).id();
+        return localNode.addCache(key, value, ttlSeconds, primaryNode);
     }
 
     public Cache getCache(String key) {
@@ -109,6 +115,8 @@ public class CacheService {
         }
         if(responses.size() < readQuorum) {
             if (responses.isEmpty()) {
+                clusterEventPublisher.publish(ClusterEventType.CACHE_MISS, clusterManager.getLocalNodeId(), key,
+                        "Key not found on any replica", "WARN");
                 throw new HelixValidationException(
                         failures.isEmpty() ? "No Replicas Available" : failures.get(0).split(": ", 2)[1]
                 );
@@ -118,10 +126,21 @@ public class CacheService {
                     + " replicas responded (required: " + readQuorum + ")"
             );
         }
+        Map<String, List<Cache>> byValue = responses.stream()
+                .collect(Collectors.groupingBy(Cache::getValue));
 
-        return responses.stream()
+        if(byValue.size() > 1) {
+            //Geuine conflict - same version, different values
+            clusterEventPublisher.publish(ClusterEventType.CONFLICT_DETECTED, clusterManager.getLocalNodeId(), key,
+                    "Conflict: " + byValue.size() + " divergent values detected", "WARN");
+        }
+
+        Cache result =  responses.stream()
                 .max(Comparator.comparingLong(Cache::getVersion))
                 .orElseThrow(() -> new HelixValidationException(HelixConstant.ERROR_KEY_NOT_EXIST));
+        clusterEventPublisher.publish(ClusterEventType.CACHE_GET, clusterManager.getLocalNodeId(), key,
+                "Key read successfully", "INFO");
+        return result;
     }
 
     public Cache readCacheLocal(String key) {
@@ -133,7 +152,7 @@ public class CacheService {
         List<Node> replicas = clusterManager.getReplicas(key);
         int writeQuorum = clusterManager.getWriteQuorum();
 
-        String successMsg = "Cache entry removed";
+        String successMsg = HelixConstant.SUCCESS_CACHE_REMOVED;
         int successCount = 0;
         List<String> failures = new ArrayList<>();
 
@@ -167,6 +186,9 @@ public class CacheService {
             throw new HelixValidationException("Delete quorum not met: " + successCount + "/" + replicas.size()
                     + " replicas acknowledged. Failures: " + failures);
         }
+
+        clusterEventPublisher.publish(ClusterEventType.CACHE_DELETE, clusterManager.getLocalNodeId(), key,
+                "Key deleted: " + successCount + "/" + replicas.size() + " replicas", "INFO");
         return successMsg;
     }
 
@@ -178,12 +200,37 @@ public class CacheService {
         return cacheStore.size();
     }
 
-    public CacheStats getCacheStats() {
-        return new CacheStats(
+    public ClusterStats getLocalClusterStats() {
+        return new ClusterStats(
                 cacheStore.size(),
-                cacheStore.getHitCount(),
-                cacheStore.getMissCount(),
-                cacheStore.getHitRatio()
+                clusterManager.getReplicationFactor(),
+                clusterManager.getWriteQuorum(),
+                clusterManager.getReadQuorum(),
+                clusterManager.getVirtualNodesPerNode()
+        );
+    }
+
+    public ClusterStats getGlobalClusterStats() {
+        List<Node> allNodes = clusterManager.getNodes();
+        String localNodeId = clusterManager.getLocalNodeId();
+        int totalRawKeys = 0;
+
+        for(Node node: allNodes) {
+            if(node.id().equals(localNodeId)) {
+                totalRawKeys += cacheStore.size();
+            } else {
+                int remote = nodeHealthService.getRemoteKeyCount(node);
+                if(remote >=0 ) totalRawKeys += remote;
+            }
+        }
+
+        int uniqueKeys = totalRawKeys / clusterManager.getReplicationFactor();
+        return new ClusterStats(
+                uniqueKeys,
+                clusterManager.getReplicationFactor(),
+                clusterManager.getWriteQuorum(),
+                clusterManager.getReadQuorum(),
+                clusterManager.getVirtualNodesPerNode()
         );
     }
 
@@ -193,6 +240,32 @@ public class CacheService {
                         .stream()
                         .anyMatch(node -> node.id().equals(targetNodeId)))
                 .toList();
+    }
+
+    public BulkSeedResult seedCache(int count) {
+        return seedCache(count, "K");
+    }
+
+    public BulkSeedResult seedCache(BulkSeedRequest request) {
+        return seedCache(request.count(), request.prefix() != null ? request.prefix() : "K");
+    }
+
+    public BulkSeedResult seedCache(int count, String prefix) {
+        if(count<=0 || count > 50) {
+            throw new HelixValidationException("Seed count must be between 1 and 50");
+        }
+        int succeeded = 0;
+        for(int i = 1; i<=count; i++) {
+            String key = prefix + i;
+            String value = "seed:value:" + i;
+            try {
+                addCache(key, value, null);
+                succeeded++;
+            } catch (Exception e) {
+                log.warn("Seed failed for key '{}': {}", key, e.getMessage());
+            }
+        }
+        return new BulkSeedResult(count, succeeded, count-succeeded);
     }
 
 }

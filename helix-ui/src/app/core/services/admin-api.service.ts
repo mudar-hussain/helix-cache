@@ -1,35 +1,32 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { inject, Injectable } from "@angular/core";
-import { catchError, Observable } from "rxjs";
+import { Injectable } from "@angular/core";
+import { Observable } from "rxjs";
 import { HotKeyPredictionResponse } from "../../shared/interfaces/helix.interface";
-import { environment } from "../../../environments/environment";
+import { ApiService } from "./api.service";
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminApiService {
-    private readonly http = inject(HttpClient);
-    private readonly base = environment.primaryNode;
 
-    pauseNode(nodeBaseUrl: string): Observable<unknown> {
+    constructor(private http: HttpClient, private apiService: ApiService) {}
+
+    pauseNode(nodeBaseUrl: string): Observable<any> {
         return this.http.put<unknown>(`${nodeBaseUrl}/admin/node/pause`, null);
     }
 
-    resumeNode(nodeBaseUrl: string): Observable<unknown> {
+    resumeNode(nodeBaseUrl: string): Observable<any> {
         return this.http.put<unknown>(`${nodeBaseUrl}/admin/node/resume`, null);
     }
 
-    slowNode(nodeBaseUrl: string, delayMs: number): Observable<unknown> {
+    slowNode(nodeBaseUrl: string, delayMs: number): Observable<any> {
         return this.http.post<unknown>(`${nodeBaseUrl}/admin/node/slow`, null,
             { params: new HttpParams().set('delayMs', delayMs.toString()) });
     }
 
     getPrediction(): Observable<HotKeyPredictionResponse[]> {
-        return environment.nodes.slice(1).reduce(
-            (acc$, node) => acc$.pipe(catchError(() => this.http.get<HotKeyPredictionResponse[]>(`${node.baseUrl}/admin/stats/predictions`))),
-            this.http.get<HotKeyPredictionResponse[]>(`${environment.nodes[0].baseUrl}/admin/stats/predictions`)
-        );
+        return this.apiService.withFallback<HotKeyPredictionResponse[]>('get', '/admin/stats/predictions');
     }
 
 }

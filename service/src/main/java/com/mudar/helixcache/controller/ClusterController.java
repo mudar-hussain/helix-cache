@@ -4,6 +4,7 @@ import com.mudar.helixcache.cluster.NodeStateManager;
 import com.mudar.helixcache.dto.*;
 import com.mudar.helixcache.enums.NodeStatus;
 import com.mudar.helixcache.model.Node;
+import com.mudar.helixcache.model.ReplicaNodes;
 import com.mudar.helixcache.service.CacheService;
 import com.mudar.helixcache.service.ClusterService;
 import com.mudar.helixcache.utils.HelixUtils;
@@ -29,8 +30,13 @@ public class ClusterController {
     private final ClusterService clusterService;
 
     @GetMapping("/stats")
-    public ResponseEntity<CacheStats> getCacheStats() {
-        return ResponseEntity.ok(cacheService.getCacheStats());
+    public ResponseEntity<ClusterStats> getLocalClusterStats() {
+        return ResponseEntity.ok(cacheService.getLocalClusterStats());
+    }
+
+    @GetMapping("/stats/global")
+    public ResponseEntity<ClusterStats> getGlobalClusterStats() {
+        return ResponseEntity.ok(cacheService.getGlobalClusterStats());
     }
 
     @GetMapping("/node")
@@ -49,8 +55,8 @@ public class ClusterController {
     }
 
     @GetMapping("/replicas/{key}")
-    public ResponseEntity<List<Node>> getReplicas(@PathVariable String key) {
-        return ResponseEntity.ok(clusterService.getReplicas(key));
+    public ResponseEntity<ReplicaNodes> getReplicas(@PathVariable String key) {
+        return ResponseEntity.ok(clusterService.getReplicaNodes(key));
     }
 
     @GetMapping("/ring")
@@ -65,14 +71,6 @@ public class ClusterController {
 
     @GetMapping("/ping")
     public ResponseEntity<Map<String, String>> ping() {
-        if(nodeStateManager.isPaused()) {
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                    .body(Map.of(
-                            "nodeId", clusterService.getLocalNodeId(),
-                            "status", NodeStatus.DOWN.name(),
-                            "reason", "Node is paused (simulated failure)"
-                    ));
-        }
         long delayMs = nodeStateManager.getSlowDelayMs();
         if(delayMs > 0) {
             try {

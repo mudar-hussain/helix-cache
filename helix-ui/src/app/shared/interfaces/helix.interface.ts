@@ -15,6 +15,7 @@ export interface RingNodeResponse {
     nodeId: string;
     address: string;
     replicaIndex: number;
+    normalizedPosition: number;
 }
 
 export interface NodeDistributionResponse {
@@ -28,20 +29,27 @@ export interface HotKeyPredictionResponse {
     emaScore: number;
     recentRate: number;
     totalAccess: number;
-    predicted: number;
+    predicted: boolean;
 }
 
-export interface CacheStats {
-    size: number;
-    hitCount: number;
-    missCount: number;
-    hitRatio: number;
+export interface ClusterStats {
+    totalKeys: number;
+    replicationFactor: number;
+    writeQuorum: number;
+    readQuorum: number;
+    virtualNodesPerNode: number;
 }
 
 export interface Node {
     id: string;
     host: string;
     port: number;
+}
+
+export interface ReplicaNodes {
+    key: string;
+    primaryNode: Node;
+    replicaNodes: Node[];
 }
 
 export interface CacheResponse {
@@ -64,15 +72,24 @@ export interface ClusterEvent {
 }
 
 export interface OpResult {
-    status: 'ok' | 'error';
-    statusCode: number;
     latencyMs: number;
-    body: string;
-    primaryNode?: string;
+    body: CacheResponse;
 }
 
 export interface NodeConfig {
     id: string;
     baseUrl: string;
     color: string;
+}
+
+export interface ClusterEventEntry {
+    event: ClusterEvent;
+    count: number;      // 1 = single event, >1 = merged duplicates
+    lastTimestamp: string;      // timestamp of the most-recent merged event
+}
+
+export interface SeedRequestResult {
+    total: number;
+    succeeded: number;      
+    failed: number;      
 }

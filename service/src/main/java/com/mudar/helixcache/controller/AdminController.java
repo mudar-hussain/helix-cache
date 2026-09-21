@@ -1,6 +1,6 @@
 package com.mudar.helixcache.controller;
 
-import com.mudar.helixcache.Scheduler.HotKeyPredictor;
+import com.mudar.helixcache.scheduler.HotKeyPredictor;
 import com.mudar.helixcache.cluster.NodeStateManager;
 import com.mudar.helixcache.dto.HotKeyPredictionResponse;
 import com.mudar.helixcache.store.AccessTracker;
@@ -58,5 +58,17 @@ public class AdminController {
     @GetMapping("/stats/predictions")
     public ResponseEntity<List<HotKeyPredictionResponse>> getPredictions() {
         return ResponseEntity.ok(hotKeyPredictor.getLastPredictions());
+    }
+
+    @PutMapping("/node/partition/{targetNodeId}")
+    public ResponseEntity<?> partition(@PathVariable String targetNodeId) {
+        nodeStateManager.blockPeer(targetNodeId);
+        return ResponseEntity.ok(Map.of("blocked", targetNodeId));
+    }
+
+    @DeleteMapping("/node/partition/{targetNodeId}")
+    public ResponseEntity<?> heal(@PathVariable String targetNodeId) {
+        nodeStateManager.unblockPeer(targetNodeId);
+        return ResponseEntity.ok(Map.of("unblocked", targetNodeId));
     }
 }

@@ -1,5 +1,7 @@
 package com.mudar.helixcache.controller;
 
+import com.mudar.helixcache.dto.BulkSeedRequest;
+import com.mudar.helixcache.dto.BulkSeedResult;
 import com.mudar.helixcache.model.Cache;
 import com.mudar.helixcache.service.CacheService;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +23,23 @@ public class CacheController {
     }
 
     @GetMapping("/{key}")
-    public ResponseEntity<Cache> getCache(@PathVariable String key) {
+    public ResponseEntity<Cache> getCache(@PathVariable("key") String key) {
         return ResponseEntity.ok(cacheService.getCache(key));
     }
 
     @DeleteMapping("/{key}")
-    public ResponseEntity<String> deleteCache(@PathVariable String key) {
+    public ResponseEntity<String> deleteCache(@PathVariable("key") String key) {
         return ResponseEntity.ok(cacheService.deleteCache(key));
+    }
+
+    @PostMapping("/seed")
+    public ResponseEntity<BulkSeedResult> seedCache(@RequestBody BulkSeedRequest request) {
+        return ResponseEntity.ok(cacheService.seedCache(request));
+    }
+
+    @PutMapping("/seed/{count}")
+    public ResponseEntity<BulkSeedResult> seedCache(@PathVariable("count") int count) {
+        return ResponseEntity.ok(cacheService.seedCache(count));
     }
 
 }
