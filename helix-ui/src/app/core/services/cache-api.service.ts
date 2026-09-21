@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { CacheResponse, SeedRequestResult } from "../../shared/interfaces/helix.interface";
 import { Observable } from "rxjs";
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpParams } from "@angular/common/http";
 import { ApiService } from "./api.service";
 
 @Injectable({

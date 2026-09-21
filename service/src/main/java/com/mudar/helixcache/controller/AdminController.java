@@ -59,4 +59,16 @@ public class AdminController {
     public ResponseEntity<List<HotKeyPredictionResponse>> getPredictions() {
         return ResponseEntity.ok(hotKeyPredictor.getLastPredictions());
     }
+
+    @PutMapping("/node/partition/{targetNodeId}")
+    public ResponseEntity<?> partition(@PathVariable String targetNodeId) {
+        nodeStateManager.blockPeer(targetNodeId);
+        return ResponseEntity.ok(Map.of("blocked", targetNodeId));
+    }
+
+    @DeleteMapping("/node/partition/{targetNodeId}")
+    public ResponseEntity<?> heal(@PathVariable String targetNodeId) {
+        nodeStateManager.unblockPeer(targetNodeId);
+        return ResponseEntity.ok(Map.of("unblocked", targetNodeId));
+    }
 }

@@ -3,6 +3,8 @@ package com.mudar.helixcache.cluster;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -12,6 +14,7 @@ public class NodeStateManager {
 
     private final AtomicBoolean paused = new AtomicBoolean(false);
     private final AtomicLong slowDelayMs = new AtomicLong(0L);
+    private final Set<String> blockedPeers = ConcurrentHashMap.newKeySet();
 
     public void pause() {
         paused.set(true);
@@ -35,5 +38,17 @@ public class NodeStateManager {
 
     public long getSlowDelayMs() {
         return slowDelayMs.get();
+    }
+
+    public void blockPeer(String nodeId) {
+        blockedPeers.add(nodeId);
+    }
+
+    public void unblockPeer(String nodeId) {
+        blockedPeers.remove(nodeId);
+    }
+
+    public boolean isBlocked(String nodeId) {
+        return blockedPeers.contains(nodeId);
     }
 }

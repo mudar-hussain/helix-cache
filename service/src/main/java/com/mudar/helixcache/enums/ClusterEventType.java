@@ -17,5 +17,6 @@ public enum ClusterEventType {
     NODE_DOWN,
     SYNC_STARTED,
     SYNC_COMPLETE,
-    HEARTBEAT
+    HEARTBEAT,
+    CONFLICT_DETECTED
 }

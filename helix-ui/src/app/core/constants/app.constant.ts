@@ -31,6 +31,7 @@ export const BADGE_STYLE: Partial<Record<ClusterEventType, string>> = {
     [ClusterEventType.CACHE_EXPIRED]: 'background:var(--color-danger-dim);color:var(--color-danger);border:1px solid var(--color-danger-border)',
     [ClusterEventType.HINT_ENQUEUED]: 'background:var(--color-info-dim);color:var(--color-info);border:1px solid var(--color-info-border)',
     [ClusterEventType.HINT_DELIVERED]: 'background:var(--color-info-dim);color:var(--color-info);border:1px solid var(--color-info-border)',
+    [ClusterEventType.CONFLICT_DETECTED]: 'background:var(--color-warning-dim);color:var(--color-warning);border:1px solid var(--color-warning-border)',
 };
 
 export const MERGEABLE_TYPES = new Set<ClusterEventType>([

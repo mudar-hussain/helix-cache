@@ -41,6 +41,9 @@ public class ConsistentHashRing {
             for(int i = 0; i<this.virtualNodesPerNode; i++) {
                 String virtualNodeKey = node.id() + "#" + i;
                 Long hash = hashFunction.hash(virtualNodeKey);
+                while (ring.containsKey(hash)) {
+                    hash++;
+                }
                 ring.put(hash, new VirtualNode(node, i, hash));
             }
         } finally {

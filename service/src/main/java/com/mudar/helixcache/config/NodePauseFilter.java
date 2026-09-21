@@ -50,8 +50,9 @@ public class NodePauseFilter extends OncePerRequestFilter {
         log.debug("Node is PAUSED - blocking {} {}", method, path);
         response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
         response.setContentType("application/json");
+        String safePath = path.replace("\\", "\\\\").replace("\"", "\\\"");
         response.getWriter().write(
-                "{\"error\":\"Node is paused\",\"path\":\"" + path + "\"}"
+                "{\"error\":\"Node is paused\",\"path\":\"" + safePath + "\"}"
         );
     }
 }

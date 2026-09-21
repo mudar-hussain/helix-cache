@@ -29,7 +29,7 @@ export interface HotKeyPredictionResponse {
     emaScore: number;
     recentRate: number;
     totalAccess: number;
-    predicted: number;
+    predicted: boolean;
 }
 
 export interface ClusterStats {

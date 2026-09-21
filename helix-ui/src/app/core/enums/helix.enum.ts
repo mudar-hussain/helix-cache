@@ -29,7 +29,8 @@ export enum ClusterEventType {
     NODE_SUSPECT = 'NODE_SUSPECT',
     NODE_DOWN = 'NODE_DOWN',
     SYNC_STARTED = 'SYNC_STARTED',
-    SYNC_COMPLETE = 'SYNC_COMPLETE'
+    SYNC_COMPLETE = 'SYNC_COMPLETE',
+    CONFLICT_DETECTED = 'CONFLICT_DETECTED'
  };
 export enum TtlOption {
     'never' = -1, '10s' = 10, '30s' = 30, '2m' = 120, '5m' = 300, '10m' = 600

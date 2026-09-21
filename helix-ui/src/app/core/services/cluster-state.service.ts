@@ -51,7 +51,7 @@ export class ClusterStateService implements OnDestroy {
             clearTimeout(this.highlightTimer);
         }
         this.replicaNodes.set(replica);
-        this.highlightTimer = setTimeout(() => this.replicaNodes.set(null), 2000);
+        this.highlightTimer = setTimeout(() => this.replicaNodes.set(null), 2500);
     }
 
     clearReplicaNodes(): void {
@@ -64,7 +64,7 @@ export class ClusterStateService implements OnDestroy {
     triggerRingBurst(): void {
         if (this.burstTimer) clearTimeout(this.burstTimer);
         this.ringBurst.set(Date.now());
-        this.highlightTimer = setTimeout(() => this.replicaNodes.set(null), 2500);
+        this.burstTimer = setTimeout(() => this.replicaNodes.set(null), 2500);
     }
 
     private startPolling() {
@@ -129,7 +129,7 @@ export class ClusterStateService implements OnDestroy {
             // Normal prepend
             const entry: ClusterEventEntry = {
                 event,
-                count: 1, 
+                count: 1,
                 lastTimestamp: event.eventTimestamp
             };
             return [entry, ...prev].slice(0, this.MAX_EVENTS);

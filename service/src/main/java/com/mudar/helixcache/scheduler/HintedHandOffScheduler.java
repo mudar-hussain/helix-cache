@@ -34,7 +34,7 @@ public class HintedHandOffScheduler {
                 try {
                     clientNode.replicateCache(node, hint.key(), hint.value(), hint.ttlSeconds());
                     hintedHandOffStore.removeHint(node.id(), hint);
-                    clusterEventPublisher.publish(ClusterEventType.HINT_ENQUEUED, node.id(), hint.key(),
+                    clusterEventPublisher.publish(ClusterEventType.HINT_DELIVERED, node.id(), hint.key(),
                             "Hint replayed to recovered node " + node.id(), "INFO");
                     log.info("Hint delivered to {}: key='{}'", node.id(), hint.key());
                 } catch (Exception e) {

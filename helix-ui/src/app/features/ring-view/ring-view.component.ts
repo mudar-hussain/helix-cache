@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { NodeColorPipe } from "../../shared/components/node-color.pipe";
-import { Component, computed, inject, OnInit, signal } from "@angular/core";
+import { Component, computed, inject, OnDestroy, OnInit, signal } from "@angular/core";
 import { environment } from "../../../environments/environment";
 import { ClusterStateService } from "../../core/services/cluster-state.service";
 import { interval, startWith, Subscription, switchMap } from "rxjs";
@@ -19,7 +19,7 @@ interface NodePos { id: string; x: number; y: number; }
     templateUrl: './ring-view.component.html',
     styleUrl: './ring-view.component.css',
 })
-export class RingViewComponent implements OnInit {
+export class RingViewComponent implements OnInit, OnDestroy {
 
     protected readonly clusterState = inject(ClusterStateService);
     protected readonly clusterApi = inject(ClusterApiService);
@@ -149,6 +149,10 @@ export class RingViewComponent implements OnInit {
                 )
                 .subscribe(data => this.distribution.set(data))
         );
+    }
+
+    ngOnDestroy(): void {
+        this.sub.unsubscribe();
     }
 
     getDistributionPercentage(nodeId: string): string {

@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams, HttpRequest, HttpStatusCode } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { HotKeyPredictionResponse } from "../../shared/interfaces/helix.interface";

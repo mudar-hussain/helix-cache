@@ -1,5 +1,4 @@
 import { Component, signal } from '@angular/core';
-import { ClusterStateService } from './core/services/cluster-state.service';
 import { RouterOutlet } from '@angular/router';
 
 @Component({

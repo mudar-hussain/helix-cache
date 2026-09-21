@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -124,6 +125,14 @@ public class CacheService {
                     "Read quorum not met: only " + responses.size() + "/" + replicas.size()
                     + " replicas responded (required: " + readQuorum + ")"
             );
+        }
+        Map<String, List<Cache>> byValue = responses.stream()
+                .collect(Collectors.groupingBy(Cache::getValue));
+
+        if(byValue.size() > 1) {
+            //Geuine conflict - same version, different values
+            clusterEventPublisher.publish(ClusterEventType.CONFLICT_DETECTED, clusterManager.getLocalNodeId(), key,
+                    "Conflict: " + byValue.size() + " divergent values detected", "WARN");
         }
 
         Cache result =  responses.stream()

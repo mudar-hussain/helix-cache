@@ -1,5 +1,6 @@
 package com.mudar.helixcache.transport;
 
+import com.mudar.helixcache.cluster.NodeStateManager;
 import com.mudar.helixcache.exception.HelixValidationException;
 import com.mudar.helixcache.model.Cache;
 import com.mudar.helixcache.model.Node;
@@ -16,8 +17,16 @@ import java.util.List;
 public class ClientNode {
 
     private final RestClient restClient;
+    private final NodeStateManager nodeStateManager;
+
+    public void validateNodeConnection(String nodeId) {
+        if(nodeStateManager.isBlocked(nodeId)) {
+            throw new HelixValidationException("Network partition: cannot reach " + nodeId);
+        }
+    }
 
     public Cache replicateCache(Node node, String key, String value, Long ttlSeconds) {
+        validateNodeConnection(node.id());
         String baseUri = "http://" + node.address() + "/internal/cache/{key}";
         if(ttlSeconds != null) {
             return restClient.put()
@@ -42,6 +51,7 @@ public class ClientNode {
     }
 
     public Cache getCacheFromReplica(Node node, String key) {
+        validateNodeConnection(node.id());
         return restClient
                 .get()
                 .uri("http://" + node.address() + "/internal/cache/{key}", key)
@@ -54,6 +64,7 @@ public class ClientNode {
     }
 
     public String deleteCacheFromReplica(Node node, String key) {
+        validateNodeConnection(node.id());
         return restClient
                 .delete()
                 .uri("http://" + node.address() + "/internal/cache/{key}", key)
@@ -66,6 +77,7 @@ public class ClientNode {
     }
 
     public List<Cache> fetchCacheListForNode(Node node, String targetNodeId) {
+        validateNodeConnection(node.id());
         return restClient
                 .get()
                 .uri("http://" + node.address() + "/internal/cache/sync/node?targetNodeId={targetNodeId}", targetNodeId)
