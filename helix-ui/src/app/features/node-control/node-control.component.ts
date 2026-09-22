@@ -79,7 +79,13 @@ export class NodeControlComponent {
         })
 
         forkJoin(calls).subscribe(() => {
-            this.state.setPartition({ groupA: [...groupA, ...neutral], groupB: [...groupB, ...neutral] });
+            this.state.setPartition({ 
+                groupA: [...groupA, ...neutral], 
+                groupB: [...groupB, ...neutral],
+                explicitA: groupA,
+                explicitB: groupB,
+                neutral            
+            });
             this.closeModal();
         })
 
@@ -92,12 +98,10 @@ export class NodeControlComponent {
 
     groupOf(nodeId: string): 'A' | 'B' | 'AB' | null {
         const p = this.state.partition();
-        if(!p) return null;
-        const inGroupA = p.groupA.includes(nodeId);
-        const inGroupB = p.groupB.includes(nodeId);
-        if(inGroupA && inGroupB) return 'AB'; //neutral node
-        if(inGroupA) return 'A';
-        if(inGroupB) return 'B';
+        if (!p) return null;
+        if (p.neutral.includes(nodeId)) return 'AB';
+        if (p.explicitA.includes(nodeId)) return 'A';
+        if (p.explicitB.includes(nodeId)) return 'B';
         return null;
     }
 }

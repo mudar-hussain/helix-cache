@@ -95,6 +95,9 @@ export interface SeedRequestResult {
 }
 
 export interface PartitionConfig {
-    groupA: string[];    //node Ids only in group A
-    groupB: string[];    //node Ids only in group B
+    groupA: string[];       //node Ids only in group A + neutral (for ring filtering)
+    groupB: string[];       //node Ids only in group B + neutral (for ring filtering)
+    explicitA: string[];    //node Ids only in group A
+    explicitB: string[];    //node Ids only in group B
+    neutral: string[];      //appear in both
 }

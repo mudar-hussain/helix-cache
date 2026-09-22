@@ -1,4 +1,4 @@
-<app-section-title icon="fa-solid ra-server" text="Cluster Nodes" />
+<app-section-title icon="fa-solid fa-server" text="Cluster Nodes" />
 
 @for (node of state.nodes(); track node.nodeId) {
 <div class="node-card" [class.node-card--down]="node.nodeStatus === 'DOWN'"
@@ -41,17 +41,17 @@
 </div>
 }
 
-<hr class="ops-divider" />
+<!-- <hr class="ops-divider" /> -->
 
 <!-- Cut / Mend Network button -->
 @if (!state.partition()) {
 <button class="btn-cut-net w-100" (click)="openPartitionModal()">
-    Cut Network
+    <i class="fa-solid fa-scissors"></i> Cut Network
 </button>
 
 } @else {
 <button class="btn-mend-net w-100" (click)="mendNetwork()">
-    Mend Network
+    <i class="fa-solid fa-circle-nodes"></i> Mend Network
 </button>
 }
 
@@ -87,7 +87,7 @@
         <div class="pmodal-actions">
             <button class="pbtn btn-pcancel" (click)="closeModal()">Cancel</button>
             <button class="pbtn btn-psplit" (click)="splitEvenly()">Split Evenly</button>
-            <button class="pbtn btn-pcut" [disabled]="!canCut" (click)="cutNetwork()"> Cut network</button>
+            <button class="pbtn btn-pcut" [disabled]="!canCut" (click)="cutNetwork()"> <i class="fa-solid fa-scissors"></i> Cut network</button>
         </div>
     </div>
 </div>
