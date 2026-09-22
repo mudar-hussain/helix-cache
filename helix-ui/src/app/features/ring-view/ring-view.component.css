@@ -67,11 +67,27 @@ Node elements
     filter: drop-shadow(0 0 6px currentColor);
     animation: dot-travel 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+
 @keyframes dot-travel {
-    0% { transform: translate(0, 0); opacity: 0.9; }
-    10% { transform: translate(0, 0); opacity: 0.9; }
-    80% { transform: translate(var(--dx), var(--dy)); opacity: 0.9; }
-    100% { transform: translate(var(--dx), var(--dy)); opacity: 0; }
+    0% {
+        transform: translate(0, 0);
+        opacity: 0.9;
+    }
+
+    10% {
+        transform: translate(0, 0);
+        opacity: 0.9;
+    }
+
+    80% {
+        transform: translate(var(--dx), var(--dy));
+        opacity: 0.9;
+    }
+
+    100% {
+        transform: translate(var(--dx), var(--dy));
+        opacity: 0;
+    }
 }
 
 .legend-dot {
@@ -117,19 +133,19 @@ Node elements
     padding: 6px 12px;
 }
 
-.live-dot { 
-    width: 8px; 
-    height: 8px; 
-    border-radius: 50%; 
-    background: var(--color-success); 
-    box-shadow: 0 0 8px var(--color-success); 
+.live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-success);
+    box-shadow: 0 0 8px var(--color-success);
 }
 
 .live-label {
-    font-size: 0.55rem; 
-    font-weight: 900; 
-    letter-spacing: 3px; 
-    color: var(--color-success); 
+    font-size: 0.55rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+    color: var(--color-success);
 }
 
 .corner {
@@ -200,4 +216,55 @@ Node elements
     border: 1px solid var(--color-border);
     border-radius: 5px;
     padding: 8px 10px;
+}
+
+/* partition banner */
+
+.partition-banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    Padding: 7px 16px;
+    background: rgba(160, 106, 0, .22);
+    border-bottom: 1px solid var(--color-warning-border);
+    animation: banner-glow 2s ease-in-out infinite;
+}
+
+.partition-banner--icon {
+    color: var(--color-warning);
+    font-size: 85rem;
+    flex-shrink: 0;
+}
+
+.partition-banner--label {
+    font-size: .6rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--color-warning);
+
+    font-family: var(--font-mono);
+    white-space: nowrap;
+}
+
+.partition-banner_desc {
+    font-size: .58rem;
+    color: var(--color-text-secondary);
+    font-family: var(--font-mono);
+}
+
+@keyframes banner-glow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 10px rgba(255, 204, 0, .12);
+    }
+
+    50% {
+        box-shadow: 0 0 28px rgba(255, 204, 0, .32);
+    }
 }

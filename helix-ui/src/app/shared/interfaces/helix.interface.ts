@@ -93,3 +93,8 @@ export interface SeedRequestResult {
     succeeded: number;      
     failed: number;      
 }
+
+export interface PartitionConfig {
+    groupA: string[];    //node Ids only in group A
+    groupB: string[];    //node Ids only in group B
+}

@@ -3,6 +3,7 @@ package com.mudar.helixcache.cluster;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -44,11 +45,15 @@ public class NodeStateManager {
         blockedPeers.add(nodeId);
     }
 
-    public void unblockPeer(String nodeId) {
-        blockedPeers.remove(nodeId);
+    public void unblockAllPeer() {
+        blockedPeers.clear();
     }
 
     public boolean isBlocked(String nodeId) {
         return blockedPeers.contains(nodeId);
+    }
+
+    public Set<String> getBlockedPeers(String nodeId) {
+        return Collections.unmodifiableSet(blockedPeers);
     }
 }

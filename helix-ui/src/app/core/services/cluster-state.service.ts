@@ -2,7 +2,7 @@ import { computed, inject, Injectable, OnDestroy, signal } from "@angular/core";
 import { ClusterApiService } from "./cluster-api.service";
 import { SseService } from "./sse.service";
 import { catchError, EMPTY, interval, startWith, Subscription, switchMap } from "rxjs";
-import { ClusterEvent, ClusterStats, NodeStatusResponse, RingNodeResponse, ReplicaNodes, ClusterEventEntry } from "../../shared/interfaces/helix.interface";
+import { ClusterEvent, ClusterStats, NodeStatusResponse, RingNodeResponse, ReplicaNodes, ClusterEventEntry, PartitionConfig } from "../../shared/interfaces/helix.interface";
 import { ClusterEventType, NodeStatus } from "../enums/helix.enum";
 import { environment } from "../../../environments/environment";
 import { MERGEABLE_TYPES } from "../constants/app.constant";
@@ -19,6 +19,7 @@ export class ClusterStateService implements OnDestroy {
     readonly ring = signal<RingNodeResponse[]>([]);
     readonly stats = signal<ClusterStats | null>(null);
     readonly ringBurst = signal<number>(0);
+    readonly partition = signal<PartitionConfig | null>(null);
 
     //Derived state for the cluster
     readonly aliveCount = computed(() => this.nodes().filter(node => node.nodeStatus !== NodeStatus.DOWN).length);
@@ -134,5 +135,13 @@ export class ClusterStateService implements OnDestroy {
             };
             return [entry, ...prev].slice(0, this.MAX_EVENTS);
         });
+    }
+
+    setPartition(config: PartitionConfig): void {
+        this.partition.set(config);
+    }
+
+    healPartition(): void {
+        this.partition.set(null);
     }
 }

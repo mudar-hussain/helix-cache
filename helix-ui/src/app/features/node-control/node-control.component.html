@@ -1,15 +1,25 @@
-<app-section-title icon="fa-solid fa-server" text="Cluster Nodes" />
+<app-section-title icon="fa-solid ra-server" text="Cluster Nodes" />
 
 @for (node of state.nodes(); track node.nodeId) {
-<div class="node-card" [class.node-card--down]="node.nodeStatus === 'DOWN'">
+<div class="node-card" [class.node-card--down]="node.nodeStatus === 'DOWN'"
+    [class.node-card--side-a]="groupOf(node.nodeId) === 'A'" [class.node-card--side-b]="groupOf(node.nodeId) === 'B'"
+    [class.node-card--side-ab]="groupOf(node.nodeId) === 'AB'">
+
     <div class="d-flex align-items-center justify-content-between gap-2">
         <div class="d-flex align-items-center gap-1">
             <span class="node-dot" [style.background]="node.nodeId | nodeColor"
                 [style.box-shadow]="'0 0 8px ' + (node.nodeId | nodeColor) + '90'"></span>
-            <span class="node-id ms-1" [style.color]="node.nodeId | nodeColor">{{ node.nodeId}}</span>
-            <!-- <span class="ms-auto key-count">{{ node.keyCount }} keys</span>
-            <app-status-badge [status]="node.nodeStatus" /> -->
+            <span class="node-id ms-1" [style.color]="node.nodeId | nodeColor">{{ node.nodeId }}</span>
+
+            @if (groupOf(node.nodeId)) {
+            <span class="node-side-tag" [class.node-side-tag--a]="groupOf(node.nodeId) === 'A'"
+                [class.node-side-tag--b]="groupOf(node.nodeId) === 'B'"
+                [class.node-side-tag--ab]="groupOf(node.nodeId) === 'AB'">
+                {{ groupOf(node.nodeId) }}
+            </span>
+            }
         </div>
+
         <div class="d-flex align-items-center gap-1">
             @if (node.nodeStatus === 'DOWN') {
             <button class="btn-node btn-node--success w-100" (click)="resume(node)">
@@ -26,13 +36,59 @@
 }
 
 @if (state.nodes().length === 0) {
-<div class="text-center py-4" style="color:var(--color-text-muted); font-size:0.75rem;">
+<div class="text-center py-4" style="color: var(--color-text-muted); font-size:0.75rem;">
     <i class="fa-solid fa-spinner anim-spin d-block mb-2" style="font-size:1.2rem;"></i>Connecting...
 </div>
 }
 
-
 <hr class="ops-divider" />
 
+<!-- Cut / Mend Network button -->
+@if (!state.partition()) {
+<button class="btn-cut-net w-100" (click)="openPartitionModal()">
+    Cut Network
+</button>
+
+} @else {
+<button class="btn-mend-net w-100" (click)="mendNetwork()">
+    Mend Network
+</button>
+}
+
+<hr class="ops-divider" />
 <!-- Mini SSE Live Stream -->
 <app-activity-log />
+
+
+
+<!--Partition Config Modal -->
+@if(showPartitionModal) {
+<div class="pmodal-backdrop" (click)="closeModal()">
+    <div class="pmodal-panel" (click)="$event.stopPropagation()">
+        <div class="pmodal-header"> NETWORK PARTITION</div>
+        <p class="pmodal-desc">
+            Assign nodes to Group A or Group B, then cut. Unassigned nodes stay reachable by everyone - they appear in both rings. Each side needs at least one assigned node.
+        </p>
+
+        @for (node of state.nodes(); track node.nodeId) {
+        <div class="pmodal-row">
+            <span class="node-dot" [style.background]="node.nodeId | nodeColor"
+                [style.box-shadow]="'0 0 6px ' + (node.nodeId | nodeColor) + '80'"></span>
+            <span class="pmodal-node-id" [style.color]="node.nodeId | nodeColor">{{ node.nodeId }}</span>
+            <div class="side-btn-group">
+                <button class="side-btn side-btn--a" [class.side-btn-select--a]="assignments[node.nodeId] === 'A'"
+                    (click)="assignGroup(node.nodeId, 'A')">A</button>
+                <button class="side-btn side-btn--b" [class.side-btn-select--b]="assignments[node.nodeId] === 'B'"
+                    (click)="assignGroup(node.nodeId, 'B')">B</button>
+            </div>
+        </div>
+        }
+
+        <div class="pmodal-actions">
+            <button class="pbtn btn-pcancel" (click)="closeModal()">Cancel</button>
+            <button class="pbtn btn-psplit" (click)="splitEvenly()">Split Evenly</button>
+            <button class="pbtn btn-pcut" [disabled]="!canCut" (click)="cutNetwork()"> Cut network</button>
+        </div>
+    </div>
+</div>
+}

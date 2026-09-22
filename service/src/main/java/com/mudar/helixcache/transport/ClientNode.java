@@ -21,7 +21,7 @@ public class ClientNode {
 
     public void validateNodeConnection(String nodeId) {
         if(nodeStateManager.isBlocked(nodeId)) {
-            throw new HelixValidationException("Network partition: cannot reach " + nodeId);
+            throw new HelixValidationException("Network partition: Outbound calls  to " + nodeId + " are blocked");
         }
     }
 

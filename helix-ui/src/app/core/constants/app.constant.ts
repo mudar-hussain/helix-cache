@@ -4,7 +4,7 @@ import { ClusterEventType } from "../enums/helix.enum"
 
 export const LOG_CATEGORIES: Record<string, ClusterEventType[]> = {
     'ALL': [],
-    'NODE': [ClusterEventType.HEARTBEAT, ClusterEventType.NODE_UP, ClusterEventType.NODE_DOWN, ClusterEventType.NODE_SUSPECT],
+    'NODE': [ClusterEventType.HEARTBEAT, ClusterEventType.NODE_UP, ClusterEventType.NODE_DOWN, ClusterEventType.NODE_SUSPECT, ClusterEventType.PARTITION_SET, ClusterEventType.PARTITION_HEALED],
     'QUORUM': [ClusterEventType.QUORUM_SUCCESS, ClusterEventType.QUORUM_FAILED],
     'REPLICA': [ClusterEventType.REPLICA_WRITE, ClusterEventType.REPLICA_FAILED],
     'SYNC': [ClusterEventType.SYNC_STARTED, ClusterEventType.SYNC_COMPLETE],
@@ -32,6 +32,8 @@ export const BADGE_STYLE: Partial<Record<ClusterEventType, string>> = {
     [ClusterEventType.HINT_ENQUEUED]: 'background:var(--color-info-dim);color:var(--color-info);border:1px solid var(--color-info-border)',
     [ClusterEventType.HINT_DELIVERED]: 'background:var(--color-info-dim);color:var(--color-info);border:1px solid var(--color-info-border)',
     [ClusterEventType.CONFLICT_DETECTED]: 'background:var(--color-warning-dim);color:var(--color-warning);border:1px solid var(--color-warning-border)',
+    [ClusterEventType.PARTITION_SET]: 'background:var(--color-warning-dim);color:var(--color-warning);border:1px solid var(--color-warning-border)',
+    [ClusterEventType.PARTITION_HEALED]: 'background:var(--color-success-dim);color:var(--color-success);border:1px solid var(--color-success-border)',
 };
 
 export const MERGEABLE_TYPES = new Set<ClusterEventType>([

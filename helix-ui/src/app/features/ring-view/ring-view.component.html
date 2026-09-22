@@ -1,4 +1,30 @@
+
+
 <div class="ring-wrap">
+
+    @if (clusterState.partition()) {
+        <div class="partition-banner">
+            <span class="partition-banner--icon"></span>
+            <span class="partition-banner--label">NETWORK PARTITIONED</span>
+            <span class="partition-banner--desc">
+                Group A: {{ clusterState.partition()!.groupA.join(', ') }}
+                &nbsp;.&nbsp;
+                Group B: {{ clusterState.partition()!.groupB.join(', ') }}
+            </span>
+        </div>
+
+    <div class="corner ctl" style="top: 45px"></div>
+    <div class="corner ctr" style="top: 45px"></div>
+    <div class="corner cbl"></div>
+    <div class="corner cbr"></div>
+
+
+    <!-- Live Indicator -->
+    <div class="d-flex align-items-center gap-2 live-indicator" style="top: 55px">
+        <div class="live-dot anim-pulse"></div>
+        <span class="live-label">LIVE</span>
+    </div>
+    } @else {
 
     <div class="corner ctl"></div>
     <div class="corner ctr"></div>
@@ -11,6 +37,7 @@
         <div class="live-dot anim-pulse"></div>
         <span class="live-label">LIVE</span>
     </div>
+    }
 
     <svg class="ring-svg" [attr.viewBox]="'0 0 '+ width +' '+ height" preserveAspectRatio="xMidYMid meet">
 
@@ -34,12 +61,11 @@
         @for (vn of vnodePositions(); track vn.normalizedPosition) {
             <polygon [attr.points]="pentagonPoints(vn.x, vn.y, isHighlit(vn.nodeId) ? 5 : 3)"
                 [attr.fill]="color(vn.nodeId) + (isHighlit(vn.nodeId) ? '88' : '55')"
-                [attr.stroke]="color(vn.nodeId) + (isHighlit(vn.nodeId) ? 'ff': 'cc' )"
-                [attr.stroke-width]="isHighlit(vn.nodeId) ? 1 : 0.8" />
+                [attr.stroke]="color(vn.nodeId) + (isHighlit(vn.nodeId) ? 'ff': 'cc')"
+                [attr.stroke-width]="(isHighlit(vn.nodeId) ? 1 : 0.8)" />
         }
 
         <!-- Travel dots: primary replicas (animate on DOM entry) -->
-
         @for(dot of travelDots(); track dot.key) {
             <circle [attr.cx]="dot.startX" [attr.cy]="dot.startY" r="5" [attr.fill]="dot.color" class="travel-dot"
                 [style.--dx]="dot.dx + 'px'" [style.--dy]="dot.dy + 'px'" [style.animation-delay]="dot.delay + 's'" />
@@ -89,7 +115,7 @@
             <!-- Node id -->
             <text [attr.y]="isHighlit(node.nodeId) ? 34 : 30" text-anchor="middle" class="node-label"
                 [attr.fill]="color(node.nodeId) + (isHighlit(node.nodeId) ? 'ff' : 'aa')">
-                {{ node.nodeId}}
+                {{ node.nodeId }}{{ partitionGroupOf()(node.nodeId) ? ' (' + partitionGroupOf()(node.nodeId) + ')': '' }}
             </text>
 
             <!-- Key count -->

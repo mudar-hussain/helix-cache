@@ -29,4 +29,12 @@ export class AdminApiService {
         return this.apiService.withFallback<HotKeyPredictionResponse[]>('get', '/admin/stats/predictions');
     }
 
+    setPartition(nodeBaseUrl: string, blockedPeers: string[]): Observable<any> {
+        return this.http.post<unknown>(`${nodeBaseUrl}/admin/node/partition`, { blockedPeers });
+    }
+
+    healPartition(nodeBaseUrl: string): Observable<any> {
+        return this.http.put<unknown>(`${nodeBaseUrl}/admin/node/heal`, null);
+    }
+
 }

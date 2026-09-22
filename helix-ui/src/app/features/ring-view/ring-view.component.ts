@@ -138,7 +138,20 @@ export class RingViewComponent implements OnInit, OnDestroy {
             });
         });
         return dots;
-    })
+    });
+
+    readonly partitionGroupOf = computed(() => {
+        const p = this.clusterState.partition();
+        return (nodeId: string): 'A' | 'B' | 'AB' | null => {
+            if(!p) return null;
+            const inGroupA = p.groupA.includes(nodeId);
+            const inGroupB = p.groupB.includes(nodeId);
+            if(inGroupA && inGroupB) return 'AB';
+            if(inGroupA) return 'A';
+            if(inGroupB) return 'B';
+            return null;
+        };
+    });
 
     ngOnInit(): void {
         this.sub.add(
@@ -196,4 +209,6 @@ export class RingViewComponent implements OnInit, OnDestroy {
             return `${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`;
         }).join(' ');
     }
+
+
 }
