@@ -5,11 +5,6 @@
     <div class="partition-banner">
         <span class="partition-banner--icon"><i class="fa-solid fa-scissors"></i></span>
         <span class="partition-banner--label">NETWORK PARTITIONED</span>
-        <span class="partition-banner--desc">
-            Group A: {{ clusterState.partition()!.groupA.join(', ') }}
-            &nbsp;<i class="fa-solid fa-arrows-up-down fa-rotate-90"></i>&nbsp;
-            Group B: {{ clusterState.partition()!.groupB.join(', ') }}
-        </span>
     </div>
     }
 
@@ -128,16 +123,20 @@
 
         <!-- Group A header -->
         <div class="dual-group-header dual-group-header--a">
-            <span class="dual-group-label">GROUP A</span>
-            <span class="dual-group-count"> {{ groupAIds().length}} nodes</span>
+            <span class="dual-group-label">
+                GROUP A - <span class="dual-group-count">{{ groupAIds().length}} nodes</span> 
+            </span>
+            
             @for (id of groupAIds(); track id) {
-            <span class="dual-legend-dot" [style.background]="color(id)"></span>
-            <span class="dual-legend-id" [style.color]="color(id)">{{ id }}</span>
+            <span class="dual-legend-id" [style.color]="color(id)">
+                <span class="dual-legend-dot" [style.background]="color(id)"></span> {{ id }}
+            </span>
             }
         </div>
 
         <!-- Group A SVG -->
-        <svg class="sub-ring-svg" [attr.viewBox]="'0 0 ' + subW+' ' + subH" preserveAspectRatio="xMidYMid meet">
+        <svg class="sub-ring-svg sub-ring-svg--a" [attr.viewBox]="'0 0 ' + subW+' ' + subH"
+            preserveAspectRatio="xMidYMid meet">
 
             <!-- Hash ring circle -->
             <circle [attr.cx]="subCx" [attr.cy]="subCy" [attr.r]="subRingR" fill="none" stroke="rgba(0,200,255,0.18)"
@@ -151,7 +150,8 @@
 
             <!-- Spokes -->
             @for (p of nodePositionsA(); track p.id) {
-            <line [attr.x1]="subCx" [attr.y1]="subCy" [attr.x2]="p.x" [attr.y2]="p.y" [attr.stroke]="color(p.id) + (isHighlit(p.id) ? '55' : '22')"
+            <line [attr.x1]="subCx" [attr.y1]="subCy" [attr.x2]="p.x" [attr.y2]="p.y"
+                [attr.stroke]="color(p.id) + (isHighlit(p.id) ? '55' : '22')"
                 [attr.stroke-width]="isHighlit(p.id) ? 1.3 : 1" />
             }
 
@@ -159,6 +159,12 @@
             @for (vn of vnodePositionsA(); track vn.normalizedPosition) {
             <polygon [attr.points]="pentagonPoints(vn.x, vn.y, 3)" [attr.fill]="color(vn.nodeId) + '55'"
                 [attr.stroke]="color(vn.nodeId) + 'aa'" stroke-width="0.8" />
+            }
+
+            <!-- Travel dots for Group A -->
+            @for (dot of travelDotsA(); track dot.key) {
+            <circle [attr.cx]="dot.startX" [attr.cy]="dot.startY" r="5" [attr.fill]="dot.color" class="travel-dot"
+                [style.--dx]="dot.dx + 'px'" [style.--dy]="dot.dy + 'px'" [style.animation-delay]="dot.delay + 's'" />
             }
 
             <!-- Physical nodes -->
@@ -185,14 +191,9 @@
             <circle [attr.cx]="subCx" [attr.cy]="subCy" r="3" fill="rgba(0,200,255,0.5)" />
         </svg>
 
-        <!-- Scissors divider -->
-        <div class="partition-divider">
-            <span class="partition-scissors"><i class="fa-solid fa-scissors"></i></span>
-            <span class="partition-divider-label">CUT</span>
-        </div>
-
         <!-- Group B SVG -->
-        <svg class="sub-ring-svg" [attr.viewBox]="'0 0 ' + subW + ' ' + subH" preserveAspectRatio="xMidYMid meet">
+        <svg class="sub-ring-svg sub-ring-svg--b" [attr.viewBox]="'0 0 ' + subW + ' ' + subH"
+            preserveAspectRatio="xMidYMid meet">
 
             <!-- Hash ring circle -->
             <circle [attr.cx]="subCx" [attr.cy]="subCy" [attr.r]="subRingR" fill="none" stroke="rgba(0,200,255,0.18)"
@@ -206,7 +207,8 @@
 
             <!-- Spokes -->
             @for (p of nodePositionsB(); track p.id) {
-            <line [attr.x1]="subCx" [attr.yl]="subCy" [attr.x2]="p.x" [attr.y2]="p.y" [attr.stroke]="color(p.id) + (isHighlit(p.id) ? '55' : '22')"
+            <line [attr.x1]="subCx" [attr.y1]="subCy" [attr.x2]="p.x" [attr.y2]="p.y"
+                [attr.stroke]="color(p.id) + (isHighlit(p.id) ? '55' : '22')"
                 [attr.stroke-width]="isHighlit(p.id) ? 1.3 : 1" />
             }
 
@@ -214,6 +216,12 @@
             @for (vn of vnodePositionsB(); track vn.normalizedPosition) {
             <polygon [attr.points]="pentagonPoints(vn.x, vn.y, 3)" [attr.fill]="color(vn.nodeId) + '55'"
                 [attr.stroke]="color(vn.nodeId) + 'aa'" stroke-width="0.8" />
+            }
+
+            <!-- Travel dots for Group A -->
+            @for (dot of travelDotsB(); track dot.key) {
+            <circle [attr.cx]="dot.startX" [attr.cy]="dot.startY" r="5" [attr.fill]="dot.color" class="travel-dot"
+                [style.--dx]="dot.dx + 'px'" [style.--dy]="dot.dy + 'px'" [style.animation-delay]="dot.delay + 's'" />
             }
 
             <!-- Physical nodes -->
@@ -242,12 +250,14 @@
 
         <!-- Group B header -->
         <div class="dual-group-header dual-group-header--b">
-            <span class="dual-group-label">GROUP B</span>
-            <span class="dual-group-count"> {{ groupBIds().length }} nodes</span>
+            <span class="dual-group-label">
+                GROUP B - <span class="dual-group-count">{{ groupBIds().length}} nodes</span> 
+            </span>
 
             @for (id of groupBIds(); track id) {
-            <span class="dual-legend-dot" [style.background]="color (id) "></span>
-            <span class="dual-legend-id" [style.color]="color (id)">{{ id }}</span>
+            <span class="dual-legend-id" [style.color]="color (id)">
+                <span class="dual-legend-dot" [style.background]="color (id) "></span> {{ id }}
+            </span>
             }
         </div>
 
@@ -270,7 +280,7 @@
         }
     </div>
 
-    <div class="stats-legend" [style]="clusterState.partition() ? 'flex-direction: row;' : ''">
+    <div class="stats-legend" [style]="clusterState.partition() ? 'flex-direction: row;padding: 0px 12px' : ''">
         <app-stat-card class="stats-card" [value]="clusterState.aliveCount() + '/' + N" label="Nodes Alive" />
         <app-stat-card class="stats-card" [value]="clusterState.totalKeys().toString()" label="Total Keys" />
         <app-stat-card class="stats-card" [value]="clusterState.replicationFactor().toString()" label="Replication" />

@@ -81,7 +81,6 @@ export class RingViewComponent implements OnInit, OnDestroy {
     );
 
     // Replica travel dots primary each active replica
-
     readonly travelDots = computed(() => {
         const replicaNodes = this.clusterState.replicaNodes();
         if (replicaNodes === null) return [];
@@ -105,6 +104,52 @@ export class RingViewComponent implements OnInit, OnDestroy {
                     delay: i * 0.2
                 };
 
+            });
+    });
+
+    readonly travelDotsA = computed(() => {
+        const replicaNodes = this.clusterState.replicaNodes();
+        if (!replicaNodes || !this.clusterState.partition()) return [];
+        const primaryId = replicaNodes.primaryNode.id;
+        const posA = this.nodePositionsA();
+        if (!posA.find(p => p.id === primaryId)) return [];     // primary not in group A
+        const primaryPos = this.getPosInGroup(primaryId, posA);
+        const animKey = Date.now();
+        return replicaNodes.replicaNodes
+            .filter(r => this.nodeStatus(r.id) === 'UP' && posA.find(p => p.id === r.id))
+            .map((r, i) => {
+                const rPos = this.getPosInGroup(r.id, posA);
+                return {
+                    key: `A-${r.id}-${animKey}`,
+                    startX: primaryPos.x, startY: primaryPos.y,
+                    dx: rPos.x - primaryPos.x,
+                    dy: rPos.y - primaryPos.y,
+                    color: this.color(primaryId),
+                    delay: i * 0.2
+                };
+            });
+    });
+
+    readonly travelDotsB = computed(() => {
+        const replicaNodes = this.clusterState.replicaNodes();
+        if (!replicaNodes || !this.clusterState.partition()) return [];
+        const primaryId = replicaNodes.primaryNode.id;
+        const posB = this.nodePositionsB();
+        if (!posB.find(p => p.id = primaryId)) return []; // primary not in group B
+        const primaryPos = this.getPosInGroup(primaryId, posB);
+        const animKey = Date.now();
+        return replicaNodes.replicaNodes
+            .filter(r => this.nodeStatus(r.id) === 'UP' && posB.find(p => p.id === r.id))
+            .map((r, i) => {
+                const rPos = this.getPosInGroup(r.id, posB);
+                return {
+                    key: `B-${r.id}-${animKey}`,
+                    startX: primaryPos.x, startY: primaryPos.y,
+                    dx: rPos.x - primaryPos.x,
+                    dy: rPos.y - primaryPos.y,
+                    color: this.color(primaryId),
+                    delay: i * 0.2
+                };
             });
     });
 
@@ -144,11 +189,9 @@ export class RingViewComponent implements OnInit, OnDestroy {
         const p = this.clusterState.partition();
         return (nodeId: string): 'A' | 'B' | 'AB' | null => {
             if (!p) return null;
-            const inGroupA = p.groupA.includes(nodeId);
-            const inGroupB = p.groupB.includes(nodeId);
-            if (inGroupA && inGroupB) return 'AB';
-            if (inGroupA) return 'A';
-            if (inGroupB) return 'B';
+            if (p.neutral.includes(nodeId)) return 'AB';
+            if (p.groupA.includes(nodeId)) return 'A';
+            if (p.groupB.includes(nodeId)) return 'B';
             return null;
         };
     });
@@ -158,8 +201,8 @@ export class RingViewComponent implements OnInit, OnDestroy {
     readonly subH = 520;
     readonly subCx = this.subW / 2;
     readonly subCy = this.subH / 2;
-    readonly subRingR = Math.min(this.subW, this.subW) * 0.28;
-    readonly subNodeR = Math.min(this.subW, this.subW) * 0.38;
+    readonly subRingR = Math.min(this.subW, this.subH) * 0.28;
+    readonly subNodeR = Math.min(this.subW, this.subH) * 0.38;
 
     readonly groupAIds = computed(() => this.clusterState.partition()?.groupA ?? []);
     readonly groupBIds = computed(() => this.clusterState.partition()?.groupB ?? []);
