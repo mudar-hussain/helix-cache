@@ -1,11 +1,12 @@
 import { computed, inject, Injectable, OnDestroy, signal } from "@angular/core";
 import { ClusterApiService } from "./cluster-api.service";
 import { SseService } from "./sse.service";
-import { catchError, EMPTY, interval, startWith, Subscription, switchMap } from "rxjs";
+import { catchError, EMPTY, forkJoin, interval, startWith, Subscription, switchMap } from "rxjs";
 import { ClusterEvent, ClusterStats, NodeStatusResponse, RingNodeResponse, ReplicaNodes, ClusterEventEntry, PartitionConfig } from "../../shared/interfaces/helix.interface";
 import { ClusterEventType, NodeStatus } from "../enums/helix.enum";
 import { environment } from "../../../environments/environment";
 import { MERGEABLE_TYPES } from "../constants/app.constant";
+import { AdminApiService } from "./admin-api.service";
 
 @Injectable({
     providedIn: 'root'
@@ -38,9 +39,10 @@ export class ClusterStateService implements OnDestroy {
     private readonly MAX_EVENTS = 500;
     readonly eventLog = signal<ClusterEventEntry[]>([]);
 
-    constructor(private clusterApi: ClusterApiService) {
+    constructor(private clusterApi: ClusterApiService, private adminApi: AdminApiService) {
         this.startPolling();
         this.subscribeToNodeEvents();
+        this.syncPartition();
     }
 
     ngOnDestroy() {
@@ -143,5 +145,40 @@ export class ClusterStateService implements OnDestroy {
 
     healPartition(): void {
         this.partition.set(null);
+    }
+
+    private syncPartition() {
+        const nodeEntries = environment.nodes;
+
+        const calls = nodeEntries.map(n => 
+            this.adminApi.getPartition(n.baseUrl).pipe(catchError(() => EMPTY))
+        );
+
+        forkJoin(calls) .subscribe((results: {nodeId: string; blockedPeers: string[]}[]) => {
+            const blocking = results.filter(r => r.blockedPeers.length > 0);
+            if(blocking.length === 0) return; //no partition exists in backend
+
+            const allNodeIds: string[] = nodeEntries.map(n => n.id);
+            const blockMap = new Map<string, Set<string>>();
+            results.forEach(r => blockMap.set(r.nodeId, new Set(r.blockedPeers)));
+
+            const neutral = allNodeIds.filter(id => (blockMap.get(id)?.size ?? 0) === 0);
+
+            const firstBlocker = results.find(r => r.blockedPeers.length > 0);
+            if(!firstBlocker) return;
+
+            const explicitB = firstBlocker.blockedPeers.filter(id => !neutral.includes(id));
+            const explicitA = allNodeIds.filter(id => !explicitB.includes(id) && !neutral.includes(id));
+
+            if(explicitA.length === 0 || explicitB.length === 0) return;
+
+            this.partition.set({
+                groupA: [...explicitA, ...neutral],
+                groupB: [...explicitB, ...neutral],
+                explicitA,
+                explicitB,
+                neutral
+            });
+        });
     }
 }

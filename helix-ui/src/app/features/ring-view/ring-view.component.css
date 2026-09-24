@@ -359,7 +359,6 @@ Node elements
     bottom: 16px;
     right: 16px;
     display: flex;
-    flex-direction: column;
     gap: 5px;
     background: rgba(2, 9, 18, 0.75);
     border-radius: 5px;

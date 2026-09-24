@@ -211,8 +211,8 @@
                 }
                 <!-- Node id -->
                 <text [attr.y]="isHighlit(id) ? 30 : 26" text-anchor="middle" class="node-label"
-                    [attr.fill]="partitionGroupOf() (id) == 'AB' ? '#aa55ff': (color(id) + (isHighlit(id) ? 'ff' : 'aa'))">
-                    {{ id }} ({{ partitionGroupOf() (id) }})
+                    [attr.fill]="partitionGroupOf()(id) === 'AB' ? '#aa55ff': (color(id) + (isHighlit(id) ? 'ff' : 'aa'))">
+                    {{ id }} ({{ partitionGroupOf()(id) }})
                 </text>
 
                 <!-- Key count -->
@@ -301,8 +301,8 @@
                 }
                 <!-- Node id -->
                 <text [attr.y]="isHighlit(id) ? 30 : 26" text-anchor="middle" class="node-label"
-                    [attr.fill]="partitionGroupOf() (id) == 'AB' ? '#aa55ff': (color(id) + (isHighlit(id) ? 'ff' : 'aa'))">
-                    {{ id }} ({{ partitionGroupOf() (id) }})
+                    [attr.fill]="partitionGroupOf()(id) === 'AB' ? '#aa55ff': (color(id) + (isHighlit(id) ? 'ff' : 'aa'))">
+                    {{ id }} ({{ partitionGroupOf()(id) }})
                 </text>
 
                 <!-- Key count -->
@@ -346,7 +346,9 @@
         }
     </div>
 
-    <div class="stats-legend" [style]="clusterState.partition() ? 'flex-direction: row;padding: 0px 12px' : ''">
+    <div class="stats-legend" 
+    [style.flex-direction]="clusterState.partition() ? 'row' : 'column'"
+    [style.padding]="clusterState.partition() ? '0px 12px' : '8px 12px'">
         <app-stat-card class="stats-card" [value]="clusterState.aliveCount() + '/' + N" label="Nodes Alive" />
         <app-stat-card class="stats-card" [value]="clusterState.totalKeys().toString()" label="Total Keys" />
         <app-stat-card class="stats-card" [value]="clusterState.replicationFactor().toString()" label="Replication" />

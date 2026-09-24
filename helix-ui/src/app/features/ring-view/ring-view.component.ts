@@ -103,7 +103,6 @@ export class RingViewComponent implements OnInit, OnDestroy {
                     color: this.color(primaryNodeId),
                     delay: i * 0.2
                 };
-
             });
     });
 
@@ -205,7 +204,7 @@ export class RingViewComponent implements OnInit, OnDestroy {
             liveNodes.forEach(to => {
                 if (from.id === to.id) return;
                 dots.push({
-                    key: `burst-${from.id}-${to.id}-${burst}`,
+                    key: `burstA-${from.id}-${to.id}-${burst}`,
                     startX: from.x,
                     startY: from.y,
                     dx: to.x - from.x, dy: to.y - from.y,
@@ -225,7 +224,7 @@ export class RingViewComponent implements OnInit, OnDestroy {
         //Only group B nodes and are UP
         const posB = this.nodePositionsB();
         const liveNodes = this.clusterState.nodes()
-            .filter(n => n.nodeStatus === 'UP' && posB.find(p => p.id = n.nodeId))
+            .filter(n => n.nodeStatus === 'UP' && posB.find(p => p.id === n.nodeId))
             .map(n => this.getPosInGroup(n.nodeId, posB));
 
         const dots: Array<{
