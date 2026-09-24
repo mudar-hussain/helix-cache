@@ -5,6 +5,7 @@ import com.mudar.helixcache.cluster.NodeStateManager;
 import com.mudar.helixcache.dto.HotKeyPredictionResponse;
 import com.mudar.helixcache.service.ClusterService;
 import com.mudar.helixcache.store.AccessTracker;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -63,16 +64,22 @@ public class AdminController {
     }
 
     @PostMapping("/node/partition")
-    public ResponseEntity<Map<String, Object>> setPartition(@PathVariable Map<String, List<String>> partitionMap) {
+    public ResponseEntity<Map<String, Object>> setPartition(@RequestBody Map<String, List<String>> partitionMap) {
         clusterService.setPartition(partitionMap);
         return ResponseEntity.ok(Map.of("nodeId", clusterService.getLocalNodeId(),
-                "blockedPeers", nodeStateManager.getBlockedPeers(clusterService.getLocalNodeId())));
+                "blockedPeers", nodeStateManager.getBlockedPeers()));
+    }
+
+    @GetMapping("/node/partition")
+    public ResponseEntity<Map<String, Object>> getPartition() {
+        return ResponseEntity.ok(Map.of("nodeId", clusterService.getLocalNodeId(),
+                "blockedPeers", nodeStateManager.getBlockedPeers()));
     }
 
     @PutMapping("/node/heal")
     public ResponseEntity<?> healPartition() {
         nodeStateManager.unblockAllPeer();
         return ResponseEntity.ok(Map.of("nodeId", clusterService.getLocalNodeId(),
-                "blockedPeers", nodeStateManager.getBlockedPeers(clusterService.getLocalNodeId())));
+                "blockedPeers", nodeStateManager.getBlockedPeers()));
     }
 }

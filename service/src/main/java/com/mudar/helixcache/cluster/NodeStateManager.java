@@ -53,7 +53,7 @@ public class NodeStateManager {
         return blockedPeers.contains(nodeId);
     }
 
-    public Set<String> getBlockedPeers(String nodeId) {
+    public Set<String> getBlockedPeers() {
         return Collections.unmodifiableSet(blockedPeers);
     }
 }

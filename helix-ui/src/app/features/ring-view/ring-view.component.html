@@ -218,7 +218,7 @@
                 [attr.stroke]="color(vn.nodeId) + 'aa'" stroke-width="0.8" />
             }
 
-            <!-- Travel dots for Group A -->
+            <!-- Travel dots for Group B -->
             @for (dot of travelDotsB(); track dot.key) {
             <circle [attr.cx]="dot.startX" [attr.cy]="dot.startY" r="5" [attr.fill]="dot.color" class="travel-dot"
                 [style.--dx]="dot.dx + 'px'" [style.--dy]="dot.dy + 'px'" [style.animation-delay]="dot.delay + 's'" />

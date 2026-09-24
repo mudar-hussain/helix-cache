@@ -135,7 +135,7 @@ export class RingViewComponent implements OnInit, OnDestroy {
         if (!replicaNodes || !this.clusterState.partition()) return [];
         const primaryId = replicaNodes.primaryNode.id;
         const posB = this.nodePositionsB();
-        if (!posB.find(p => p.id = primaryId)) return []; // primary not in group B
+        if (!posB.find(p => p.id === primaryId)) return []; // primary not in group B
         const primaryPos = this.getPosInGroup(primaryId, posB);
         const animKey = Date.now();
         return replicaNodes.replicaNodes
@@ -190,8 +190,8 @@ export class RingViewComponent implements OnInit, OnDestroy {
         return (nodeId: string): 'A' | 'B' | 'AB' | null => {
             if (!p) return null;
             if (p.neutral.includes(nodeId)) return 'AB';
-            if (p.groupA.includes(nodeId)) return 'A';
-            if (p.groupB.includes(nodeId)) return 'B';
+            if (p.explicitA.includes(nodeId)) return 'A';
+            if (p.explicitB.includes(nodeId)) return 'B';
             return null;
         };
     });

@@ -33,6 +33,10 @@ export class AdminApiService {
         return this.http.post<unknown>(`${nodeBaseUrl}/admin/node/partition`, { blockedPeers });
     }
 
+    getPartition(nodeBaseUrl: string): Observable<{nodeId: string; blockedPeers: string[] }> {
+        return this.http.get<{nodeId: string; blockedPeers: string[] }>(`${nodeBaseUrl}/admin/node/partition`);
+    }
+
     healPartition(nodeBaseUrl: string): Observable<any> {
         return this.http.put<unknown>(`${nodeBaseUrl}/admin/node/heal`, null);
     }
