@@ -65,7 +65,7 @@ export class ClusterStateService implements OnDestroy {
     triggerRingBurst(): void {
         if (this.burstTimer) clearTimeout(this.burstTimer);
         this.ringBurst.set(Date.now());
-        this.burstTimer = setTimeout(() => this.replicaNodes.set(null), 2500);
+        this.burstTimer = setTimeout(() => this.ringBurst.set(0), 2500);
     }
 
     private startPolling() {

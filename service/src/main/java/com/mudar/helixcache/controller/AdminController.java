@@ -5,7 +5,6 @@ import com.mudar.helixcache.cluster.NodeStateManager;
 import com.mudar.helixcache.dto.HotKeyPredictionResponse;
 import com.mudar.helixcache.service.ClusterService;
 import com.mudar.helixcache.store.AccessTracker;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

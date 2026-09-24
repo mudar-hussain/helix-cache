@@ -31,8 +31,8 @@ export class RingViewComponent implements OnInit, OnDestroy {
     readonly height = 600;
     readonly cx = this.width / 2;
     readonly cy = this.height / 2;
-    readonly ringR = Math.min(this.width, this.height) * 0.30;
-    readonly nodeR = Math.min(this.width, this.height) * 0.42;
+    readonly ringR = Math.min(this.width, this.height) * 0.28;
+    readonly nodeR = Math.min(this.width, this.height) * 0.38;
 
     private sub = new Subscription();
     readonly distribution = signal<NodeDistributionResponse[]>([]);
@@ -155,7 +155,7 @@ export class RingViewComponent implements OnInit, OnDestroy {
 
     readonly burstDots = computed(() => {
         const burst = this.clusterState.ringBurst();
-        if (!burst) return [];
+        if (!burst || this.clusterState.partition()) return [];
 
         const liveNodes = this.clusterState.nodes()
             .filter(n => n.nodeStatus === 'UP')
@@ -184,6 +184,84 @@ export class RingViewComponent implements OnInit, OnDestroy {
         });
         return dots;
     });
+
+    readonly burstDotsA = computed(() => {
+        const burst = this.clusterState.ringBurst();
+        if (!burst || !this.clusterState.partition()) return [];
+
+        //Only group A nodes and are UP
+        const posA = this.nodePositionsA();
+        const liveNodes = this.clusterState.nodes()
+            .filter(n => n.nodeStatus === 'UP' && posA.find(p => p.id === n.nodeId))
+            .map(n => this.getPosInGroup(n.nodeId, posA));
+
+        const dots: Array<{
+            key: string; startX: number; startY: number;
+            dx: number; dy: number; color: string; delay: number;
+        }> = [];
+
+        let idx = 0;
+        liveNodes.forEach(from => {
+            liveNodes.forEach(to => {
+                if (from.id === to.id) return;
+                dots.push({
+                    key: `burst-${from.id}-${to.id}-${burst}`,
+                    startX: from.x,
+                    startY: from.y,
+                    dx: to.x - from.x, dy: to.y - from.y,
+                    color: this.color(from.id),
+                    delay: idx * 0.05,
+                });
+                idx++;
+            });
+        });
+        return dots;
+    });
+
+    readonly burstDotsB = computed(() => {
+        const burst = this.clusterState.ringBurst();
+        if (!burst || !this.clusterState.partition()) return [];
+
+        //Only group B nodes and are UP
+        const posB = this.nodePositionsB();
+        const liveNodes = this.clusterState.nodes()
+            .filter(n => n.nodeStatus === 'UP' && posB.find(p => p.id = n.nodeId))
+            .map(n => this.getPosInGroup(n.nodeId, posB));
+
+        const dots: Array<{
+            key: string; startX: number; startY: number;
+            dx: number; dy: number; color: string; delay: number;
+        }> = [];
+
+        let idx = 0;
+        liveNodes.forEach(from => {
+            liveNodes.forEach(to => {
+                if (from.id === to.id) return;
+                dots.push({
+                    key: `burstB-${from.id}-${to.id}-${burst}`,
+                    startX: from.x, startY: from.y,
+                    dx: to.x - from.x,
+                    dy: to.y - from.y,
+                    color: this.color(from.id),
+                    delay: idx * 0.05,
+                });
+                idx++;
+            });
+        });
+        return dots;
+    });
+
+    readonly primaryIdInA = computed(() => {
+        const pid = this.primaryId();
+        if(!pid) return null;
+        return this.nodePositionsA().find(p => p.id === pid) ? pid : null;
+    })
+
+    readonly primaryIdInB = computed(() => {
+        const pid = this.primaryId();
+        if(!pid) return null;
+        return this.nodePositionsB().find(p => p.id === pid) ? pid : null;
+    })
 
     readonly partitionGroupOf = computed(() => {
         const p = this.clusterState.partition();

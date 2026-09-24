@@ -124,9 +124,9 @@
         <!-- Group A header -->
         <div class="dual-group-header dual-group-header--a">
             <span class="dual-group-label">
-                GROUP A - <span class="dual-group-count">{{ groupAIds().length}} nodes</span> 
+                GROUP A - <span class="dual-group-count">{{ groupAIds().length}} nodes</span>
             </span>
-            
+
             @for (id of groupAIds(); track id) {
             <span class="dual-legend-id" [style.color]="color(id)">
                 <span class="dual-legend-dot" [style.background]="color(id)"></span> {{ id }}
@@ -157,8 +157,10 @@
 
             <!-- Virtual nodes on ring -->
             @for (vn of vnodePositionsA(); track vn.normalizedPosition) {
-            <polygon [attr.points]="pentagonPoints(vn.x, vn.y, 3)" [attr.fill]="color(vn.nodeId) + '55'"
-                [attr.stroke]="color(vn.nodeId) + 'aa'" stroke-width="0.8" />
+            <polygon [attr.points]="pentagonPoints(vn.x, vn.y, isHighlit(vn.nodeId) ? 5 : 3)"
+                [attr.fill]="color(vn.nodeId) + (isHighlit(vn.nodeId) ? '88' : '55')"
+                [attr.stroke]="color(vn.nodeId) + (isHighlit(vn.nodeId) ? 'ff' : 'cc')"
+                [attr.stroke-width]="isHighlit(vn.nodeId) ? 1 : 0.8" />
             }
 
             <!-- Travel dots for Group A -->
@@ -167,23 +169,54 @@
                 [style.--dx]="dot.dx + 'px'" [style.--dy]="dot.dy + 'px'" [style.animation-delay]="dot.delay + 's'" />
             }
 
+            @for(dot of burstDotsA(); track dot.key) {
+            <circle [attr.cx]="dot.startX" [attr.cy]="dot.startY" r="3" [attr.fill]="dot.color" class="travel-dot"
+                [style.--dx]="dot.dx + 'px'" [style.--dy]="dot.dy + 'px'" [style.animation-delay]="dot.delay + 's'" />
+            }
+
             <!-- Physical nodes -->
             @for (id of groupAIds(); track id) {
             <g
                 [attr.transform]="'translate(' + getPosInGroup(id, nodePositionsA()).x + ',' + getPosInGroup(id, nodePositionsA()).y +')'">
 
-                <circle r="26" [attr.fill]="color(id) + '12'" class="node-glow anim-pulse" />
-                <polygon [attr.points]="pentagonPoints(0, 0, 17)" [attr.fill]="color(id) + '28'"
-                    [attr.stroke]="color(id) + 'cc'" stroke-width="1.5" class="node-pentagon" />
+                <!-- Glow -->
+                @if (isNodeAlive(id)) {
+                <circle [attr.r]="primaryIdInA() === id ? 34 : isHighlit(id) ? 28 : 24"
+                    [attr.fill]="color(id) + (primaryIdInA() === id ? '25' : isHighlit(id) ? '18':'12')"
+                    class="node-glow  anim-pulse" />
+                }
 
+                <!-- Outer ring pulse for primary-->
+                @if (primaryIdInA() === id) {
+                <circle r="20" fill="none" [attr.stroke]="color (id) + 'cc'" stroke-width="1.5" class="primary-ring" />
+                }
+
+                <!-- Pentagon body -->
+                <polygon [attr.points]="pentagonPoints(0, 0, isHighlit(id) ? 19 : 15)"
+                    [attr.fill]="color(id)+ (nodeStatus(id) === 'DOWN' ? '18' : isHighlit(id) ? '40' : '28')"
+                    [attr.stroke]="color(id) + (nodeStatus(id) === 'DOWN' ? '55' : isHighlit(id) ? 'ff' : 'cc')"
+                    [attr.stroke-width]="isHighlit(id) ? 2: 1.5" class="node-pentagon"
+                    [class.node-pentagon--suspect]="nodeStatus(id) === 'SUSPECT'" />
+
+                <!-- Crown for primary -->
+                @if(primaryIdInA() === id) {
+                <text y="-22" text-anchor="middle" class="crown" [attr.fill]="color(id)">👑</text>
+                }
+
+                <!-- P | R1 | R2 role label -->
+                @if(isHighlit(id)) {
+                <text y="4" text-anchor="middle" class="node-role" [attr.fill]="color(id)">
+                    {{ replicaLabel(id) }}
+                </text>
+                }
                 <!-- Node id -->
-                <text [attr.y]="isHighlit(id) ? 30 : 28" text-anchor="middle" class="node-label"
+                <text [attr.y]="isHighlit(id) ? 30 : 26" text-anchor="middle" class="node-label"
                     [attr.fill]="partitionGroupOf() (id) == 'AB' ? '#aa55ff': (color(id) + (isHighlit(id) ? 'ff' : 'aa'))">
                     {{ id }} ({{ partitionGroupOf() (id) }})
                 </text>
 
                 <!-- Key count -->
-                <text [attr.y]="isHighlit(id) ? 40 : 38" text-anchor="middle" class="node-keys">
+                <text [attr.y]="isHighlit(id) ? 40 : 36" text-anchor="middle" class="node-keys">
                     {{ keyCount (id) }} keys ({{ getDistributionPercentage(id)}})
                 </text>
             </g>
@@ -214,8 +247,10 @@
 
             <!-- Virtual nodes on ring -->
             @for (vn of vnodePositionsB(); track vn.normalizedPosition) {
-            <polygon [attr.points]="pentagonPoints(vn.x, vn.y, 3)" [attr.fill]="color(vn.nodeId) + '55'"
-                [attr.stroke]="color(vn.nodeId) + 'aa'" stroke-width="0.8" />
+            <polygon [attr.points]="pentagonPoints(vn.x, vn.y, isHighlit(vn.nodeId) ? 5 : 3)"
+                [attr.fill]="color(vn.nodeId) + (isHighlit(vn.nodeId) ? '88' : '55')"
+                [attr.stroke]="color(vn.nodeId) + (isHighlit(vn.nodeId) ? 'ff' : 'cc')"
+                [attr.stroke-width]="isHighlit(vn.nodeId) ? 1 : 0.8" />
             }
 
             <!-- Travel dots for Group B -->
@@ -224,23 +259,54 @@
                 [style.--dx]="dot.dx + 'px'" [style.--dy]="dot.dy + 'px'" [style.animation-delay]="dot.delay + 's'" />
             }
 
+            @for(dot of burstDotsB(); track dot.key) {
+            <circle [attr.cx]="dot.startX" [attr.cy]="dot.startY" r="3" [attr.fill]="dot.color" class="travel-dot"
+                [style.--dx]="dot.dx + 'px'" [style.--dy]="dot.dy + 'px'" [style.animation-delay]="dot.delay + 's'" />
+            }
+
             <!-- Physical nodes -->
             @for (id of groupBIds(); track id) {
             <g
                 [attr.transform]="'translate(' + getPosInGroup(id, nodePositionsB()).x + ',' + getPosInGroup(id, nodePositionsB()).y +')'">
 
-                <circle r="26" [attr.fill]="color(id) + '12'" class="node-glow anim-pulse" />
-                <polygon [attr.points]="pentagonPoints(0, 0, 17)" [attr.fill]="color(id) + '28'"
-                    [attr.stroke]="color(id) + 'cc'" stroke-width="1.5" class="node-pentagon" />
+                <!-- Glow -->
+                @if (isNodeAlive(id)) {
+                <circle [attr.r]="primaryIdInB() === id ? 34 : isHighlit(id) ? 28 : 24"
+                    [attr.fill]="color(id) + (primaryIdInB() === id ? '25' : isHighlit(id) ? '18':'12')"
+                    class="node-glow  anim-pulse" />
+                }
 
+                <!-- Outer ring pulse for primary-->
+                @if (primaryIdInB() === id) {
+                <circle r="20" fill="none" [attr.stroke]="color (id) + 'cc'" stroke-width="1.5" class="primary-ring" />
+                }
+
+                <!-- Pentagon body -->
+                <polygon [attr.points]="pentagonPoints(0, 0, isHighlit(id) ? 19 : 15)"
+                    [attr.fill]="color(id)+ (nodeStatus(id) === 'DOWN' ? '18' : isHighlit(id) ? '40' : '28')"
+                    [attr.stroke]="color(id) + (nodeStatus(id) === 'DOWN' ? '55' : isHighlit(id) ? 'ff' : 'cc')"
+                    [attr.stroke-width]="isHighlit(id) ? 2: 1.5" class="node-pentagon"
+                    [class.node-pentagon--suspect]="nodeStatus(id) === 'SUSPECT'" />
+
+                <!-- Crown for primary -->
+                @if(primaryIdInB() === id) {
+                <text y="-22" text-anchor="middle" class="crown" [attr.fill]="color(id)">👑</text>
+                }
+
+                <!-- P | R1 | R2 role label -->
+                @if(isHighlit(id)) {
+                <text y="4" text-anchor="middle" class="node-role" [attr.fill]="color(id)">
+                    {{ replicaLabel(id) }}
+                </text>
+                }
                 <!-- Node id -->
-                <text [attr.y]="isHighlit(id) ? 30 : 28" text-anchor="middle" class="node-label"
+                <text [attr.y]="isHighlit(id) ? 30 : 26" text-anchor="middle" class="node-label"
                     [attr.fill]="partitionGroupOf() (id) == 'AB' ? '#aa55ff': (color(id) + (isHighlit(id) ? 'ff' : 'aa'))">
                     {{ id }} ({{ partitionGroupOf() (id) }})
                 </text>
 
                 <!-- Key count -->
-                <text [attr.y]="isHighlit(id) ? 40 : 38" text-anchor="middle" class="node-keys">
+                <text [attr.y]="isHighlit(id) ? 40 : 36" text-anchor="middle" class="node-keys">
                     {{ keyCount (id) }} keys ({{ getDistributionPercentage(id)}})
                 </text>
             </g>
@@ -251,7 +317,7 @@
         <!-- Group B header -->
         <div class="dual-group-header dual-group-header--b">
             <span class="dual-group-label">
-                GROUP B - <span class="dual-group-count">{{ groupBIds().length}} nodes</span> 
+                GROUP B - <span class="dual-group-count">{{ groupBIds().length}} nodes</span>
             </span>
 
             @for (id of groupBIds(); track id) {
