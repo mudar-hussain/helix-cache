@@ -7,7 +7,7 @@ import { AdminApiService } from "../../core/services/admin-api.service";
 import { environment } from "../../../environments/environment";
 import { NodeStatusResponse } from "../../shared/interfaces/helix.interface";
 import { ActivityLogComponent } from "../activity-log/activity-log.component";
-import { forkJoin, Observable } from "rxjs";
+import { catchError, forkJoin, Observable, of } from "rxjs";
 
 
 @Component({
@@ -67,15 +67,21 @@ export class NodeControlComponent {
         //Each groupA nodes must block groupB nodes
         const calls: Array<Observable<any>> = [];
         groupA.forEach(id => {
-            calls.push(this.admin.setPartition(this.nodeUrl(id), groupB));
+            calls.push(this.admin.setPartition(this.nodeUrl(id), groupB)
+                .pipe(catchError(() => of(null)))
+            );
         });
         groupB.forEach(id => {
-            calls.push(this.admin.setPartition(this.nodeUrl(id), groupA));
+            calls.push(this.admin.setPartition(this.nodeUrl(id), groupA)
+                .pipe(catchError(() => of(null)))
+            );
         });
 
         //Neutral nodes get an empty block list (no restrictions)
         neutral.forEach(id => {
-            calls.push(this.admin.setPartition(this.nodeUrl(id), []));
+            calls.push(this.admin.setPartition(this.nodeUrl(id), [])
+                .pipe(catchError(() => of(null)))
+            );
         })
 
         forkJoin(calls).subscribe(() => {
@@ -92,7 +98,9 @@ export class NodeControlComponent {
     }
 
     mendNetwork(): void {
-        const calls = this.state.nodes().map(n => this.admin.healPartition(this.nodeUrl(n.nodeId)));
+        const calls = this.state.nodes().map(n => this.admin.healPartition(this.nodeUrl(n.nodeId))
+                .pipe(catchError(() => of(null)))
+            );
         forkJoin(calls).subscribe(() => this.state.healPartition());
     }
 

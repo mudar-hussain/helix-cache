@@ -135,4 +135,10 @@ public class ClusterService {
                 : getLocalNodeId() + " cannot reach: " + peers;
         clusterEventPublisher.publish(ClusterEventType.PARTITION_SET, getLocalNodeId(), null, eventDetail, "WARN");
     }
+
+    public void healPartition() {
+        nodeStateManager.unblockAllPeer();
+        String eventDetail = "Partition healed on " + getLocalNodeId();
+        clusterEventPublisher.publish(ClusterEventType.PARTITION_HEALED, getLocalNodeId(), null, eventDetail, "INFO");
+    }
 }

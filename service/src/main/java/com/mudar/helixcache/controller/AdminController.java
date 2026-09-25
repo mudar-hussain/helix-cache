@@ -77,7 +77,7 @@ public class AdminController {
 
     @PutMapping("/node/heal")
     public ResponseEntity<?> healPartition() {
-        nodeStateManager.unblockAllPeer();
+        clusterService.healPartition();
         return ResponseEntity.ok(Map.of("nodeId", clusterService.getLocalNodeId(),
                 "blockedPeers", nodeStateManager.getBlockedPeers()));
     }
