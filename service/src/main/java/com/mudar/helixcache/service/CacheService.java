@@ -213,20 +213,20 @@ public class CacheService {
     public ClusterStats getGlobalClusterStats() {
         List<Node> allNodes = clusterManager.getNodes();
         String localNodeId = clusterManager.getLocalNodeId();
-        int totalRawKeys = 0;
+        Set<String> distinctKeys = new HashSet<>(getLocalKeys());
 
         for(Node node: allNodes) {
-            if(node.id().equals(localNodeId)) {
-                totalRawKeys += cacheStore.size();
-            } else {
-                int remote = nodeHealthService.getRemoteKeyCount(node);
-                if(remote >=0 ) totalRawKeys += remote;
+            if(node.id().equals(localNodeId)) continue;
+            try {
+                Set<String> remoteKeys = clientNode.getRemoteKeys(node);
+                if(remoteKeys != null) distinctKeys.addAll(remoteKeys);
+            } catch (Exception e) {
+                log.warn("Could not fetch keys from node {}: {}", node.id(), e.getMessage());
             }
         }
 
-        int uniqueKeys = (int) Math.round((double) totalRawKeys / clusterManager.getReplicationFactor());
         return new ClusterStats(
-                uniqueKeys,
+                distinctKeys.size(),
                 clusterManager.getReplicationFactor(),
                 clusterManager.getWriteQuorum(),
                 clusterManager.getReadQuorum(),
@@ -266,6 +266,12 @@ public class CacheService {
             }
         }
         return new BulkSeedResult(count, succeeded, count-succeeded);
+    }
+
+    public Set<String> getLocalKeys() {
+        return cacheStore.getAll().stream()
+                .map(Cache::getKey)
+                .collect(Collectors.toSet());
     }
 
 }
