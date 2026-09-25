@@ -362,7 +362,6 @@ Node elements
     gap: 5px;
     background: rgba(2, 9, 18, 0.75);
     border-radius: 5px;
-    padding: 8px 12px;
     backdrop-filter: blur(8px);
 }
 

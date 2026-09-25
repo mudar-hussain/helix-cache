@@ -224,7 +224,7 @@ public class CacheService {
             }
         }
 
-        int uniqueKeys = totalRawKeys / clusterManager.getReplicationFactor();
+        int uniqueKeys = (int) Math.round((double) totalRawKeys / clusterManager.getReplicationFactor());
         return new ClusterStats(
                 uniqueKeys,
                 clusterManager.getReplicationFactor(),

@@ -1,7 +1,7 @@
 import { computed, inject, Injectable, OnDestroy, signal } from "@angular/core";
 import { ClusterApiService } from "./cluster-api.service";
 import { SseService } from "./sse.service";
-import { catchError, EMPTY, forkJoin, interval, startWith, Subscription, switchMap } from "rxjs";
+import { catchError, EMPTY, forkJoin, interval, of, startWith, Subscription, switchMap } from "rxjs";
 import { ClusterEvent, ClusterStats, NodeStatusResponse, RingNodeResponse, ReplicaNodes, ClusterEventEntry, PartitionConfig } from "../../shared/interfaces/helix.interface";
 import { ClusterEventType, NodeStatus } from "../enums/helix.enum";
 import { environment } from "../../../environments/environment";
@@ -151,7 +151,7 @@ export class ClusterStateService implements OnDestroy {
         const nodeEntries = environment.nodes;
 
         const calls = nodeEntries.map(n => 
-            this.adminApi.getPartition(n.baseUrl).pipe(catchError(() => EMPTY))
+            this.adminApi.getPartition(n.baseUrl).pipe(catchError(() => of({ nodeId: '', blockedPeers: [] as string[] })))
         );
 
         forkJoin(calls) .subscribe((results: {nodeId: string; blockedPeers: string[]}[]) => {
