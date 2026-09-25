@@ -35,7 +35,7 @@ public class ClusterService {
         Map<String, Integer> counts = new LinkedHashMap<>();
         for(Node node: allNodes) {
             if (node.id().equals(clusterManager.getLocalNodeId())) {
-                counts.put(node.id(), cacheService.size());
+                counts.put(node.id(), cacheService.getPrimaryCacheSize());
             } else {
                 counts.put(node.id(), nodeHealthService.getRemoteKeyCount(node));
             }
@@ -64,7 +64,7 @@ public class ClusterService {
                     } else {
                         nodeStatus = nodeHealthService.getNodeStatus(node.id());
                     }
-                    int keyCount = isLocal ? cacheService.size() : nodeStatus != NodeStatus.DOWN ? nodeHealthService.getRemoteKeyCount(node) : 0;
+                    int keyCount = isLocal ? cacheService.getPrimaryCacheSize() : nodeStatus != NodeStatus.DOWN ? nodeHealthService.getRemoteKeyCount(node) : 0;
                     NodeHealth nodeHealth = nodeHealthService.getNodeHealth(node.id());
                     int missedHeartbeats = nodeHealth != null ? nodeHealth.getMissedHeartbeats() : 0;
                     Timestamp lastSeenAt = nodeHealth != null ? nodeHealth.getLastSeenAt() : HelixUtils.getCurrentTimestamp();

@@ -202,7 +202,7 @@ public class CacheService {
 
     public ClusterStats getLocalClusterStats() {
         return new ClusterStats(
-                cacheStore.size(),
+                cacheStore.getPrimaryCacheSize(clusterManager.getLocalNodeId()),
                 clusterManager.getReplicationFactor(),
                 clusterManager.getWriteQuorum(),
                 clusterManager.getReadQuorum(),
@@ -272,6 +272,10 @@ public class CacheService {
         return cacheStore.getAll().stream()
                 .map(Cache::getKey)
                 .collect(Collectors.toSet());
+    }
+
+    public int getPrimaryCacheSize() {
+        return cacheStore.getPrimaryCacheSize(clusterManager.getLocalNodeId());
     }
 
 }
