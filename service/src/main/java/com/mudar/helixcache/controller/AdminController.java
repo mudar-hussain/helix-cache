@@ -3,6 +3,7 @@ package com.mudar.helixcache.controller;
 import com.mudar.helixcache.scheduler.HotKeyPredictor;
 import com.mudar.helixcache.cluster.NodeStateManager;
 import com.mudar.helixcache.dto.HotKeyPredictionResponse;
+import com.mudar.helixcache.service.ClusterService;
 import com.mudar.helixcache.store.AccessTracker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ public class AdminController {
     private final NodeStateManager nodeStateManager;
     private final AccessTracker accessTracker;
     private final HotKeyPredictor hotKeyPredictor;
+    private final ClusterService clusterService;
 
     @PutMapping("/node/pause")
     public ResponseEntity<Map<String, String>> pause() {
@@ -60,15 +62,23 @@ public class AdminController {
         return ResponseEntity.ok(hotKeyPredictor.getLastPredictions());
     }
 
-    @PutMapping("/node/partition/{targetNodeId}")
-    public ResponseEntity<?> partition(@PathVariable String targetNodeId) {
-        nodeStateManager.blockPeer(targetNodeId);
-        return ResponseEntity.ok(Map.of("blocked", targetNodeId));
+    @PostMapping("/node/partition")
+    public ResponseEntity<Map<String, Object>> setPartition(@RequestBody Map<String, List<String>> partitionMap) {
+        clusterService.setPartition(partitionMap);
+        return ResponseEntity.ok(Map.of("nodeId", clusterService.getLocalNodeId(),
+                "blockedPeers", nodeStateManager.getBlockedPeers()));
     }
 
-    @DeleteMapping("/node/partition/{targetNodeId}")
-    public ResponseEntity<?> heal(@PathVariable String targetNodeId) {
-        nodeStateManager.unblockPeer(targetNodeId);
-        return ResponseEntity.ok(Map.of("unblocked", targetNodeId));
+    @GetMapping("/node/partition")
+    public ResponseEntity<Map<String, Object>> getPartition() {
+        return ResponseEntity.ok(Map.of("nodeId", clusterService.getLocalNodeId(),
+                "blockedPeers", nodeStateManager.getBlockedPeers()));
+    }
+
+    @PutMapping("/node/heal")
+    public ResponseEntity<?> healPartition() {
+        clusterService.healPartition();
+        return ResponseEntity.ok(Map.of("nodeId", clusterService.getLocalNodeId(),
+                "blockedPeers", nodeStateManager.getBlockedPeers()));
     }
 }

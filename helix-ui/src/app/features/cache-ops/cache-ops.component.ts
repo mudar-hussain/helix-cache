@@ -42,15 +42,6 @@ export class CacheOpsComponent {
         return ({ '10s': 10, '30s': 30, '2m': 120, '10m': 600 } as Record<string, number>)[ttl];
     }
 
-    // getValueByKey(value: string): number | undefined {
-    //     var ttlOption = Object.entries(TtlOption).find(([key, val]) => key === value);
-    //     if(ttlOption != undefined && ttlOption != null) {
-    //         return ttlOption[1];
-    //     } else {
-    //         return -1;
-    //     }
-    // }
-
     onWrite(): void {
         if (!this.writeKey.trim() || !this.writeValue.trim()) return;
         this.resetResult();

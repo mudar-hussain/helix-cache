@@ -1,11 +1,13 @@
 package com.mudar.helixcache.service;
 
+import com.mudar.helixcache.cluster.ClusterEventPublisher;
 import com.mudar.helixcache.cluster.ClusterManager;
 import com.mudar.helixcache.cluster.NodeStateManager;
 import com.mudar.helixcache.dto.NodeDistributionResponse;
 import com.mudar.helixcache.dto.NodeInfoResponse;
 import com.mudar.helixcache.dto.NodeStatusResponse;
 import com.mudar.helixcache.dto.RingNodeResponse;
+import com.mudar.helixcache.enums.ClusterEventType;
 import com.mudar.helixcache.enums.NodeStatus;
 import com.mudar.helixcache.model.Node;
 import com.mudar.helixcache.model.NodeHealth;
@@ -15,10 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +27,7 @@ public class ClusterService {
     private final CacheService cacheService;
     private final NodeHealthService nodeHealthService;
     private final NodeStateManager nodeStateManager;
+    private final ClusterEventPublisher clusterEventPublisher;
 
 
     public List<NodeDistributionResponse> getNodeDistributionResponseList() {
@@ -35,7 +35,7 @@ public class ClusterService {
         Map<String, Integer> counts = new LinkedHashMap<>();
         for(Node node: allNodes) {
             if (node.id().equals(clusterManager.getLocalNodeId())) {
-                counts.put(node.id(), cacheService.size());
+                counts.put(node.id(), cacheService.getPrimaryCacheSize());
             } else {
                 counts.put(node.id(), nodeHealthService.getRemoteKeyCount(node));
             }
@@ -64,7 +64,7 @@ public class ClusterService {
                     } else {
                         nodeStatus = nodeHealthService.getNodeStatus(node.id());
                     }
-                    int keyCount = isLocal ? cacheService.size() : nodeStatus != NodeStatus.DOWN ? nodeHealthService.getRemoteKeyCount(node) : 0;
+                    int keyCount = isLocal ? cacheService.getPrimaryCacheSize() : nodeStatus != NodeStatus.DOWN ? nodeHealthService.getRemoteKeyCount(node) : 0;
                     NodeHealth nodeHealth = nodeHealthService.getNodeHealth(node.id());
                     int missedHeartbeats = nodeHealth != null ? nodeHealth.getMissedHeartbeats() : 0;
                     Timestamp lastSeenAt = nodeHealth != null ? nodeHealth.getLastSeenAt() : HelixUtils.getCurrentTimestamp();
@@ -125,5 +125,20 @@ public class ClusterService {
 
     public Collection<Node> getActiveNodes() {
         return clusterManager.getActiveNodes();
+    }
+
+    public void setPartition(Map<String, List<String>> partitionMap) {
+        List<String> peers = partitionMap.getOrDefault("blockedPeers", List.of());
+        nodeStateManager.unblockAllPeer();
+        peers.forEach(nodeStateManager::blockPeer);
+        String eventDetail = peers.isEmpty() ? "Partition cleared on " + getLocalNodeId()
+                : getLocalNodeId() + " cannot reach: " + peers;
+        clusterEventPublisher.publish(ClusterEventType.PARTITION_SET, getLocalNodeId(), null, eventDetail, "WARN");
+    }
+
+    public void healPartition() {
+        nodeStateManager.unblockAllPeer();
+        String eventDetail = "Partition healed on " + getLocalNodeId();
+        clusterEventPublisher.publish(ClusterEventType.PARTITION_HEALED, getLocalNodeId(), null, eventDetail, "INFO");
     }
 }

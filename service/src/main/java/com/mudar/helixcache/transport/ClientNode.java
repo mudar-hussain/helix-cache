@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -21,7 +22,7 @@ public class ClientNode {
 
     public void validateNodeConnection(String nodeId) {
         if(nodeStateManager.isBlocked(nodeId)) {
-            throw new HelixValidationException("Network partition: cannot reach " + nodeId);
+            throw new HelixValidationException("Network partition: Outbound calls  to " + nodeId + " are blocked");
         }
     }
 
@@ -87,5 +88,17 @@ public class ClientNode {
                     throw new HelixValidationException(body);
                 }))
                 .body(new ParameterizedTypeReference<List<Cache>>() {});
+    }
+
+    public Set<String> getRemoteKeys(Node node) {
+        return restClient
+                .get()
+                .uri("http://" + node.address() + "/internal/cache/fetch/keys")
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
+                    String body = new String(response.getBody().readAllBytes());
+                    throw new HelixValidationException(body);
+                }))
+                .body(new ParameterizedTypeReference<Set<String>>() {});
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,5 +46,10 @@ public class InternalCacheController {
     @GetMapping("/sync/node")
     public ResponseEntity<List<Cache>> getCacheListForNode(@RequestParam String targetNodeId) {
         return ResponseEntity.ok(cacheService.getCacheListForNode(targetNodeId));
+    }
+
+    @GetMapping("/fetch/keys")
+    public ResponseEntity<Set<String>> getLocalKeys() {
+        return ResponseEntity.ok(cacheService.getLocalKeys());
     }
 }

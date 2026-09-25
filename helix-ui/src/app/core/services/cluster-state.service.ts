@@ -1,11 +1,12 @@
 import { computed, inject, Injectable, OnDestroy, signal } from "@angular/core";
 import { ClusterApiService } from "./cluster-api.service";
 import { SseService } from "./sse.service";
-import { catchError, EMPTY, interval, startWith, Subscription, switchMap } from "rxjs";
-import { ClusterEvent, ClusterStats, NodeStatusResponse, RingNodeResponse, ReplicaNodes, ClusterEventEntry } from "../../shared/interfaces/helix.interface";
+import { catchError, EMPTY, forkJoin, interval, of, startWith, Subscription, switchMap } from "rxjs";
+import { ClusterEvent, ClusterStats, NodeStatusResponse, RingNodeResponse, ReplicaNodes, ClusterEventEntry, PartitionConfig } from "../../shared/interfaces/helix.interface";
 import { ClusterEventType, NodeStatus } from "../enums/helix.enum";
 import { environment } from "../../../environments/environment";
 import { MERGEABLE_TYPES } from "../constants/app.constant";
+import { AdminApiService } from "./admin-api.service";
 
 @Injectable({
     providedIn: 'root'
@@ -19,6 +20,7 @@ export class ClusterStateService implements OnDestroy {
     readonly ring = signal<RingNodeResponse[]>([]);
     readonly stats = signal<ClusterStats | null>(null);
     readonly ringBurst = signal<number>(0);
+    readonly partition = signal<PartitionConfig | null>(null);
 
     //Derived state for the cluster
     readonly aliveCount = computed(() => this.nodes().filter(node => node.nodeStatus !== NodeStatus.DOWN).length);
@@ -37,9 +39,10 @@ export class ClusterStateService implements OnDestroy {
     private readonly MAX_EVENTS = 500;
     readonly eventLog = signal<ClusterEventEntry[]>([]);
 
-    constructor(private clusterApi: ClusterApiService) {
+    constructor(private clusterApi: ClusterApiService, private adminApi: AdminApiService) {
         this.startPolling();
         this.subscribeToNodeEvents();
+        this.syncPartition();
     }
 
     ngOnDestroy() {
@@ -64,7 +67,7 @@ export class ClusterStateService implements OnDestroy {
     triggerRingBurst(): void {
         if (this.burstTimer) clearTimeout(this.burstTimer);
         this.ringBurst.set(Date.now());
-        this.burstTimer = setTimeout(() => this.replicaNodes.set(null), 2500);
+        this.burstTimer = setTimeout(() => this.ringBurst.set(0), 2500);
     }
 
     private startPolling() {
@@ -133,6 +136,49 @@ export class ClusterStateService implements OnDestroy {
                 lastTimestamp: event.eventTimestamp
             };
             return [entry, ...prev].slice(0, this.MAX_EVENTS);
+        });
+    }
+
+    setPartition(config: PartitionConfig): void {
+        this.partition.set(config);
+    }
+
+    healPartition(): void {
+        this.partition.set(null);
+    }
+
+    private syncPartition() {
+        const nodeEntries = environment.nodes;
+
+        const calls = nodeEntries.map(n => 
+            this.adminApi.getPartition(n.baseUrl).pipe(catchError(() => of({ nodeId: '', blockedPeers: [] as string[] })))
+        );
+
+        forkJoin(calls) .subscribe((results: {nodeId: string; blockedPeers: string[]}[]) => {
+            const blocking = results.filter(r => r.blockedPeers.length > 0);
+            if(blocking.length === 0) return; //no partition exists in backend
+
+            const allNodeIds: string[] = nodeEntries.map(n => n.id);
+            const blockMap = new Map<string, Set<string>>();
+            results.forEach(r => blockMap.set(r.nodeId, new Set(r.blockedPeers)));
+
+            const neutral = allNodeIds.filter(id => (blockMap.get(id)?.size ?? 0) === 0);
+
+            const firstBlocker = results.find(r => r.blockedPeers.length > 0);
+            if(!firstBlocker) return;
+
+            const explicitB = firstBlocker.blockedPeers.filter(id => !neutral.includes(id));
+            const explicitA = allNodeIds.filter(id => !explicitB.includes(id) && !neutral.includes(id));
+
+            if(explicitA.length === 0 || explicitB.length === 0) return;
+
+            this.partition.set({
+                groupA: [...explicitA, ...neutral],
+                groupB: [...explicitB, ...neutral],
+                explicitA,
+                explicitB,
+                neutral
+            });
         });
     }
 }
