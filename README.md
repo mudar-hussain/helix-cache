@@ -102,6 +102,10 @@ flowchart TB
 ![Dual Ring](docs/screenshots/partition-dual-ring.png)
 *Split-brain simulation Group A and Group B isolated with scoped replication animations*
 
+### Docker Cluster
+![Docker Cluster](docs/screenshots/docker-cluster.png)
+*5-node cluster running in Docker - each node on its own port (8081 - 8085), health check per container, all on a shared bridge network*
+
 ### Node Control & Failure Injection
 ![Node Control](docs/screenshots/node-control.png)
 *Pause, resume, throttle, partition, and heal individual nodes in real time*
@@ -112,7 +116,7 @@ flowchart TB
 
 ### Cache Operations
 ![Cache Operations](docs/screenshots/cache-operations.png)
-*Cache add, read, delete along with seed keys to add multiple keys at single click*
+*Quorum write (W=2) / read (R=2, LWW) / delete with optional TTL - highlights primary and replica nodes on the ring on each operation; bulk seed up to 50 keys with a single click*
 
 ### Hot-Key Predictions
 ![Hot Keys](docs/screenshots/hot-keys.png)
